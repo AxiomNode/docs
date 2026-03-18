@@ -1,0 +1,84 @@
+@startuml
+title Flujo de Comunicación - Asincrónico (Event-Driven)
+
+participant "Order Service" as ORDER
+participant "Message Broker\n(Kafka/RabbitMQ)" as BROKER
+participant "Payment Service" as PAYMENT
+participant "Notification Service" as NOTIF
+participant "Analytics Service" as ANALYTICS
+participant "Payment DB" as DB_PAY
+participant "Order DB" as DB_ORDER
+
+== Creación de Orden ==
+ORDER ->> ORDER: Crear orden
+ORDER ->> DB_ORDER: Persistir orden
+activate DB_ORDER
+DB_ORDER -->> ORDER: Order ID: 12345
+deactivate DB_ORDER
+
+ORDER ->> BROKER: [1] Publicar evento\nOrderCreated {orderId: 12345, userId: 789}
+activate BROKER
+note right of BROKER
+  Topic: "orders.created"
+  Partition: hash(userId)
+  Retention: 7 días
+end note
+
+== Consumidores suscritos ==
+BROKER ->> PAYMENT: [2] Consume evento
+activate PAYMENT
+PAYMENT ->> PAYMENT: Crear transacción de pago
+PAYMENT ->> DB_PAY: Registrar pago pendiente
+activate DB_PAY
+DB_PAY -->> PAYMENT: Done
+deactivate DB_PAY
+
+par Procesamiento paralelo
+  PAYMENT ->> BROKER: [3a] PaymentProcessed
+  note right of BROKER
+    Topic: "payments.processed"
+  end note
+  
+  BROKER ->> NOTIF: [3b] Consume PaymentProcessed
+  activate NOTIF
+  NOTIF ->> NOTIF: Enviar email "Pago recibido"
+  NOTIF ->> NOTIF: Enviar notificación push
+  NOTIF ->> BROKER: [4] NotificationSent
+  deactivate NOTIF
+  
+  BROKER ->> ANALYTICS: [3c] Consume OrderCreated
+  activate ANALYTICS
+  ANALYTICS ->> ANALYTICS: Registrar métrica
+  ANALYTICS ->> ANALYTICS: Actualizar dashboard
+  deactivate ANALYTICS
+  
+  BROKER ->> ORDER: [3d] Consume PaymentProcessed
+  activate ORDER
+  ORDER ->> DB_ORDER: Actualizar estado orden
+  activate DB_ORDER
+  DB_ORDER -->> ORDER: Done
+  deactivate DB_ORDER
+  ORDER ->> BROKER: [5] OrderConfirmed
+  deactivate ORDER
+end
+
+deactivate PAYMENT
+deactivate BROKER
+
+note bottom
+  **Ventajas del patrón Event-Driven:**
+  ✓ Servicios completamente desacoplados
+  ✓ Procesamiento paralelo
+  ✓ Escalabilidad independiente
+  ✓ Resiliencia: si un servicio cae, los eventos persisten
+  ✓ Event sourcing: historial completo
+  ✓ Fácil agregar nuevos consumidores
+  ✓ Garantías de entrega: at-least-once
+  
+  **Garantías de orden:**
+  • Particionado por userId
+  • Orden garantizado dentro de partición
+  • Idempotencia en consumidores
+end note
+
+@enduml

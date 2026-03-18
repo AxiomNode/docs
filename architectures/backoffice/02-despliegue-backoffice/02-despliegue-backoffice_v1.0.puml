@@ -1,0 +1,20 @@
+@startuml
+title Despliegue - Backoffice
+
+node "Admin Client" {
+  artifact "Backoffice UI"
+}
+
+cloud "Kubernetes" {
+  node "Backoffice Pod" {
+    component "Admin App"
+    component "Metrics Agent"
+  }
+  database "Backoffice DB" as BDB
+}
+
+Backoffice UI --> Backoffice Pod
+Backoffice Pod --> BDB
+Backoffice Pod --> Metrics Agent
+
+@enduml

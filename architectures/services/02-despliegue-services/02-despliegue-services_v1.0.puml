@@ -1,0 +1,13 @@
+@startuml
+title Deployment - Services (minimal)
+
+cloud "Kubernetes" {
+  node "Service Pod (replicas)" {
+    component "Service Instance"
+  }
+  database "Service DB" as SDB
+}
+
+Service Instance --> SDB
+
+@enduml

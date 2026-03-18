@@ -1,0 +1,17 @@
+@startuml
+title Componentes - Backoffice
+
+package "Backoffice" {
+  component "UI (Admin)"
+  component "Auth"
+  component "Metrics Collector"
+  component "Data Manager"
+  component "Reporting Engine"
+}
+
+UI (Admin) --> Auth
+UI (Admin) --> Data Manager
+Data Manager --> Reporting Engine
+Reporting Engine --> Metrics Collector
+
+@enduml

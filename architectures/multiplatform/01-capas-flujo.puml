@@ -1,0 +1,18 @@
+@startuml
+title Clean Architecture - Capas y flujo
+
+rectangle "Feature layer\n(feature/*)" as FEAT
+rectangle "Domain layer\n(domain/*)" as DOM
+rectangle "Data layer\n(data/*)" as DATA
+rectangle "Core/shared\n(core/*)" as CORE
+
+FEAT -down-> DOM : usa casos de uso + modelos
+DOM -down-> DATA : define contratos/repositorios
+DATA -down-> CORE : helpers/base (opcional)
+FEAT -down-> CORE : UI base, recursos
+DOM -down-> CORE : utilidades comunes
+
+' flujo de datos
+DATA -up-> DOM : implementa repositorios
+DOM -up-> FEAT : expone UseCases
+@enduml

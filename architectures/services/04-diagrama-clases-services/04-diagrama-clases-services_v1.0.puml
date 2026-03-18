@@ -1,0 +1,15 @@
+@startuml
+title Clases - Ejemplo Service
+
+class ServiceEntity {
+  - id: String
+  - createdAt: LocalDateTime
+}
+
+class ServiceRepository {
+  +findById(id: String): ServiceEntity
+}
+
+ServiceRepository ..> ServiceEntity
+
+@enduml

@@ -1,0 +1,165 @@
+@startuml
+title Diagrama de Despliegue - Infraestructura Escalable
+
+node "Cliente" {
+  artifact "Mobile App" as MA
+  artifact "Web App" as WA
+  artifact "Backoffice" as BO
+}
+
+cloud "CDN & Load Balancing" {
+  node "Load Balancer\nCluster" {
+    artifact "LB Instance 1" as LB1
+    artifact "LB Instance 2" as LB2
+    artifact "LB Instance 3" as LB3
+  }
+}
+
+cloud "Kubernetes Cluster - API Gateway" {
+  node "Pod API Gateway 1" {
+    component "Gateway Service" as GW1
+    component "Circuit Breaker" as CB1
+  }
+  node "Pod API Gateway 2" {
+    component "Gateway Service" as GW2
+    component "Circuit Breaker" as CB2
+  }
+  node "Pod API Gateway 3" {
+    component "Gateway Service" as GW3
+    component "Circuit Breaker" as CB3
+  }
+}
+
+cloud "Kubernetes Cluster - Microservicios" {
+  node "Pod Auth (3 replicas)" {
+    component "Auth Service" as AS1
+    component "Auth Service" as AS2
+    component "Auth Service" as AS3
+  }
+  
+  node "Pod User (3 replicas)" {
+    component "User Service" as US1
+    component "User Service" as US2
+    component "User Service" as US3
+  }
+  
+  node "Pod Product (4 replicas)" {
+    component "Product Service" as PS1
+    component "Product Service" as PS2
+    component "Product Service" as PS3
+    component "Product Service" as PS4
+  }
+  
+  node "Pod Order (3 replicas)" {
+    component "Order Service" as OS1
+    component "Order Service" as OS2
+    component "Order Service" as OS3
+  }
+  
+  node "Pod Notification (2 replicas)" {
+    component "Notif Service" as NS1
+    component "Notif Service" as NS2
+  }
+}
+
+cloud "Managed Services" {
+  database "PostgreSQL\nCluster\n(RDS)" as PGDB {
+    artifact "Auth DB" as PDB_AUTH
+    artifact "User DB" as PDB_USER
+    artifact "Product DB" as PDB_PRODUCT
+    artifact "Order DB" as PDB_ORDER
+  }
+  
+  database "MongoDB\nCluster\n(Atlas)" as MONGODB {
+    artifact "Payment Data" as MDB_PAY
+  }
+  
+  artifact "Redis\nCluster\n(ElastiCache)" as REDIS
+  
+  artifact "RabbitMQ / Kafka\nCluster\n(Managed)" as MSGBROKER
+  
+  artifact "Service Registry\n(Consul/Eureka)" as REGISTRY
+  
+  artifact "Elasticsearch\nCluster\n(Logging)" as ELASTIC
+}
+
+cloud "Monitoring & Observability" {
+  artifact "Prometheus\n(Metrics)" as PROM
+  artifact "Grafana\n(Dashboards)" as GRAFANA
+  artifact "Jaeger\n(Tracing)" as JAEGER
+  artifact "ELK Stack\n(Logs)" as ELK
+}
+
+cloud "External Services" {
+  artifact "Payment Gateway\n(Stripe/PayPal)" as PAYMENT
+  artifact "Email Service\n(SendGrid)" as EMAIL
+  artifact "SMS Service\n(Twilio)" as SMS
+}
+
+' Client connections
+MA --> LB1
+WA --> LB1
+BO --> LB1
+LB1 --> LB2
+LB2 --> LB3
+
+' LB to Gateway
+LB3 --> GW1
+LB3 --> GW2
+LB3 --> GW3
+
+' Gateway to Microservices
+GW1 --> AS1
+GW2 --> US1
+GW3 --> PS1
+
+' Service to Service (via message broker)
+AS1 -.-> MSGBROKER
+US1 -.-> MSGBROKER
+OS1 -.-> MSGBROKER
+NS1 -.-> MSGBROKER
+
+' Services to Databases
+AS1 --> PDB_AUTH
+US1 --> PDB_USER
+PS1 --> PDB_PRODUCT
+OS1 --> PDB_ORDER
+
+' Cache layer
+AS1 -.-> REDIS
+US1 -.-> REDIS
+PS1 -.-> REDIS
+
+' Monitoring
+GW1 -.-> PROM
+AS1 -.-> PROM
+PROM --> GRAFANA
+
+' Tracing
+AS1 -.-> JAEGER
+US1 -.-> JAEGER
+OS1 -.-> JAEGER
+
+' Logging
+GW1 -.-> ELK
+AS1 -.-> ELK
+MSGBROKER -.-> ELK
+
+' External integrations
+PAYMENT -.-> MSGBROKER
+EMAIL -.-> MSGBROKER
+SMS -.-> MSGBROKER
+
+note bottom
+  **Características de Escalabilidad:**
+  • Auto-scaling horizontal en K8s
+  • Replicación de servicios (3-4 instancias)
+  • Load balancing en múltiples niveles
+  • Bases de datos replicadas en clusters
+  • Cache distribuido
+  • Message broker para desacoplamiento
+  • Monitoreo y alertas en tiempo real
+  • CI/CD pipeline para actualizaciones sin downtime
+end note
+
+@enduml
