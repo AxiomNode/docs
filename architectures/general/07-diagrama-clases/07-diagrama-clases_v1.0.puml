@@ -1,0 +1,266 @@
+@startuml
+title Class Diagram - Microservices Architecture
+
+package "Core Interfaces" {
+  interface IService {
+    +healthCheck(): HealthStatus
+    +getServiceInfo(): ServiceInfo
+    +shutdown(): void
+  }
+  
+  interface IEventPublisher {
+    +publish(event: DomainEvent): void
+    +publishBatch(events: List<DomainEvent>): void
+  }
+  
+  interface IEventConsumer {
+    +subscribe(topic: String, handler: EventHandler): void
+    +unsubscribe(topic: String): void
+  }
+  
+  interface IRepository<T> {
+    +findById(id: String): Optional<T>
+    +findAll(filter: Filter): List<T>
+    +save(entity: T): T
+    +update(entity: T): T
+    +delete(id: String): void
+  }
+  
+  interface ICacheService {
+    +get(key: String): Optional<Object>
+    +set(key: String, value: Object, ttl: Duration): void
+    +delete(key: String): void
+  }
+}
+
+package "Domain Events" {
+  abstract class DomainEvent {
+    -eventId: String
+    -occurredAt: LocalDateTime
+    -aggregateId: String
+    -version: Integer
+    {abstract} getEventType(): String
+    {abstract} serialize(): String
+  }
+  
+  class OrderCreatedEvent extends DomainEvent {
+    -orderId: String
+    -userId: String
+    -items: List<OrderItem>
+    -totalAmount: BigDecimal
+    +getEventType(): String
+  }
+  
+  class PaymentProcessedEvent extends DomainEvent {
+    -paymentId: String
+    -orderId: String
+    -amount: BigDecimal
+    -status: PaymentStatus
+    +getEventType(): String
+  }
+  
+  class NotificationSentEvent extends DomainEvent {
+    -notificationId: String
+    -recipientId: String
+    -channel: Channel
+    +getEventType(): String
+  }
+}
+
+package "Order Service" {
+  class OrderService implements IService, IEventPublisher {
+    -orderRepository: IRepository<Order>
+    -inventoryClient: InventoryServiceClient
+    -eventPublisher: IEventPublisher
+    -cache: ICacheService
+    
+    +createOrder(command: CreateOrderCommand): Order
+    +getOrder(orderId: String): Order
+    +updateOrderStatus(orderId: String, status: OrderStatus): void
+    +handlePaymentCompletedEvent(event: PaymentProcessedEvent): void
+    -enrichOrderData(order: Order): Order
+    -validateOrder(order: Order): Boolean
+  }
+  
+  class Order {
+    -orderId: String
+    -userId: String
+    -items: List<OrderItem>
+    -status: OrderStatus
+    -totalAmount: BigDecimal
+    -createdAt: LocalDateTime
+    -updatedAt: LocalDateTime
+    
+    +addItem(item: OrderItem): void
+    +calculateTotal(): BigDecimal
+    +markAsConfirmed(): void
+    +markAsShipped(): void
+  }
+  
+  enum OrderStatus {
+    PENDING
+    CONFIRMED
+    PAYMENT_FAILED
+    SHIPPED
+    DELIVERED
+    CANCELLED
+  }
+}
+
+package "Payment Service" {
+  class PaymentService implements IService, IEventPublisher, IEventConsumer {
+    -paymentRepository: IRepository<Payment>
+    -paymentGateway: PaymentGatewayAdapter
+    -eventPublisher: IEventPublisher
+    -cache: ICacheService
+    -retry: RetryPolicy
+    
+    +processPayment(command: ProcessPaymentCommand): Payment
+    +handleOrderCreatedEvent(event: OrderCreatedEvent): void
+    +refundPayment(paymentId: String): Payment
+    -callPaymentProvider(payment: Payment): PaymentResponse
+    -handlePaymentFailure(payment: Payment): void
+  }
+  
+  class Payment {
+    -paymentId: String
+    -orderId: String
+    -amount: BigDecimal
+    -currency: String
+    -status: PaymentStatus
+    -method: PaymentMethod
+    -transactionId: String
+    -createdAt: LocalDateTime
+    
+    +markAsSuccessful(transactionId: String): void
+    +markAsFailed(reason: String): void
+    +canBeRefunded(): Boolean
+  }
+  
+  enum PaymentStatus {
+    PENDING
+    PROCESSING
+    COMPLETED
+    FAILED
+    REFUNDED
+  }
+  
+  interface PaymentGatewayAdapter {
+    +charge(payment: Payment): PaymentResponse
+    +refund(transactionId: String, amount: BigDecimal): RefundResponse
+  }
+}
+
+package "Notification Service" {
+  class NotificationService implements IService, IEventConsumer {
+    -notificationRepository: IRepository<Notification>
+    -emailProvider: EmailProvider
+    -smsProvider: SmsProvider
+    -pushProvider: PushNotificationProvider
+    -queue: NotificationQueue
+    
+    +sendEmail(notification: EmailNotification): void
+    +sendSms(notification: SmsNotification): void
+    +sendPush(notification: PushNotification): void
+    +handleOrderConfirmedEvent(event: OrderConfirmedEvent): void
+    -retryFailedNotifications(): void
+  }
+  
+  abstract class Notification {
+    -notificationId: String
+    -recipientId: String
+    -status: NotificationStatus
+    -createdAt: LocalDateTime
+    {abstract} send(): Boolean
+    {abstract} getRetryPolicy(): RetryPolicy
+  }
+  
+  class EmailNotification extends Notification {
+    -recipient: String
+    -subject: String
+    -body: String
+    -template: String
+    +send(): Boolean
+  }
+}
+
+package "Patterns & Utilities" {
+  class CircuitBreaker {
+    -state: CircuitBreakerState
+    -failureThreshold: Integer
+    -resetTimeout: Duration
+    -failureCount: Integer
+    
+    +execute<T>(operation: Supplier<T>): T
+    +recordSuccess(): void
+    +recordFailure(): void
+    -tryReset(): void
+  }
+  
+  class RetryPolicy {
+    -maxRetries: Integer
+    -initialDelay: Duration
+    -maxDelay: Duration
+    -backoffMultiplier: Double
+    
+    +execute<T>(operation: Supplier<T>): T
+    +getNextDelay(attempt: Integer): Duration
+  }
+  
+  class ServiceRegistry {
+    -services: Map<String, ServiceInstance>
+    
+    +register(service: ServiceInstance): void
+    +deregister(serviceId: String): void
+    +discover(serviceName: String): List<ServiceInstance>
+    +getHealthyInstance(serviceName: String): ServiceInstance
+  }
+  
+  class DistributedTracing {
+    -traceId: String
+    -spanId: String
+    -parentSpanId: String
+    
+    +startSpan(operationName: String): Span
+    +finishSpan(): void
+    +getTraceContext(): TraceContext
+  }
+}
+
+' Relationships
+OrderService --> IRepository
+OrderService --> IEventPublisher
+OrderService --> ICacheService
+PaymentService --> IRepository
+PaymentService --> PaymentGatewayAdapter
+PaymentService --> IEventPublisher
+PaymentService --> RetryPolicy
+NotificationService --> Notification
+OrderService -.-> CircuitBreaker: uses
+PaymentService -.-> CircuitBreaker: uses
+OrderService -.-> DistributedTracing: uses
+
+OrderService --> OrderCreatedEvent: publishes
+PaymentService --> PaymentProcessedEvent: publishes
+PaymentService --> OrderCreatedEvent: consumes
+NotificationService --> PaymentProcessedEvent: consumes
+
+note right of OrderService
+  **Characteristics:**
+  • Event sourcing
+  • Cache-aside pattern
+  • Idempotency in operations
+  • Circuit breaker for failures
+  • Distributed tracing
+end note
+
+note right of PaymentService
+  **Characteristics:**
+  • Retry policy with backoff
+  • Distributed transactions (Saga)
+  • Compensating transactions
+  • Webhook handlers
+  • PCI compliance
+end note
+
+@enduml

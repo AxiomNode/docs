@@ -1,0 +1,115 @@
+@startuml
+title Scenario Diagram - Scalability Under Load
+
+rectangle "Hora Pico: 10,000 Requests/min" as PEAK
+
+package "Escalado Automático" {
+  
+  component [Metrics\nCPU: 85%\nMemory: 90%\nLatency: 200ms] as METRICS_1
+  
+  note right of METRICS_1
+    Detected thresholds:
+    • CPU > 80%
+    • P95 latency > 150ms
+    • Queue size > 1000
+    → Scale NOW
+  end note
+  
+  component [Orchestrator\nInstances: 2 → 6] as ORCH_SCALE
+  component [Auth Service\nInstances: 3 → 8] as AUTH_SCALE
+  component [User Service\nInstances: 3 → 10] as USER_SCALE
+  component [Order Service\nInstances: 3 → 12] as ORDER_SCALE
+  
+  METRICS_1 -.-> ORCH_SCALE: Auto-scale trigger
+  METRICS_1 -.-> AUTH_SCALE: Auto-scale trigger
+  METRICS_1 -.-> USER_SCALE: Auto-scale trigger
+  METRICS_1 -.-> ORDER_SCALE: Auto-scale trigger
+}
+
+package "Gestión de Recursos" {
+  
+  component [Load Balancer\nAlgorithm: Least Connections] as LB_ALGO
+  component [Connection Pool\nSize: 500 → 1000] as CONN_POOL
+  component [Thread Pool\nCore: 100 → 500] as THREAD_POOL
+  component [Redis Cache\nEviction: LRU\nExpanded nodes] as CACHE_EXPAND
+  
+  LB_ALGO -.-> CONN_POOL: Ajusta
+  LB_ALGO -.-> THREAD_POOL: Expande
+  CACHE_EXPAND --> CACHE_EXPAND: Evict oldest 20%
+}
+
+package "Database Scaling" {
+  
+  component [PostgreSQL\nRead Replicas: 2 → 5\nReplication lag: < 100ms] as DB_REPLICA
+  component [Connection Pooling\n(PgBouncer/HikariCP)\nMax: 1000 connections] as DB_POOL
+  component [Query Caching\nHit rate: 85%] as DB_CACHE
+  
+  DB_REPLICA --> DB_POOL
+  DB_REPLICA --> DB_CACHE
+}
+
+package "Message Queue Management" {
+  
+  component [Kafka Broker\nPartitions: auto-scale\nReplication factor: 3] as KAFKA_SCALE
+  component [Consumer Groups\nWorkers: 3 → 10 per service] as CONSUMERS_SCALE
+  component [Backpressure\nQueue depth: monitored] as BACKPRESSURE
+  
+  KAFKA_SCALE --> CONSUMERS_SCALE
+  CONSUMERS_SCALE --> BACKPRESSURE
+}
+
+package "Monitoreo" {
+  
+  database [Prometheus\nSeries: 50K+\nScrape interval: 15s] as PROM_SCALE
+  component [Grafana Alerts\nActive: 25 rules\nFiring: 3 critical] as GRAFANA_ALERTS
+  component [Jaeger Tracing\nSpan sampling: 10%\nLatency p99: 250ms] as JAEGER_TRACE
+  component [ELK Stack\nLogs/min: 500K\nQuery: ElasticSearch] as ELK_SCALE
+  
+  PROM_SCALE --> GRAFANA_ALERTS
+  GRAFANA_ALERTS --> GRAFANA_ALERTS: Alert Slack/PagerDuty
+  JAEGER_TRACE -.-> PROM_SCALE
+  ELK_SCALE -.-> PROM_SCALE
+}
+
+package "Estrategias de Degradación" {
+  
+  component [Rate Limiting\nPor cliente: 100 req/min\nGlobal: 50K req/min] as RATE_LIMIT
+  component [Circuit Breaker\nThreshold: 50% errors\nTimeout: 30s] as CB_STRATEGY
+  component [Request Queuing\nMax queue: 5000\nTimeout: 30s] as REQ_QUEUE
+  component [Feature Flags\nDisable: Analytics write\nDisable: Recommendations] as FLAGS
+  
+  note bottom of RATE_LIMIT
+    Si excede:
+    → 429 Too Many Requests
+    → Retry-After header
+  end note
+  
+  note bottom of CB_STRATEGY
+    Si fallos detectados:
+    → OPEN state
+    → Fallback response
+    → Intento de recuperación
+  end note
+}
+
+  METRICS_1 --> RATE_LIMIT: Adjust limits
+  METRICS_1 --> CB_STRATEGY: Monitor
+  METRICS_1 --> REQ_QUEUE: Adjust
+  METRICS_1 --> FLAGS: Trigger degradation
+
+note bottom of PEAK
+  **Comprehensive scalability strategy under load:**
+  
+  1. **Detection**: Real-time metrics
+  2. **Auto-scaling**: Horizontal + vertical
+  3. **Distribution**: Intelligent load balancing
+  4. **Cache**: Multi-tier with expansion
+  5. **Database**: Read replicas + connection pooling
+  6. **Messaging**: Backpressure + workers
+  7. **Monitoring**: Full observability
+  8. **Degradation**: Fallbacks + feature flags
+  9. **Alerts**: Automated response
+  10. **Scalability**: Horizontal in K8s/ECS
+end note
+
+@enduml

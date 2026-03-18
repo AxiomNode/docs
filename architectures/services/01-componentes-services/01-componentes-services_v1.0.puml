@@ -1,0 +1,16 @@
+@startuml
+title Components - Services
+
+package "Services" {
+  component "Auth Service"
+  component "User Service"
+  component "Order Service"
+  component "Payment Service"
+  component "Notification Service"
+}
+
+Auth Service --> User Service
+Order Service --> Payment Service
+Order Service --> Notification Service
+
+@enduml

@@ -1,0 +1,119 @@
+@startuml
+title Scalability Patterns - Architecture
+
+package "Pattern: API Gateway with Load Balancing" {
+  component [Client Requests] as CLIENTS
+  component [Load Balancer\n(Round Robin/Least Conn)] as PATTERN_LB
+  component [Gateway Instance 1] as GATE1
+  component [Gateway Instance 2] as GATE2
+  component [Gateway Instance 3] as GATE3
+  
+  CLIENTS --> PATTERN_LB
+  PATTERN_LB --> GATE1
+  PATTERN_LB --> GATE2
+  PATTERN_LB --> GATE3
+}
+
+package "Pattern: Service Registry & Discovery" {
+  component [Service Registry\n(Consul/Eureka)] as REGISTRY
+  component [Auth Service] as SVC_AUTH
+  component [User Service] as SVC_USER
+  component [Product Service] as SVC_PROD
+  
+  SVC_AUTH -.-> REGISTRY: Register
+  SVC_USER -.-> REGISTRY: Register
+  SVC_PROD -.-> REGISTRY: Register
+  GATE1 -.-> REGISTRY: Lookup
+}
+
+package "Pattern: Circuit Breaker" {
+  component [Consumer\n(Order Service)] as CONSUMER
+  component [Circuit Breaker\nEstado: CLOSED] as CB
+  component [Provider\n(Payment Service)] as PROVIDER
+  
+  CONSUMER --> CB: request
+  
+  note bottom of CB
+    States:
+    • CLOSED: Normal (requests pass)
+    • OPEN: Failure detected (rejects requests)
+    • HALF_OPEN: Tests recovery
+    Transitions based on error thresholds
+  end note
+  
+  CB --> PROVIDER: request (si CLOSED)
+  PROVIDER -->> CB: response/error
+  CB -->> CONSUMER: response/fallback
+}
+
+package "Pattern: Bulkhead Isolation" {
+  component [API Gateway] as BULK_GATE
+  component [Thread Pool A\n(Auth)] as THREAD_A
+  component [Thread Pool B\n(Payment)] as THREAD_B
+  component [Thread Pool C\n(Notifications)] as THREAD_C
+  
+  BULK_GATE --> THREAD_A
+  BULK_GATE --> THREAD_B
+  BULK_GATE --> THREAD_C
+  
+  note bottom
+    Isolates resources per service
+    If one service fails, others are not affected
+  end note
+}
+
+package "Pattern: Database per Service + Sharding" {
+  database [Auth DB\n(PostgreSQL)] as DB_AUTH_SH
+  database [User DB Shard 1\n(hash % 3)] as DB_USER_1
+  database [User DB Shard 2\n(hash % 3)] as DB_USER_2
+  database [User DB Shard 3\n(hash % 3)] as DB_USER_3
+  
+  component [User Service] as US_SHARD
+  US_SHARD --> DB_USER_1: id % 3 = 0
+  US_SHARD --> DB_USER_2: id % 3 = 1
+  US_SHARD --> DB_USER_3: id % 3 = 2
+  
+  note bottom
+    Sharding by:
+    • User ID (consistent hashing)
+    • Geolocation
+    • Tenant ID
+    • Timestamp
+  end note
+}
+
+package "Pattern: Caching Strategy" {
+  component [Service] as SVC_CACHE
+  component [L1 Cache\n(In-memory)] as CACHE_L1
+  component [L2 Cache\n(Redis)] as CACHE_L2
+  database [Database] as DB_CACHE
+  
+  SVC_CACHE --> CACHE_L1: Check
+  CACHE_L1 --> CACHE_L2: Miss -> Check
+  CACHE_L2 --> DB_CACHE: Miss -> Query
+  
+  note bottom
+    TTL by type:
+    • Config: 1 hour
+    • User Profile: 30 min
+    • Product: 5 min
+    • Real-time: Cache-aside
+  end note
+}
+
+package "Pattern: Read Replicas" {
+  database [Primary DB\n(Writes)] as PRIMARY
+  database [Read Replica 1] as REPLICA_1
+  database [Read Replica 2] as REPLICA_2
+  database [Read Replica 3] as REPLICA_3
+  
+  PRIMARY --> REPLICA_1: Replication
+  PRIMARY --> REPLICA_2: Replication
+  PRIMARY --> REPLICA_3: Replication
+  
+  component [Read Service] as READ_SVC
+  READ_SVC --> REPLICA_1: SELECT (distribute)
+  READ_SVC --> REPLICA_2: SELECT (distribute)
+}
+
+@enduml

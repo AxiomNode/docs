@@ -1,0 +1,12 @@
+@startuml
+title Async Flow - Services
+
+participant "Service Producer" as PROD
+participant "Message Broker" as BROKER
+participant "Service Consumer" as CONS
+
+PROD ->> BROKER: Publica evento
+BROKER ->> CONS: Entrega evento
+CONS ->> CONS: Procesa evento
+
+@enduml

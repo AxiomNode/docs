@@ -1,0 +1,28 @@
+@startuml
+title Paquetes principales - data
+
+package "data" {
+  package "repositories" {
+    interface IRepo
+    class RepoImpl
+  }
+  package "room" {
+    class RoomDb
+    class Dao
+  }
+  package "retrofit" {
+    class ApiService
+  }
+  package "couchbase" {
+    class CBClient
+  }
+  package "datastore" {
+    class PreferencesStore
+  }
+}
+
+RepoImpl ..|> IRepo
+RepoImpl --> Dao
+RepoImpl --> ApiService
+RepoImpl --> PreferencesStore
+@enduml

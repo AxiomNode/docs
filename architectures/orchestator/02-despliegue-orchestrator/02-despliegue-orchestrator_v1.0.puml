@@ -1,0 +1,16 @@
+@startuml
+title Deployment - Orchestrator
+
+cloud "Kubernetes" {
+  node "API Gateway Pod" {
+    component "Gateway"
+  }
+  node "Orchestrator Pod (replicas)" {
+    component "Orchestrator Instance"
+  }
+}
+
+Gateway --> Orchestrator Instance
+Orchestrator Instance --> Service Registry
+
+@enduml

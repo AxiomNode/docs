@@ -1,0 +1,118 @@
+@startuml
+title Component Diagram - Scalable Architecture
+
+package "Client Layer" {
+  component [Mobile Apps\n(iOS/Android)] as MOBILE
+  component [Web App] as WEB
+  component [Backoffice\nAdmin Panel] as BACKOFFICE
+}
+
+package "API Gateway & Orchestration" {
+  component [Load Balancer] as LB
+  component [API Gateway\n(Kong/Nginx)] as GATEWAY
+  component [Service Registry\n(Consul/Eureka)] as REGISTRY
+  component [Circuit Breaker\n(Hystrix/Resilience4j)] as CB
+  component [Orchestrator Service] as ORCHESTRATOR
+}
+
+package "Message Broker & Events" {
+  component [Message Broker\n(RabbitMQ/Kafka)] as MESSAGEBROKER
+  component [Event Bus] as EVENTBUS
+  component [Cache Layer\n(Redis)] as CACHE
+}
+
+package "Microservices (Distributed)" {
+  component [Auth Service] as AUTH
+  component [User Service] as USER
+  component [Product Service] as PRODUCT
+  component [Order Service] as ORDER
+  component [Payment Service] as PAYMENT
+  component [Notification Service] as NOTIF
+}
+
+package "Data Layer" {
+  database "Auth DB\n(Isolated)" as DB_AUTH
+  database "User DB\n(Isolated)" as DB_USER
+  database "Product DB\n(Isolated)" as DB_PRODUCT
+  database "Order DB\n(Isolated)" as DB_ORDER
+  database "Payment DB\n(Isolated)" as DB_PAYMENT
+}
+
+package "Monitoring & Analytics" {
+  component [Monitoring\n(Prometheus)] as MONITOR
+  component [Logging\n(ELK Stack)] as LOGGING
+  component [Tracing\n(Jaeger)] as TRACING
+  component [Metrics Dashboard] as DASHBOARD
+}
+
+' Client connections
+MOBILE --> LB
+WEB --> LB
+BACKOFFICE --> LB
+
+' Load balancer to gateway
+LB --> GATEWAY
+
+' Gateway layer
+GATEWAY --> CB
+GATEWAY --> REGISTRY
+CB --> ORCHESTRATOR
+
+' Orchestrator to services
+ORCHESTRATOR --> AUTH: Sync
+ORCHESTRATOR --> USER: Sync
+ORCHESTRATOR --> PRODUCT: Sync
+ORCHESTRATOR --> ORDER: Sync
+
+' Event-driven communication
+AUTH --> MESSAGEBROKER: Publica eventos
+USER --> MESSAGEBROKER: Publica eventos
+ORDER --> MESSAGEBROKER: Publica eventos
+MESSAGEBROKER --> PAYMENT: Consume eventos
+MESSAGEBROKER --> NOTIF: Consume eventos
+MESSAGEBROKER --> EVENTBUS
+
+' Services to cache
+AUTH --> CACHE
+USER --> CACHE
+PRODUCT --> CACHE
+
+' Services to databases
+AUTH --> DB_AUTH
+USER --> DB_USER
+PRODUCT --> DB_PRODUCT
+ORDER --> DB_ORDER
+PAYMENT --> DB_PAYMENT
+
+' Monitoring
+AUTH -.-> MONITOR
+USER -.-> MONITOR
+ORDER -.-> MONITOR
+ORCHESTRATOR -.-> MONITOR
+GATEWAY -.-> LOGGING
+ORCHESTRATOR -.-> LOGGING
+AUTH -.-> TRACING
+MESSAGEBROKER -.-> DASHBOARD
+
+note right of GATEWAY
+  **Scalability:**
+  - Horizontal auto-scaling
+  - Per-client rate limiting
+  - Intelligent request routing
+end note
+
+note right of MESSAGEBROKER
+  **Async Pattern:**
+  - Service decoupling
+  - Event sourcing
+  - Publish/Subscribe
+end note
+
+note right of CACHE
+  **Performance:**
+  - Reduces DB load
+  - Smart invalidation
+  - Multi-tier caching
+end note
+
+@enduml
