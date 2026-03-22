@@ -1,36 +1,31 @@
 # AxiomNode Documentation
 
-Welcome to the AxiomNode documentation repository. This repository contains comprehensive documentation for all AxiomNode software and services.
+Repositorio central de documentacion para la arquitectura, operacion y evolucion de AxiomNode.
 
-## Documentation Structure
+## Estructura principal
 
-This repository is organized into the following folders:
+Documentos clave disponibles:
 
-### 📚 [Getting Started](./getting-started/)
-New to AxiomNode? Start here! Contains installation guides, quick start tutorials, and initial configuration instructions.
+- [Arquitectura objetivo](./architecture/target-architecture.md)
+- [Mapa de repositorios](./architecture/repository-map.md)
+- [Modelo de comunicacion de servicios](./guides/service-communication.md)
+- [Estrategia de despliegue](./operations/deployment-strategy.md)
+- [Entornos y secretos](./operations/environments-and-secrets.md)
+- [Fases de implementacion](./roadmap/implementation-phases.md)
 
-### 🏗️ [Architecture](./architecture/)
-Learn about the system architecture, design decisions, and component interactions.
+## Uso recomendado
 
-### 🔌 [API](./api/)
-Complete API documentation including endpoints, authentication, and examples.
+1. Revisar arquitectura y mapa de repositorios.
+2. Definir contratos en `contracts-and-schemas`.
+3. Implementar servicios en `api-gateway` y BFFs.
+4. Desplegar con `platform-infra` y operar con `observability-platform`.
 
-### 📖 [Guides](./guides/)
-Detailed user and developer guides, best practices, and common workflows.
+## Reglas de mantenimiento
 
-### 📋 [Reference](./reference/)
-Reference materials including configuration options, CLI commands, and glossary.
+- Mantener documentacion versionada junto a cambios de arquitectura.
+- Evitar decisiones no documentadas entre repos.
+- Actualizar roadmap al cerrar cada fase.
 
-### 🤝 [Contributing](./contributing/)
-Information for contributors including guidelines, code style, and development setup.
+## Diseno visual
 
-## How to Use This Documentation
-
-1. **New Users**: Start with [Getting Started](./getting-started/) to set up and configure your environment
-2. **Developers**: Check out [Guides](./guides/) and [API](./api/) documentation
-3. **Contributors**: Read [Contributing](./contributing/) guidelines before submitting changes
-4. **Reference**: Use [Reference](./reference/) for quick lookups of commands and configurations
-
-## Contributing to Documentation
-
-We welcome contributions to improve our documentation! Please see the [Contributing](./contributing/) folder for guidelines on how to contribute.
+Los assets de marca se mantienen en `design/`.
