@@ -9,8 +9,11 @@ Documentos clave disponibles:
 - [Arquitectura objetivo](./architecture/target-architecture.md)
 - [Mapa de repositorios](./architecture/repository-map.md)
 - [Modelo de comunicacion de servicios](./guides/service-communication.md)
+- [Migracion de repos existentes](./guides/migration-existing-repos.md)
+- [Integracion local de edge layer](./guides/local-edge-integration.md)
 - [Estrategia de despliegue](./operations/deployment-strategy.md)
 - [Entornos y secretos](./operations/environments-and-secrets.md)
+- [Distribucion de secretos por repositorio](./operations/secrets-distribution-guide.md)
 - [Fases de implementacion](./roadmap/implementation-phases.md)
 
 ## Uso recomendado

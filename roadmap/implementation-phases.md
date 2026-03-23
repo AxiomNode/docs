@@ -17,6 +17,7 @@
 - IaC y despliegue automatizado por entorno.
 - Observabilidad operacional con dashboards y alertas.
 - SDKs generados desde contratos.
+- Secretos centralizados por entorno en repositorio `secrets`.
 
 ## Fase 4: Hardening
 
