@@ -12,7 +12,7 @@ Levantar `api-gateway`, `bff-mobile` y `bff-backoffice` en una sola composicion 
    - `microservice-users` en `7102`
 2. Docker Desktop corriendo.
 3. Secretos de entorno dev en repo privado `secrets`.
-4. Ejecutar `node scripts/export-secrets-map.mjs dev` desde `secrets`.
+4. Ejecutar `node scripts/prepare-runtime-secrets.mjs dev` desde `secrets`.
 
 ## Levantar edge layer
 
@@ -34,14 +34,14 @@ Si `EDGE_API_TOKEN` esta configurado en gateway, incluir:
 
 ```bash
 -H "Authorization: Bearer <EDGE_API_TOKEN>"
+```
 
-`EDGE_API_TOKEN` se carga desde `api-gateway/src/.env.secrets`, copiado desde `secrets/runtime/dev/api-gateway.env`.
+`EDGE_API_TOKEN` se carga desde `api-gateway/src/.env.secrets`, copiado desde `secrets/runtime/repositories/api-gateway/dev.env`.
 
 ## Smoke test automatizado
 
 ```bash
 bash scripts/smoke-edge.sh
-```
 ```
 
 ## Apagado

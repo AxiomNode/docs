@@ -5,10 +5,22 @@
 - The private repository `secrets` contains all real secrets.
 - Runtime repositories must not commit real secrets.
 
+## Quick reference
+
+- `.env.example`: placeholder template, safe to commit.
+- `.env`: local developer values (gitignored).
+- `.env.secrets`: real injected secrets from private `secrets` repository (gitignored).
+
+Recommended setup flow:
+
+1. `cp .env.example .env`
+2. `node scripts/prepare-runtime-secrets.mjs <env>` from `secrets`
+3. Application reads both `.env` and `.env.secrets`
+
 ## Copy model
 
 1. Clone `secrets`.
-2. Pick distribution: `dev`, `stg`, `prod`.
+2. Pick distribution: `dev`, `stg`, `pro`.
 3. Run from `secrets`:
 
 ```bash
@@ -29,7 +41,7 @@ node scripts/prepare-runtime-secrets.mjs dev
 
 ## Synchronization rule by distribution
 
-For the same distribution (`dev`, `stg`, `prod`), shared keys must match across repositories that use them:
+For the same distribution (`dev`, `stg`, `pro`), shared keys must match across repositories that use them:
 
 - `AI_ENGINE_API_KEY`
 - `AI_ENGINE_GAMES_API_KEY`
@@ -44,7 +56,7 @@ Between different distributions, values must be different.
 ```bash
 node scripts/prepare-runtime-secrets.mjs dev
 node scripts/prepare-runtime-secrets.mjs stg
-node scripts/prepare-runtime-secrets.mjs prod
+node scripts/prepare-runtime-secrets.mjs pro
 node scripts/prepare-runtime-secrets.mjs all
 ```
 
