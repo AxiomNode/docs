@@ -11,6 +11,8 @@ Documentos clave disponibles:
 - [Modelo de comunicacion de servicios](./guides/service-communication.md)
 - [Migracion de repos existentes](./guides/migration-existing-repos.md)
 - [Integracion local de edge layer](./guides/local-edge-integration.md)
+- [Guia de desarrollo backoffice (React)](./guides/backoffice-react-development.md)
+- [Guia de desarrollo app movil (Firebase)](./guides/mobile-app-development-firebase.md)
 - [Estrategia de despliegue](./operations/deployment-strategy.md)
 - [Entornos y secretos](./operations/environments-and-secrets.md)
 - [Distribucion de secretos por repositorio](./operations/secrets-distribution-guide.md)
