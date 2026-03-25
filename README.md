@@ -16,7 +16,7 @@ Documentos clave disponibles:
 - [Estrategia de despliegue](./operations/deployment-strategy.md)
 - [Entornos y secretos](./operations/environments-and-secrets.md)
 - [Distribucion de secretos por repositorio](./operations/secrets-distribution-guide.md)
-- [Fases de implementacion](./roadmap/implementation-phases.md)
+- [Fases de implementacion (archivo historico)](./roadmap/implementation-phases.md)
 
 ## Uso recomendado
 
@@ -29,7 +29,7 @@ Documentos clave disponibles:
 
 - Mantener documentacion versionada junto a cambios de arquitectura.
 - Evitar decisiones no documentadas entre repos.
-- Actualizar roadmap al cerrar cada fase.
+- Mantener los documentos de roadmap como historial y registrar nuevas planificaciones en artefactos operativos vigentes.
 
 ## Diseno visual
 

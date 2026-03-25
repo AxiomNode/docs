@@ -1,5 +1,7 @@
 # Implementation Phases
 
+Estado: documento historico de fases ya ejecutadas. No se usa como backlog activo.
+
 ## Fase 1: Baseline
 
 - Estructura base de repos nuevos.

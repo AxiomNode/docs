@@ -18,7 +18,7 @@ Flujo principal:
 
 1. React Backoffice -> api-gateway (edge)
 2. api-gateway -> bff-backoffice
-3. bff-backoffice -> microservice-users (actual) y futuros microservicios administrativos
+3. bff-backoffice -> microservice-users y microservicios administrativos habilitados por contrato
 
 Endpoints ya disponibles en el flujo backoffice:
 

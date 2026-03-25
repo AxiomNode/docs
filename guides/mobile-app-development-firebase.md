@@ -151,7 +151,7 @@ No incluir secretos internos de infraestructura en variables publicas.
 3. E2E (Detox o Maestro) para login + jugar + guardar evento.
 4. Contract tests de cliente contra respuestas reales de edge en dev.
 
-## Roadmap De Implementacion
+## Plan De Implementacion De Referencia
 
 Fase A (core app):
 - bootstrap Expo + navigation + auth state

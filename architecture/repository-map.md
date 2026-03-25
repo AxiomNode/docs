@@ -16,5 +16,5 @@
 - `shared-sdk-client`: SDKs multi-lenguaje derivados de contratos.
 - `platform-infra`: IaC y despliegues por entorno.
 - `observability-platform`: stack de metricas, logs, traces y alertado.
-- `docs`: arquitectura, guias operativas y roadmap.
+- `docs`: arquitectura, guias operativas y documentacion de referencia.
 - `secrets`: catalogo de variables sensibles y convenciones de gestion de secretos.
