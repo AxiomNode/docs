@@ -30,9 +30,9 @@ Objetivo de esta hoja:
 
 ## Bloque 4: observabilidad estandar
 
-- [ ] Log schema unificado en servicios runtime.
+- [x] Log schema unificado en servicios runtime.
 - [ ] Metricas Prometheus por endpoint clave.
-- [ ] Correlation id en logs y respuestas.
+- [x] Correlation id en logs y respuestas.
 - [ ] Alertas P0 con runbook por servicio.
 
 ## Bloque 5: flujo critico quiz/wordpass
@@ -63,6 +63,6 @@ Objetivo de esta hoja:
 | Baseline KPI por servicio |  | [x] | Informe iteracion 01 con snapshot runtime y comparativa pre/post |
 | Forwarding de headers criticos |  | [ ] |  |
 | Circuit breaker y timeout policy |  | [x] | Breaker auth AI activo + timeout policy en api-gateway, bff-backoffice y bff-mobile |
-| Observabilidad minima activa |  | [ ] |  |
+| Observabilidad minima activa |  | [ ] | Logs estructurados con `correlation_id` en api-gateway, bff-backoffice, bff-mobile, microservice-quiz y microservice-wordpass |
 | Flujo quiz/wordpass estabilizado |  | [x] | Smoke check + abort batch + 503 por circuito abierto + dashboard requested->created + corrida final (3/3 en ambos; created=1 por servicio) |
 | Cierre iteracion del bloque actual |  | [x] | build/test + comparativa KPI + informe de resultados publicado |

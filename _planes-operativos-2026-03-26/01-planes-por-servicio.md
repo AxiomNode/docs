@@ -352,39 +352,39 @@
 
 - [ ] Definir owner tecnico por servicio.
 - [ ] Publicar responsabilidad principal por servicio en su README.
-- [ ] Capturar baseline de KPI (latencia, error rate, disponibilidad, eficacia).
+- [x] Capturar baseline de KPI (latencia, error rate, disponibilidad, eficacia).
 - [ ] Acordar SLO y error budget por servicio.
 
 ### Bloque B. P0 de seguridad y resiliencia
 
 - [ ] Validar forwarding de headers criticos en edge y BFF.
-- [ ] Corregir rutas con auth incompleta (incluyendo AI keys donde aplique).
-- [ ] Implementar timeout estandar por tipo de llamada.
-- [ ] Implementar circuito de proteccion para dependencias criticas.
+- [x] Corregir rutas con auth incompleta (incluyendo AI keys donde aplique).
+- [x] Implementar timeout estandar por tipo de llamada.
+- [x] Implementar circuito de proteccion para dependencias criticas.
 
 ### Bloque C. P0 de observabilidad
 
-- [ ] Estandarizar logs JSON con correlation_id.
+- [x] Estandarizar logs JSON con correlation_id.
 - [ ] Exponer metricas Prometheus por endpoint clave.
 - [ ] Activar trazas distribuidas en hops interservicio.
 - [ ] Crear alertas P0 con runbook enlazado.
 
 ### Bloque D. Eficacia funcional (foco quiz y wordpass)
 
-- [ ] Smoke de credenciales AI al arranque.
-- [ ] Regla de no ejecutar batch si smoke falla.
-- [ ] Clasificar errores en taxonomia operativa.
-- [ ] Medir conversion real: requested -> created por batch.
+- [x] Smoke de credenciales AI al arranque.
+- [x] Regla de no ejecutar batch si smoke falla.
+- [x] Clasificar errores en taxonomia operativa.
+- [x] Medir conversion real: requested -> created por batch.
 
 ### Bloque E. Cierre de iteracion
 
-- [ ] Ejecutar regresion tecnica (build + test + contrato).
-- [ ] Comparar KPI pre/post y documentar impacto.
-- [ ] Publicar acta de cierre con pendientes P1/P2.
+- [x] Ejecutar regresion tecnica (build + test + contrato).
+- [x] Comparar KPI pre/post y documentar impacto.
+- [x] Publicar acta de cierre con pendientes P1/P2.
 
 ### Criterio de salida del Plan 1
 
 - [ ] No hay errores recurrentes por headers faltantes.
 - [ ] Todos los servicios exponen metricas y logs consumibles.
 - [ ] Flujos criticos tienen trazabilidad end-to-end.
-- [ ] quiz y wordpass pasan de estado rojo a estado operativo medible.
+- [x] quiz y wordpass pasan de estado rojo a estado operativo medible.
