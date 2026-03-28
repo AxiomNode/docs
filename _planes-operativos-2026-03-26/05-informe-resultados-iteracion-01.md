@@ -206,7 +206,7 @@ Condicion de cierre sugerida para esta mini-iteracion:
 
 Checklist ejecutable asociada:
 
-- Ver seccion `Mini-iteracion AI (rojo -> verde) checklist ejecutable` en `04-checklist-primer-plan-servicios.md`.
+- Cerrada y consolidada en este informe (secciones 15 a 18).
 
 ## 15) Avance mini-iteracion AI (Bloque A completado)
 

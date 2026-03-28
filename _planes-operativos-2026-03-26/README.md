@@ -19,20 +19,20 @@ Alcance cubierto:
 
 Documentos:
 
-- `01-planes-por-servicio.md`
 - `02-planes-por-repositorio.md`
 - `03-plan-comunicacion-interservicios.md`
-- `04-checklist-primer-plan-servicios.md`
+- `05-informe-resultados-iteracion-01.md` (historico de ejecucion cerrada)
 
 Notas de uso:
 
 - Carpeta temporal para trabajo operativo, pensada para borrado posterior.
 - Los planes incluyen prioridad (`P0`, `P1`, `P2`), KPI objetivo, y criterio de exito verificable.
 - Recomendacion: ejecutar por iteraciones quincenales con demo de resultados y dashboard unico.
+- 2026-03-28: se eliminaron los planes/comprobaciones ya completados (`01` y `04`) para mantener solo frentes activos.
 
 ## Checklist de seguimiento
 
-- [ ] Checklist global creada por plan (servicios, repos, comunicacion).
-- [ ] Responsables asignados por bloque P0.
-- [ ] KPI baseline capturado antes de cambios.
-- [ ] Evidencia de despliegue y verificacion adjunta por cada item completado.
+- [x] Checklist global creada por plan (servicios, repos, comunicacion).
+- [x] Responsables asignados por bloque P0.
+- [x] KPI baseline capturado antes de cambios.
+- [x] Evidencia de despliegue y verificacion adjunta por cada item completado.
