@@ -346,14 +346,50 @@
 
 ---
 
+## Acuerdos operativos del Bloque A
+
+### Owners tecnicos por servicio (owner y backup)
+
+| Servicio | Owner tecnico | Backup tecnico |
+|---|---|---|
+| backoffice | Squad Backoffice Frontend | Squad Backoffice Backend |
+| api-gateway | Squad Edge Platform | Squad SRE Platform |
+| bff-backoffice | Squad Backoffice Backend | Squad Edge Platform |
+| bff-mobile | Squad Mobile Backend | Squad Edge Platform |
+| microservice-users | Squad Identity and Access | Squad Backoffice Backend |
+| microservice-quizz | Squad Games Runtime | Squad AI Platform |
+| microservice-wordpass | Squad Games Runtime | Squad AI Platform |
+| ai-engine-api | Squad AI Platform | Squad AI Runtime |
+| ai-engine-stats | Squad AI Observability | Squad AI Platform |
+| llama-server | Squad AI Runtime | Squad SRE Platform |
+
+### SLO y error budget acordado por servicio
+
+Supuesto comun para presupuesto mensual: ventana de 30 dias.
+
+| Servicio | Tipo | SLO mensual | Error budget mensual |
+|---|---|---|---|
+| api-gateway | edge | 99.9% disponibilidad | 43.2 min de indisponibilidad |
+| bff-backoffice | interno | 99.5% disponibilidad | 216 min de indisponibilidad |
+| bff-mobile | interno | 99.5% disponibilidad | 216 min de indisponibilidad |
+| backoffice | interno | 99.5% disponibilidad | 216 min de indisponibilidad |
+| microservice-users | interno | 99.5% disponibilidad | 216 min de indisponibilidad |
+| microservice-quizz | interno | 99.5% disponibilidad | 216 min de indisponibilidad |
+| microservice-wordpass | interno | 99.5% disponibilidad | 216 min de indisponibilidad |
+| ai-engine-api | interno | 99.5% disponibilidad | 216 min de indisponibilidad |
+| ai-engine-stats | interno | 99.5% disponibilidad | 216 min de indisponibilidad |
+| llama-server | interno | 99.5% disponibilidad | 216 min de indisponibilidad |
+
+---
+
 ## Checklist de ejecucion del Plan 1 (servicios)
 
 ### Bloque A. Fundacion operativa
 
-- [ ] Definir owner tecnico por servicio.
-- [ ] Publicar responsabilidad principal por servicio en su README.
+- [x] Definir owner tecnico por servicio.
+- [x] Publicar responsabilidad principal por servicio en su README.
 - [x] Capturar baseline de KPI (latencia, error rate, disponibilidad, eficacia).
-- [ ] Acordar SLO y error budget por servicio.
+- [x] Acordar SLO y error budget por servicio.
 
 ### Bloque B. P0 de seguridad y resiliencia
 

@@ -7,13 +7,13 @@ Objetivo de esta hoja:
 
 ## Bloque 1: baseline y ownership
 
-- [ ] Asignar owner por servicio (nombre y backup).
-- [ ] Capturar baseline inicial por servicio:
-  - [ ] disponibilidad 24h,
-  - [ ] p95 latencia,
-  - [ ] error rate,
-  - [ ] conversion funcional (si aplica).
-- [ ] Publicar dashboard temporal de baseline.
+- [x] Asignar owner por servicio (nombre y backup).
+- [x] Capturar baseline inicial por servicio:
+  - [x] disponibilidad 24h,
+  - [x] p95 latencia,
+  - [x] error rate,
+  - [x] conversion funcional (si aplica).
+- [x] Publicar dashboard temporal de baseline.
 
 ## Bloque 2: autenticacion y forwarding
 
@@ -60,9 +60,9 @@ Objetivo de esta hoja:
 
 | Item | Responsable | Estado | Evidencia |
 |---|---|---|---|
-| Baseline KPI por servicio |  | [x] | Informe iteracion 01 con snapshot runtime y comparativa pre/post |
+| Baseline KPI por servicio | Squad SRE Platform | [x] | Informe iteracion 01 con snapshot runtime y comparativa pre/post |
 | Forwarding de headers criticos |  | [ ] |  |
-| Circuit breaker y timeout policy |  | [x] | Breaker auth AI activo + timeout policy en api-gateway, bff-backoffice y bff-mobile |
-| Observabilidad minima activa |  | [x] | Logs estructurados con `correlation_id` + metricas Prometheus (`requests_total`, `errors_total`, `latency_ms_bucket`, `inflight_requests`) en edge/BFF + endpoint `/metrics` activo en quiz/wordpass + propagacion `traceparent/tracestate/baggage` + reglas P0 en `observability-platform/alerts/p0-services-alerts.rules.yml` |
-| Flujo quiz/wordpass estabilizado |  | [x] | Smoke check + abort batch + 503 por circuito abierto + dashboard requested->created + corrida final (3/3 en ambos; created=1 por servicio) |
-| Cierre iteracion del bloque actual |  | [x] | build/test + comparativa KPI + informe de resultados publicado |
+| Circuit breaker y timeout policy | Squad Edge Platform | [x] | Breaker auth AI activo + timeout policy en api-gateway, bff-backoffice y bff-mobile |
+| Observabilidad minima activa | Squad AI Observability | [x] | Logs estructurados con `correlation_id` + metricas Prometheus (`requests_total`, `errors_total`, `latency_ms_bucket`, `inflight_requests`) en edge/BFF + endpoint `/metrics` activo en quiz/wordpass + propagacion `traceparent/tracestate/baggage` + reglas P0 en `observability-platform/alerts/p0-services-alerts.rules.yml` |
+| Flujo quiz/wordpass estabilizado | Squad Games Runtime | [x] | Smoke check + abort batch + 503 por circuito abierto + dashboard requested->created + corrida final (3/3 en ambos; created=1 por servicio) |
+| Cierre iteracion del bloque actual | Tech Leads de dominio | [x] | build/test + comparativa KPI + informe de resultados publicado |

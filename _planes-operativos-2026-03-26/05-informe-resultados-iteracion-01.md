@@ -119,3 +119,9 @@ Estado de iteracion 01: **exitosa con seguimiento**.
 - Con seguimiento porque la conversion global sigue baja y quiz mantiene rechazos `422` por payload incompleto del modelo.
 
 Recomendacion: abrir iteracion corta enfocada en calidad estructural de payload quiz (titulo, preguntas y campos obligatorios) y cerrar con nueva medicion de conversion sostenida post-fix.
+
+## 7) Avance Bloque A (fundacion operativa)
+
+- Owner y backup tecnico definidos para todos los servicios del Plan 1.
+- Responsabilidad principal publicada en README de cada servicio del alcance.
+- SLO y error budget mensual acordados por servicio (edge 99.9%, internos 99.5%).
