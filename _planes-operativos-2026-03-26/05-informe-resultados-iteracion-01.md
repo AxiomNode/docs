@@ -159,3 +159,12 @@ Recomendacion: abrir iteracion corta enfocada en calidad estructural de payload 
   - `/v1/backoffice/services/:service/metrics`
   - `/v1/backoffice/services/:service/logs?limit=5`
   para `api-gateway`, `bff-mobile`, `microservice-users`, `microservice-quiz`, `microservice-wordpass`.
+
+## 12) Cierre de trazabilidad end-to-end en flujos criticos
+
+- 2026-03-28: validacion runtime con `x-correlation-id` y contexto de traza en requests edge.
+- Evidencia en logs estructurados por hop con el mismo `correlation_id` para:
+  - `api-gateway -> bff-backoffice -> microservice-users` sobre `/v1/backoffice/users/leaderboard`.
+  - `api-gateway -> bff-mobile -> microservice-quiz` sobre `/v1/mobile/games/quiz/random`.
+  - `api-gateway -> bff-mobile -> microservice-wordpass` sobre `/v1/mobile/games/wordpass/random`.
+- Resultado: criterio de trazabilidad end-to-end cerrado para los flujos criticos del alcance.

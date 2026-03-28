@@ -422,5 +422,5 @@ Supuesto comun para presupuesto mensual: ventana de 30 dias.
 
 - [x] No hay errores recurrentes por headers faltantes.
 - [x] Todos los servicios del alcance exponen metricas y logs consumibles.
-- [ ] Flujos criticos tienen trazabilidad end-to-end.
+- [x] Flujos criticos tienen trazabilidad end-to-end.
 - [x] quiz y wordpass pasan de estado rojo a estado operativo medible.
