@@ -1,327 +1,82 @@
-# 02. Planes Por Repositorio
-
-## Criterios transversales para todos los repositorios
-
-- Definition of Done obligatoria:
-  - tests unitarios/integracion,
-  - metricas instrumentadas,
-  - logs estructurados,
-  - contrato actualizado,
-  - runbook operativo.
-- Pipeline CI con quality gates:
-  - cobertura,
-  - lint,
-  - type-check,
-  - pruebas de contrato.
-- Politica de versionado semantico y changelog por repo.
-
----
-
-## ai-engine
-
-### Responsabilidad
-
-- Motor AI y observabilidad AI.
-
-### Mejoras recomendadas
-
-- P0: Separar claramente dominios `ai-api` y `ai-stats` (codigo, config, ownership).
-- P0: Pruebas de contrato para headers de auth (`X-API-Key`) por endpoint.
-- P1: Benchmarks reproducibles por modelo y distribucion.
-- P1: Tooling para comparar prompts/versiones en modo shadow.
-- P2: Politica de gobernanza de modelos (promocion y rollback).
-
-### Medicion clave
-
-- Regression suite de latencia/calidad por release.
-
----
-
-## api-gateway
-
-### Responsabilidad
-
-- Edge routing y politicas transversales.
-
-### Mejoras recomendadas
-
-- P1: Limites por consumidor y proteccion anti-abuso.
-- P1: Plantillas de error consistentes por dominio.
-- P2: Estrategia de despliegue canary por ruta.
-
-### Medicion clave
-
-- Tasa de errores por upstream y por ruta.
-
----
-
-## bff-backoffice
-
-### Responsabilidad
-
-- Orquestacion de datos operativos para backoffice.
-
-### Mejoras recomendadas
-
-- P0: Contrato de agregacion estable y versionado.
-- P0: Fallback por dependencia con degradacion explicita.
-- P1: Cache y coalescing de requests repetidas del panel.
-- P1: Endpoint de estado agregado con puntuacion de salud.
-- P2: Simulador de incidentes para validar UX operacional.
-
-### Medicion clave
-
-- Porcentaje de respuestas parciales vs fallos totales.
-
----
-
-## bff-mobile
-
-### Responsabilidad
-
-- API adaptada a cliente movil.
-
-### Mejoras recomendadas
-
-- P0: Contratos de payload minimos por version de app.
-- P0: Timeouts y retries orientados a red movil.
-- P1: Telemetria por version de app y calidad de red.
-- P1: Versionado backward compatible con sunset plan.
-- P2: Flags de feature para cambios progresivos.
-
-### Medicion clave
-
-- P95 por endpoint y error rate por version de app.
-
----
-
-## backoffice
-
-### Responsabilidad
-
-- Operacion, diagnostico y acciones administrativas.
-
-### Mejoras recomendadas
-
-- P0: Estandar de estados visuales y acciones seguras.
-- P0: Pruebas e2e de rutas operativas criticas.
-- P1: Registro de auditoria de operador.
-- P1: Modo degradado por dependencia.
-- P2: Dashboard de productividad operativa.
-
-### Medicion clave
-
-- Tiempo medio de resolucion asistida por UI.
-
----
-
-## microservice-users
-
-### Responsabilidad
-
-- Identidad y dominio de usuario.
-
-### Mejoras recomendadas
-
-- P0: Fortalecer RBAC y auditoria de roles.
-- P0: Idempotencia en eventos de gameplay.
-- P1: Validadores de calidad de datos de perfil/evento.
-- P1: Reportes de consistencia y reconciliacion.
-- P2: Hardening de privacidad y minimizacion de datos.
-
-### Medicion clave
-
-- Tasa de conflictos de rol/evento por 10k operaciones.
-
----
-
-## microservice-quizz
-
-### Responsabilidad
-
-- Generacion quiz y persistencia.
-
-### Mejoras recomendadas
-
-- P1: Reintentos inteligentes solo para errores transitorios.
-- P1: Observabilidad de costo por item creado.
-- P2: Control de calidad semantica de contenido.
-
-### Medicion clave
-
-- `created/requested`, `failure_ratio`, costo por item.
-
----
-
-## microservice-wordpass
-
-### Responsabilidad
-
-- Generacion wordpass y persistencia.
-
-### Mejoras recomendadas
-
-- P0: Politicas anti-duplicado de topico y contenido.
-- P1: Libreria compartida de validacion de salida.
-- P1: Telemetria de novedad/variedad de contenido.
-- P2: Ajuste dinamico de prompts por resultados.
-
-### Medicion clave
-
-- Duplicados por batch y conversion de intentos.
-
----
-
-## contracts-and-schemas
-
-### Responsabilidad
-
-- Fuente unica de contratos de API/eventos.
-
-### Mejoras recomendadas
-
-- P0: Contract tests automáticos en consumidores y productores.
-- P0: Regla de no-deploy si cambia contrato sin versionado.
-- P1: Ejemplos positivos/negativos por endpoint/evento.
-- P1: Diff semantico de breaking changes en CI.
-- P2: Catalogo de errores estandar.
-
-### Medicion clave
-
-- Incidentes por incompatibilidad de contrato = 0.
-
----
-
-## shared-sdk-client
-
-### Responsabilidad
-
-- SDKs cliente para consumir contratos de forma segura.
-
-### Mejoras recomendadas
-
-- P0: Regeneracion automatica por cambio de contrato.
-- P0: Version pinning y matriz de compatibilidad.
-- P1: Telemetria opcional de uso SDK (sin PII).
-- P1: Pruebas de backward compatibility.
-- P2: Plantillas de retries/timeouts por lenguaje.
-
-### Medicion clave
-
-- Fallos de integracion por desalineacion SDK/contrato.
-
----
-
-## platform-infra
-
-### Responsabilidad
-
-- Provisioning, configuracion de entornos y despliegue.
-
-### Mejoras recomendadas
-
-- P0: Plantillas estandar de variables y validacion pre-deploy.
-- P0: Secret management centralizado y rotacion automatizada.
-- P1: Health checks de arranque dependiente por stack.
-- P1: Rollback automatizado ante SLO breach inicial post-deploy.
-- P2: Cost observability por servicio/entorno.
-
-### Medicion clave
-
-- Fallos de despliegue por config/secrets.
-
----
-
-## observability-platform
-
-### Responsabilidad
-
-- Dashboards, alertas y trazabilidad unificada.
-
-### Mejoras recomendadas
-
-- P0: Dashboard unico de SLO por servicio.
-- P1: Mapa de dependencias con estado en tiempo real.
-- P1: Indicadores de negocio ademas de tecnicos.
-- P2: Deteccion de anomalías basada en baseline.
-
-### Medicion clave
-
-- MTTD y MTTR por tipo de incidente.
-
----
-
-## docs
-
-### Responsabilidad
-
-- Documentacion operativa y tecnica viva.
-
-### Mejoras recomendadas
-
-- P0: Estructura uniforme (arquitectura, guias, operaciones, runbooks).
-- P0: Ownership por documento y fecha de ultima validacion.
-- P1: Plantillas para ADR, incidentes y postmortems.
-- P1: "Docs as code" con validaciones de enlaces y ejemplos.
-- P2: Indices por rol (dev, ops, product).
-
-### Medicion clave
-
-- % documentos vigentes y validados en los ultimos 90 dias.
-
----
-
-## secrets
-
-### Responsabilidad
-
-- Gestion segura de credenciales y politicas.
-
-### Mejoras recomendadas
-
-- P0: No usar secretos en repos locales fuera de vault autorizado.
-- P0: Rotacion trimestral y revocacion por incidente.
-- P1: Scanners de secretos en pre-commit y CI.
-- P2: Reporte de exposicion y cumplimiento.
-
-### Medicion clave
-
-- Incidentes por fuga de secreto = 0.
-
----
-
-## Priorizacion temporal sugerida (repos)
-
-1. Semana 1-2: P0 de contratos/auth/observabilidad basica.
-2. Semana 3-4: P1 de rendimiento, cache y calidad de datos.
-3. Semana 5-6: P2 de optimizacion avanzada y costos.
-
----
-
-## Checklist de ejecucion por repositorio
-
-### Base comun
-
-- [ ] DoD actualizado y aprobado.
-- [ ] Pipeline CI con gates activos.
-- [ ] Contratos versionados y validados.
-- [ ] Runbook operativo disponible.
-
-### Repos criticos de runtime
-
-- [ ] ai-engine: auth por endpoint y benchmark base.
-- [ ] api-gateway: forwarding unificado y test matrix completa.
-- [ ] bff-backoffice: degradacion parcial implementada.
-- [ ] bff-mobile: contratos de payload por version.
-- [ ] microservice-quizz: smoke AI + circuit breaker.
-- [ ] microservice-wordpass: anti-duplicado + smoke AI.
-- [ ] microservice-users: RBAC y audit log obligatorios.
-
-### Soporte y plataforma
-
-- [ ] contracts-and-schemas: contract tests automáticos activos.
-- [ ] shared-sdk-client: regeneracion automatica y compatibilidad.
-- [ ] platform-infra: validacion pre-deploy y secretos centralizados.
-- [ ] observability-platform: dashboards SLO y alertas accionables.
-- [ ] docs: ownership y vigencia de documentos.
-- [ ] secrets: rotacion y scanning automatizado.
+# 02. Planes Por Repositorio (Pendientes Vigentes)
+
+Fecha de actualizacion: 2026-03-28.
+
+Este tablero conserva solo trabajo pendiente. Todo item ya ejecutado en iteraciones previas fue retirado.
+
+## Pendientes P0
+
+| Repositorio | Pendiente | Owner propuesto | KPI de salida |
+|---|---|---|---|
+| ai-engine | Pruebas de contrato por endpoint para `X-API-Key` (matriz de aceptacion/rechazo por ruta) | Squad AI Platform | Errores de auth por contrato = 0 en suite de regresion |
+| bff-backoffice | Contrato de agregacion estable y versionado para endpoints de observabilidad/data | Squad Backoffice Backend | Incidentes por cambio de contrato = 0 |
+| bff-mobile | Contratos de payload minimos por version de app publicados y validados | Squad Mobile Backend | Error rate por version dentro de umbral objetivo |
+| backoffice | Pruebas e2e de rutas operativas criticas | Squad Backoffice Frontend | Flujos criticos e2e en verde en CI |
+| microservice-users | Fortalecer RBAC y auditoria de roles | Squad Identity and Access | Conflictos de rol/evento por 10k dentro de objetivo |
+| microservice-wordpass | Politicas anti-duplicado de topico y contenido | Squad Games Runtime | Ratio de duplicados por batch bajo umbral |
+| contracts-and-schemas | Contract tests automaticos en productores y consumidores | Squad Contracts Platform | Incidentes por incompatibilidad de contrato = 0 |
+| shared-sdk-client | Regeneracion automatica por cambio de contrato | Squad Developer Experience | Fallos de integracion por desalineacion SDK/contrato = 0 |
+| platform-infra | Plantillas estandar de variables + validacion pre-deploy | Squad SRE Platform | Fallos de despliegue por config/secrets en descenso sostenido |
+| platform-infra | Secret management centralizado y rotacion automatizada | Squad SRE Platform | Incidentes por credenciales fuera de politica = 0 |
+| observability-platform | Dashboard unico de SLO por servicio | Squad AI Observability | Visibilidad SLO completa para servicios criticos |
+| docs | Ownership por documento + fecha de ultima validacion | Squad Docs Enablement | % docs vigentes en 90 dias por encima de objetivo |
+| secrets | Eliminar uso de secretos fuera de vault autorizado | Squad Security Platform | Incidentes por fuga de secreto = 0 |
+| secrets | Rotacion trimestral y revocacion por incidente | Squad Security Platform | Tiempo de revocacion dentro de SLA |
+
+## Pendientes P1
+
+| Repositorio | Pendiente | Owner propuesto | KPI de salida |
+|---|---|---|---|
+| ai-engine | Benchmarks reproducibles por modelo/distribucion | Squad AI Runtime | Latencia/calidad comparables por release |
+| ai-engine | Tooling de comparacion de prompts/versiones en shadow | Squad AI Runtime | Desviaciones detectadas antes de promocion |
+| api-gateway | Limites por consumidor y anti-abuso | Squad Edge Platform | Caidas por abuso reducidas |
+| api-gateway | Plantillas de error consistentes por dominio | Squad Edge Platform | Errores homogenizados en rutas edge |
+| bff-backoffice | Cache/coalescing para requests repetidas de panel | Squad Backoffice Backend | Menor latencia y menor carga aguas abajo |
+| bff-backoffice | Endpoint de estado agregado con puntuacion de salud | Squad Backoffice Backend | Diagnostico operativo mas rapido |
+| bff-mobile | Telemetria por version de app y calidad de red | Squad Mobile Backend | Visibilidad por cohortes de red/version |
+| bff-mobile | Versionado backward compatible con sunset plan | Squad Mobile Backend | Incidentes por compatibilidad en descenso |
+| backoffice | Registro de auditoria de operador | Squad Backoffice Frontend | Trazabilidad de acciones administrativas completa |
+| backoffice | Modo degradado por dependencia | Squad Backoffice Frontend | Disponibilidad funcional durante degradacion |
+| microservice-users | Validadores de calidad de datos de perfil/evento | Squad Identity and Access | Rechazos de datos inconsistentes controlados |
+| microservice-users | Reportes de consistencia y reconciliacion | Squad Identity and Access | Hallazgos de inconsistencias detectados temprano |
+| microservice-quizz | Reintentos inteligentes para errores transitorios | Squad Games Runtime | Mejora de `created/requested` sin aumentar fallos permanentes |
+| microservice-quizz | Observabilidad de costo por item creado | Squad Games Runtime | Costo por item visible por ventana temporal |
+| microservice-wordpass | Libreria compartida de validacion de salida | Squad Games Runtime | Menos rechazos por payload invalido |
+| microservice-wordpass | Telemetria de novedad/variedad de contenido | Squad Games Runtime | Variabilidad de contenido dentro de objetivo |
+| contracts-and-schemas | Ejemplos positivos/negativos por endpoint/evento | Squad Contracts Platform | Cobertura de ejemplos para contratos criticos |
+| contracts-and-schemas | Diff semantico de breaking changes en CI | Squad Contracts Platform | Bloqueo automatico de cambios incompatibles |
+| shared-sdk-client | Version pinning y matriz de compatibilidad | Squad Developer Experience | Compatibilidad documentada por version |
+| shared-sdk-client | Pruebas de backward compatibility | Squad Developer Experience | Regresiones de SDK detectadas en CI |
+| platform-infra | Health checks de arranque dependiente por stack | Squad SRE Platform | Menos fallos al iniciar stacks locales |
+| platform-infra | Rollback automatico ante SLO breach inicial post-deploy | Squad SRE Platform | MTTR post-deploy reducido |
+| observability-platform | Mapa de dependencias en tiempo real | Squad AI Observability | Impacto de fallos visible por cadena |
+| observability-platform | Indicadores de negocio ademas de tecnicos | Squad AI Observability | Correlacion tecnica-negocio visible |
+| docs | Plantillas para ADR, incidentes y postmortems | Squad Docs Enablement | Documentos consistentes y auditables |
+| docs | Docs as code con validacion de enlaces y ejemplos | Squad Docs Enablement | Errores de docs detectados en CI |
+| secrets | Scanners de secretos en pre-commit y CI | Squad Security Platform | Hallazgos de secretos en PR en descenso |
+
+## Pendientes P2
+
+| Repositorio | Pendiente | Owner propuesto | KPI de salida |
+|---|---|---|---|
+| ai-engine | Gobernanza de modelos (promocion y rollback) | Squad AI Platform | Cambios de modelo trazables y reversibles |
+| api-gateway | Estrategia de despliegue canary por ruta | Squad Edge Platform | Riesgo de despliegue reducido |
+| bff-backoffice | Simulador de incidentes para validar UX operacional | Squad Backoffice Backend | Mejor tiempo de respuesta en drills |
+| bff-mobile | Flags de feature para cambios progresivos | Squad Mobile Backend | Rollout controlado por version/cohorte |
+| backoffice | Dashboard de productividad operativa | Squad Backoffice Frontend | Mejoras medibles en tiempo de resolucion |
+| microservice-users | Hardening de privacidad y minimizacion de datos | Squad Identity and Access | Menor exposicion de datos sensibles |
+| microservice-quizz | Control de calidad semantica de contenido | Squad Games Runtime | Menos contenido invalido en produccion |
+| microservice-wordpass | Ajuste dinamico de prompts por resultados | Squad Games Runtime | Mejora sostenida de conversion |
+| contracts-and-schemas | Catalogo de errores estandar | Squad Contracts Platform | Taxonomia de errores reutilizable |
+| shared-sdk-client | Plantillas de retries/timeouts por lenguaje | Squad Developer Experience | Integraciones mas robustas entre SDKs |
+| platform-infra | Cost observability por servicio/entorno | Squad SRE Platform | Costo por servicio monitoreado |
+| observability-platform | Deteccion de anomalias basada en baseline | Squad AI Observability | MTTD reducido en incidentes anomalo |
+| docs | Indices por rol (dev, ops, product) | Squad Docs Enablement | Descubrimiento de informacion mas rapido |
+| secrets | Reporte de exposicion y cumplimiento | Squad Security Platform | Auditoria de cumplimiento periodica cerrada |
+
+## Checklist operativo global
+
+- [ ] DoD actualizado y aprobado por repositorio.
+- [ ] Pipeline CI con gates activos por repositorio.
+- [ ] Contratos versionados y validados en rutas criticas.
+- [ ] Runbook operativo disponible para cada servicio runtime.
