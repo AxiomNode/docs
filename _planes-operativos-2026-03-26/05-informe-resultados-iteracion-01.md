@@ -145,3 +145,17 @@ Recomendacion: abrir iteracion corta enfocada en calidad estructural de payload 
 
 - 2026-03-28: con entorno disponible, se ejecuto `platform-infra/environments/dev/scripts/smoke-edge.sh` con resultado **OK**.
 - El smoke verifico flujo edge/BFF en rutas GET y POST con envio de headers criticos y sin fallos recurrentes atribuibles a headers faltantes.
+
+## 11) Cierre de validacion runtime de metricas y logs
+
+- 2026-03-28: validacion runtime directa completada con estado 200 en `/metrics`, `/monitor/stats` y `/monitor/logs` para:
+  - `api-gateway` (`7005`)
+  - `bff-mobile` (`7010`)
+  - `bff-backoffice` (`7011`)
+  - `microservice-users` (`7102`)
+  - `microservice-quiz` (`7100`)
+  - `microservice-wordpass` (`7101`)
+- 2026-03-28: validacion agregada via edge completada con estado 200 en:
+  - `/v1/backoffice/services/:service/metrics`
+  - `/v1/backoffice/services/:service/logs?limit=5`
+  para `api-gateway`, `bff-mobile`, `microservice-users`, `microservice-quiz`, `microservice-wordpass`.
