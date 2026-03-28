@@ -187,3 +187,19 @@ Snapshot runtime realizado el 2026-03-28 con verificacion directa de `/health`, 
   - `ai-engine-api` (down en puerto `7001`)
 
 Resultado: criterio de salida "estado de cada servicio clasificable como verde/amarillo/rojo con evidencia" **cerrado**.
+
+## 14) Recomendacion operativa corta (rojo -> verde en AI)
+
+Objetivo de la siguiente iteracion corta: llevar `ai-engine-api` y `ai-engine-stats` de **rojo** a **verde** en entorno local estandar.
+
+Acciones minimas propuestas:
+
+1. Levantar `ai-engine-api` y `ai-engine-stats` como parte de un compose dev estable (puertos `7001` y `7000`) con healthchecks obligatorios.
+2. Alinear llaves de integracion (`AI_ENGINE_API_KEY` y `AI_ENGINE_BRIDGE_API_KEY`) entre `bff-backoffice`, `microservice-quiz` y `microservice-wordpass` para evitar 401/403 intermitentes.
+3. Exponer y validar en runtime `200` para `/health`, `/monitor/stats` y `/monitor/logs` en ambos servicios AI.
+4. Ejecutar smoke de consumo agregado por edge (`/v1/backoffice/services/ai-engine-api|ai-engine-stats/metrics|logs`) y registrar evidencia en checklist.
+5. Definir runbook de recuperacion rapida para AI (arranque, smoke, rollback de keys) y asociarlo a alerta P0.
+
+Condicion de cierre sugerida para esta mini-iteracion:
+
+- `ai-engine-api` y `ai-engine-stats` clasificados en verde con evidencia runtime + smoke agregado en edge.
