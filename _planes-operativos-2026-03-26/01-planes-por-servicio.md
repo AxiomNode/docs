@@ -424,3 +424,4 @@ Supuesto comun para presupuesto mensual: ventana de 30 dias.
 - [x] Todos los servicios del alcance exponen metricas y logs consumibles.
 - [x] Flujos criticos tienen trazabilidad end-to-end.
 - [x] quiz y wordpass pasan de estado rojo a estado operativo medible.
+- [x] Estado de cada servicio clasificable como verde/amarillo/rojo con evidencia.

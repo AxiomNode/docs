@@ -55,7 +55,7 @@ Objetivo de esta hoja:
 - [x] Todas las rutas operativas clave con observabilidad minima.
 - [x] Flujos de generacion AI con resultado medible y trazable.
 - [x] Flujos criticos tienen trazabilidad end-to-end.
-- [ ] Estado de cada servicio clasificable como verde/amarillo/rojo con evidencia.
+- [x] Estado de cada servicio clasificable como verde/amarillo/rojo con evidencia.
 
 ## Tabla de control sugerida
 
@@ -66,6 +66,20 @@ Objetivo de esta hoja:
 | Circuit breaker y timeout policy | Squad Edge Platform | [x] | Breaker auth AI activo + timeout policy en api-gateway, bff-backoffice y bff-mobile |
 | Observabilidad minima activa | Squad AI Observability | [x] | Logs estructurados con `correlation_id` + metricas Prometheus (`requests_total`, `errors_total`, `latency_ms_bucket`, `inflight_requests`) en edge/BFF + endpoint `/metrics` activo en quiz/wordpass + propagacion `traceparent/tracestate/baggage` + reglas P0 en `observability-platform/alerts/p0-services-alerts.rules.yml` + validacion runtime 2026-03-28 (200 en `/metrics`, `/monitor/stats`, `/monitor/logs` para `api-gateway`, `bff-mobile`, `bff-backoffice`, `microservice-users`, `microservice-quiz`, `microservice-wordpass`, y 200 en rutas agregadas `/v1/backoffice/services/:service/metrics|logs`) |
 | Trazabilidad end-to-end | Squad Edge Platform | [x] | Validacion runtime 2026-03-28 con `x-correlation-id` comun observado en logs de 3 hops por flujo: `api-gateway -> bff-backoffice -> microservice-users` (leaderboard), `api-gateway -> bff-mobile -> microservice-quiz` (quiz random), `api-gateway -> bff-mobile -> microservice-wordpass` (wordpass random) |
+
+## Matriz de estado por servicio (snapshot 2026-03-28)
+
+| Servicio | Estado | Evidencia |
+|---|---|---|
+| api-gateway | verde | `200` en `/health`, `/metrics`, `/monitor/stats`, `/monitor/logs`; rutas edge criticas `200` |
+| bff-mobile | verde | `200` en `/health`, `/metrics`, `/monitor/stats`, `/monitor/logs`; flujo random quiz/wordpass `200` |
+| bff-backoffice | verde | `200` en `/health`, `/metrics`, `/monitor/stats`, `/monitor/logs`; agregacion servicios `200` |
+| microservice-users | verde | `200` en `/health`, `/metrics`, `/monitor/stats`, `/monitor/logs`; leaderboard via edge `200` |
+| microservice-quiz | verde | `200` en `/health`, `/metrics`, `/monitor/stats`, `/monitor/logs`; metrics via edge `200` |
+| microservice-wordpass | verde | `200` en `/health`, `/metrics`, `/monitor/stats`, `/monitor/logs`; metrics via edge `200` |
+| ai-engine-stats | rojo | endpoint en `7000` no disponible en snapshot (`DOWN`) |
+| ai-engine-api | rojo | endpoint en `7001` no disponible en snapshot (`DOWN`) |
+| llama-server | amarillo | servicio accesible en `11434` pero sin contrato de observabilidad estandar (`/health|/metrics|/monitor/*` devuelven `404`) |
 | Flujo quiz/wordpass estabilizado | Squad Games Runtime | [x] | Smoke check + abort batch + 503 por circuito abierto + dashboard requested->created + corrida final (3/3 en ambos; created=1 por servicio) |
 | Cierre iteracion del bloque actual | Tech Leads de dominio | [x] | build/test + comparativa KPI + informe de resultados publicado |
 

@@ -168,3 +168,22 @@ Recomendacion: abrir iteracion corta enfocada en calidad estructural de payload 
   - `api-gateway -> bff-mobile -> microservice-quiz` sobre `/v1/mobile/games/quiz/random`.
   - `api-gateway -> bff-mobile -> microservice-wordpass` sobre `/v1/mobile/games/wordpass/random`.
 - Resultado: criterio de trazabilidad end-to-end cerrado para los flujos criticos del alcance.
+
+## 13) Clasificacion verde/amarillo/rojo por servicio (cierre de criterio)
+
+Snapshot runtime realizado el 2026-03-28 con verificacion directa de `/health`, `/metrics`, `/monitor/stats`, `/monitor/logs` y rutas criticas via edge.
+
+- Verde:
+  - `api-gateway`
+  - `bff-mobile`
+  - `bff-backoffice`
+  - `microservice-users`
+  - `microservice-quiz`
+  - `microservice-wordpass`
+- Amarillo:
+  - `llama-server` (servicio accesible, pero sin endpoints de observabilidad estandar en este entorno)
+- Rojo:
+  - `ai-engine-stats` (down en puerto `7000`)
+  - `ai-engine-api` (down en puerto `7001`)
+
+Resultado: criterio de salida "estado de cada servicio clasificable como verde/amarillo/rojo con evidencia" **cerrado**.
