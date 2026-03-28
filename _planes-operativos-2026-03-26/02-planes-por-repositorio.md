@@ -45,8 +45,6 @@
 
 ### Mejoras recomendadas
 
-- P0: Libreria interna unica para proxy y forwarding seguro.
-- P0: Test matrix por metodo HTTP y combinaciones de headers.
 - P1: Limites por consumidor y proteccion anti-abuso.
 - P1: Plantillas de error consistentes por dominio.
 - P2: Estrategia de despliegue canary por ruta.
@@ -145,8 +143,6 @@
 
 ### Mejoras recomendadas
 
-- P0: Smoke de auth AI en startup y antes de batch.
-- P0: Clasificacion de errores y corte por 4xx repetidos.
 - P1: Reintentos inteligentes solo para errores transitorios.
 - P1: Observabilidad de costo por item creado.
 - P2: Control de calidad semantica de contenido.
@@ -165,7 +161,6 @@
 
 ### Mejoras recomendadas
 
-- P0: Mismas salvaguardas de auth/circuit breaker que quiz.
 - P0: Politicas anti-duplicado de topico y contenido.
 - P1: Libreria compartida de validacion de salida.
 - P1: Telemetria de novedad/variedad de contenido.
@@ -246,7 +241,6 @@
 ### Mejoras recomendadas
 
 - P0: Dashboard unico de SLO por servicio.
-- P0: Alertas accionables con runbook enlazado.
 - P1: Mapa de dependencias con estado en tiempo real.
 - P1: Indicadores de negocio ademas de tecnicos.
 - P2: Deteccion de anomalías basada en baseline.
