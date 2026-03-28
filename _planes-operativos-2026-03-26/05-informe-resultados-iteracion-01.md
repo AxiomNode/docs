@@ -207,3 +207,22 @@ Condicion de cierre sugerida para esta mini-iteracion:
 Checklist ejecutable asociada:
 
 - Ver seccion `Mini-iteracion AI (rojo -> verde) checklist ejecutable` en `04-checklist-primer-plan-servicios.md`.
+
+## 15) Avance mini-iteracion AI (Bloque A completado)
+
+Fecha de ejecucion: 2026-03-28.
+
+Estado actual del Bloque A (arranque y disponibilidad): **completado**.
+
+Evidencia runtime validada:
+
+- `ai-engine-api` (`7001`): `GET /health` -> `200`.
+- `ai-engine-stats` (`7000`): `GET /health` -> `200`.
+- `ai-engine-stats` (`7000`): `GET /stats` -> `200` con `X-API-Key` valida.
+- `ai-engine-stats` (`7000`): `GET /stats/history?last_n=5` -> `200` con `X-API-Key` valida.
+
+Hallazgo operativo para Bloque B:
+
+- `ai-engine-stats` acepta para endpoints de monitoreo llaves de `AI_ENGINE_API_KEY` o `AI_ENGINE_BRIDGE_API_KEY`.
+- En pruebas iniciales se observo `403` al usar valores no alineados con el runtime efectivo del contenedor.
+- Se mantiene pendiente la alineacion explicita de keys en consumidores edge/BFF para cerrar Bloque B.

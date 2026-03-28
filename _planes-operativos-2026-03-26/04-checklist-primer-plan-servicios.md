@@ -94,9 +94,11 @@ Objetivo:
 
 ### Bloque A: arranque y disponibilidad AI
 
-- [ ] Levantar `ai-engine-api` en `7001` con endpoint `/health` operativo.
-- [ ] Levantar `ai-engine-stats` en `7000` con endpoint `/health` operativo.
-- [ ] Validar `200` en `/monitor/stats` y `/monitor/logs?limit=5` para ambos servicios.
+- [x] Levantar `ai-engine-api` en `7001` con endpoint `/health` operativo.
+- [x] Levantar `ai-engine-stats` en `7000` con endpoint `/health` operativo.
+- [x] Validar endpoints operativos reales de AI con estado `200`:
+  - `ai-engine-api`: `/health`
+  - `ai-engine-stats`: `/stats` y `/stats/history?last_n=5` (con `X-API-Key` valida)
 
 ### Bloque B: autenticacion y consumo agregado
 
@@ -122,7 +124,7 @@ Objetivo:
 
 | Item | Responsable | Estado | Evidencia |
 |---|---|---|---|
-| Arranque ai-engine-api y ai-engine-stats | Squad AI Platform | [ ] |  |
+| Arranque ai-engine-api y ai-engine-stats | Squad AI Platform | [x] | 2026-03-28: `ai-api /health=200`, `ai-stats /health=200`, `ai-stats /stats=200`, `ai-stats /stats/history?last_n=5=200` (validado con key efectiva de runtime) |
 | Alineacion de keys AI | Squad Edge Platform | [ ] |  |
 | Smoke agregado por edge (metrics/logs AI) | Squad Backoffice Backend | [ ] |  |
 | Runbook + alerta P0 AI | Squad AI Observability | [ ] |  |
