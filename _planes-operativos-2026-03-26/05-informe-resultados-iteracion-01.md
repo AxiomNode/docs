@@ -225,4 +225,42 @@ Hallazgo operativo para Bloque B:
 
 - `ai-engine-stats` acepta para endpoints de monitoreo llaves de `AI_ENGINE_API_KEY` o `AI_ENGINE_BRIDGE_API_KEY`.
 - En pruebas iniciales se observo `403` al usar valores no alineados con el runtime efectivo del contenedor.
-- Se mantiene pendiente la alineacion explicita de keys en consumidores edge/BFF para cerrar Bloque B.
+- La alineacion explicita de keys en consumidores edge/BFF se valido y quedo cerrada en Bloque B.
+
+## 16) Avance mini-iteracion AI (Bloque B completado)
+
+Fecha de ejecucion: 2026-03-28.
+
+Estado actual del Bloque B (autenticacion y consumo agregado): **completado**.
+
+Evidencia runtime validada en edge (`api-gateway:7005`):
+
+- `GET /v1/backoffice/services/ai-engine-api/metrics` -> `200`.
+- `GET /v1/backoffice/services/ai-engine-api/logs?limit=5` -> `200`.
+- `GET /v1/backoffice/services/ai-engine-stats/metrics` -> `200`.
+- `GET /v1/backoffice/services/ai-engine-stats/logs?limit=5` -> `200`.
+
+Resultado operativo:
+
+- Queda confirmada la alineacion efectiva de `AI_ENGINE_API_KEY` y `AI_ENGINE_BRIDGE_API_KEY` en el consumo agregado de backoffice hacia servicios AI para este entorno dev.
+
+## 17) Avance mini-iteracion AI (Bloque C completado)
+
+Fecha de ejecucion: 2026-03-28.
+
+Estado actual del Bloque C (runbook y alertado): **completado**.
+
+Evidencia de cierre:
+
+- Runbook corto publicado: `docs/operations/ai-services-recovery-runbook.md`.
+- Alerta P0 AI enlazada con runbook: `AxiomNodeAIServicesDown` en `observability-platform/alerts/p0-services-alerts.rules.yml`.
+- Simulacion controlada de incidente (restart de `ai-stats` y `ai-api`) con recuperacion a `200` en ambos health checks.
+- MTTR observado en simulacion: `10s`.
+
+## 18) Cierre mini-iteracion AI (rojo -> verde)
+
+Resultado: **mini-iteracion AI cerrada**.
+
+- `ai-engine-api`: verde (evidencia runtime y consumo agregado via edge en `200`).
+- `ai-engine-stats`: verde (evidencia runtime y consumo agregado via edge en `200`).
+- Criterio de salida mini-AI: cumplido en checklist operativo.

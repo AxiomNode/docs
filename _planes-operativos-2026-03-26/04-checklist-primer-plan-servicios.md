@@ -102,29 +102,29 @@ Objetivo:
 
 ### Bloque B: autenticacion y consumo agregado
 
-- [ ] Alinear `AI_ENGINE_API_KEY` y `AI_ENGINE_BRIDGE_API_KEY` en BFF y microservicios consumidores.
-- [ ] Validar `200` en edge para `/v1/backoffice/services/ai-engine-api/metrics`.
-- [ ] Validar `200` en edge para `/v1/backoffice/services/ai-engine-api/logs?limit=5`.
-- [ ] Validar `200` en edge para `/v1/backoffice/services/ai-engine-stats/metrics`.
-- [ ] Validar `200` en edge para `/v1/backoffice/services/ai-engine-stats/logs?limit=5`.
+- [x] Alinear `AI_ENGINE_API_KEY` y `AI_ENGINE_BRIDGE_API_KEY` en BFF y microservicios consumidores.
+- [x] Validar `200` en edge para `/v1/backoffice/services/ai-engine-api/metrics`.
+- [x] Validar `200` en edge para `/v1/backoffice/services/ai-engine-api/logs?limit=5`.
+- [x] Validar `200` en edge para `/v1/backoffice/services/ai-engine-stats/metrics`.
+- [x] Validar `200` en edge para `/v1/backoffice/services/ai-engine-stats/logs?limit=5`.
 
 ### Bloque C: runbook y alertado
 
-- [ ] Publicar runbook corto de recuperacion AI (arranque, smoke, rollback de keys).
-- [ ] Enlazar runbook en alerta P0 de servicios AI.
-- [ ] Ejecutar simulacion de incidente y registrar MTTR observado.
+- [x] Publicar runbook corto de recuperacion AI (arranque, smoke, rollback de keys).
+- [x] Enlazar runbook en alerta P0 de servicios AI.
+- [x] Ejecutar simulacion de incidente y registrar MTTR observado.
 
 ### Criterio de salida mini-iteracion AI
 
-- [ ] `ai-engine-api` clasificado en verde con evidencia runtime.
-- [ ] `ai-engine-stats` clasificado en verde con evidencia runtime.
-- [ ] Consumo agregado via edge validado con estado 200 para metrics/logs AI.
+- [x] `ai-engine-api` clasificado en verde con evidencia runtime.
+- [x] `ai-engine-stats` clasificado en verde con evidencia runtime.
+- [x] Consumo agregado via edge validado con estado 200 para metrics/logs AI.
 
 ### Tabla de control mini-iteracion AI
 
 | Item | Responsable | Estado | Evidencia |
 |---|---|---|---|
 | Arranque ai-engine-api y ai-engine-stats | Squad AI Platform | [x] | 2026-03-28: `ai-api /health=200`, `ai-stats /health=200`, `ai-stats /stats=200`, `ai-stats /stats/history?last_n=5=200` (validado con key efectiva de runtime) |
-| Alineacion de keys AI | Squad Edge Platform | [ ] |  |
-| Smoke agregado por edge (metrics/logs AI) | Squad Backoffice Backend | [ ] |  |
-| Runbook + alerta P0 AI | Squad AI Observability | [ ] |  |
+| Alineacion de keys AI | Squad Edge Platform | [x] | 2026-03-28: validacion runtime en compose edge con `AI_ENGINE_API_KEY=dev_api_test_key_2026` y `AI_ENGINE_BRIDGE_API_KEY=dev_bridge_test_key_2026`; consumo agregado AI responde `200` |
+| Smoke agregado por edge (metrics/logs AI) | Squad Backoffice Backend | [x] | 2026-03-28: `200` en `/v1/backoffice/services/ai-engine-api/metrics`, `/v1/backoffice/services/ai-engine-api/logs?limit=5`, `/v1/backoffice/services/ai-engine-stats/metrics`, `/v1/backoffice/services/ai-engine-stats/logs?limit=5` |
+| Runbook + alerta P0 AI | Squad AI Observability | [x] | 2026-03-28: runbook publicado en `docs/operations/ai-services-recovery-runbook.md`, alerta `AxiomNodeAIServicesDown` enlazada en `observability-platform/alerts/p0-services-alerts.rules.yml`; simulacion de reinicio controlado con `MTTR=10s` |
