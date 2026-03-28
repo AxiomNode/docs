@@ -66,3 +66,8 @@ Objetivo de esta hoja:
 | Observabilidad minima activa | Squad AI Observability | [x] | Logs estructurados con `correlation_id` + metricas Prometheus (`requests_total`, `errors_total`, `latency_ms_bucket`, `inflight_requests`) en edge/BFF + endpoint `/metrics` activo en quiz/wordpass + propagacion `traceparent/tracestate/baggage` + reglas P0 en `observability-platform/alerts/p0-services-alerts.rules.yml` |
 | Flujo quiz/wordpass estabilizado | Squad Games Runtime | [x] | Smoke check + abort batch + 503 por circuito abierto + dashboard requested->created + corrida final (3/3 en ambos; created=1 por servicio) |
 | Cierre iteracion del bloque actual | Tech Leads de dominio | [x] | build/test + comparativa KPI + informe de resultados publicado |
+
+### Nota de ejecucion runtime pendiente
+
+- 2026-03-28: intento de smoke runtime para criterio "cero incidentes por headers faltantes" bloqueado por entorno offline (`WinError 10061` en puertos 7005, 7010, 7011, 7100, 7101).
+- Script de validacion preparado: `platform-infra/environments/dev/scripts/smoke-edge.sh` (incluye envio de `authorization`, `x-correlation-id`, `x-firebase-id-token`, `x-api-key`).

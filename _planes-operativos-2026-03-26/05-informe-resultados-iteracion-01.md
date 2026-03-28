@@ -134,3 +134,9 @@ Recomendacion: abrir iteracion corta enfocada en calidad estructural de payload 
   - `api-gateway/src/tests/proxy.test.ts`
   - `bff-mobile/src/tests/mobile.test.ts`
   - `bff-backoffice/src/tests/backoffice.test.ts`
+
+## 9) Estado de validacion runtime del criterio de headers
+
+- 2026-03-28: se intento ejecutar smoke e2e en localhost para validar ausencia de incidentes por headers faltantes.
+- Resultado del intento: bloqueado por entorno no disponible (`WinError 10061`, connection refused) en `7005`, `7010`, `7011`, `7100`, `7101`.
+- Accion preparada: `platform-infra/environments/dev/scripts/smoke-edge.sh` actualizado para incluir forwarding de cabeceras criticas (`authorization`, `x-correlation-id`, `x-firebase-id-token`, `x-api-key`) cuando el entorno este levantado.
