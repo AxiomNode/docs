@@ -420,7 +420,7 @@ Supuesto comun para presupuesto mensual: ventana de 30 dias.
 
 ### Criterio de salida del Plan 1
 
-- [ ] No hay errores recurrentes por headers faltantes.
+- [x] No hay errores recurrentes por headers faltantes.
 - [ ] Todos los servicios exponen metricas y logs consumibles.
 - [ ] Flujos criticos tienen trazabilidad end-to-end.
 - [x] quiz y wordpass pasan de estado rojo a estado operativo medible.

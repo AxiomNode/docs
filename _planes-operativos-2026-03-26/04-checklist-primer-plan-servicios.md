@@ -51,7 +51,7 @@ Objetivo de esta hoja:
 
 ## Criterios de salida de este primer plan
 
-- [ ] Cero incidentes por headers faltantes en rutas criticas.
+- [x] Cero incidentes por headers faltantes en rutas criticas.
 - [ ] Todas las rutas operativas clave con observabilidad minima.
 - [x] Flujos de generacion AI con resultado medible y trazable.
 - [ ] Estado de cada servicio clasificable como verde/amarillo/rojo con evidencia.
@@ -61,13 +61,13 @@ Objetivo de esta hoja:
 | Item | Responsable | Estado | Evidencia |
 |---|---|---|---|
 | Baseline KPI por servicio | Squad SRE Platform | [x] | Informe iteracion 01 con snapshot runtime y comparativa pre/post |
-| Forwarding de headers criticos | Squad Edge Platform | [x] | Forwarding unificado en `@axiomnode/shared-sdk-client/proxy` (`authorization`, `x-firebase-id-token`, `x-api-key`, `x-correlation-id`) + propagacion de `x-correlation-id` en fetch directo de bff-backoffice + regresion en `api-gateway/src/tests/proxy.test.ts`, `bff-mobile/src/tests/mobile.test.ts` y `bff-backoffice/src/tests/backoffice.test.ts` (verde) |
+| Forwarding de headers criticos | Squad Edge Platform | [x] | Forwarding unificado en `@axiomnode/shared-sdk-client/proxy` (`authorization`, `x-firebase-id-token`, `x-api-key`, `x-correlation-id`) + propagacion de `x-correlation-id` en fetch directo de bff-backoffice + regresion en `api-gateway/src/tests/proxy.test.ts`, `bff-mobile/src/tests/mobile.test.ts` y `bff-backoffice/src/tests/backoffice.test.ts` (verde) + smoke runtime `platform-infra/environments/dev/scripts/smoke-edge.sh` OK |
 | Circuit breaker y timeout policy | Squad Edge Platform | [x] | Breaker auth AI activo + timeout policy en api-gateway, bff-backoffice y bff-mobile |
 | Observabilidad minima activa | Squad AI Observability | [x] | Logs estructurados con `correlation_id` + metricas Prometheus (`requests_total`, `errors_total`, `latency_ms_bucket`, `inflight_requests`) en edge/BFF + endpoint `/metrics` activo en quiz/wordpass + propagacion `traceparent/tracestate/baggage` + reglas P0 en `observability-platform/alerts/p0-services-alerts.rules.yml` |
 | Flujo quiz/wordpass estabilizado | Squad Games Runtime | [x] | Smoke check + abort batch + 503 por circuito abierto + dashboard requested->created + corrida final (3/3 en ambos; created=1 por servicio) |
 | Cierre iteracion del bloque actual | Tech Leads de dominio | [x] | build/test + comparativa KPI + informe de resultados publicado |
 
-### Nota de ejecucion runtime pendiente
+### Nota de ejecucion runtime
 
-- 2026-03-28: intento de smoke runtime para criterio "cero incidentes por headers faltantes" bloqueado por entorno offline (`WinError 10061` en puertos 7005, 7010, 7011, 7100, 7101).
-- Script de validacion preparado: `platform-infra/environments/dev/scripts/smoke-edge.sh` (incluye envio de `authorization`, `x-correlation-id`, `x-firebase-id-token`, `x-api-key`).
+- 2026-03-28: primer intento bloqueado por entorno offline (`WinError 10061` en puertos 7005, 7010, 7011, 7100, 7101).
+- 2026-03-28: validacion completada con `platform-infra/environments/dev/scripts/smoke-edge.sh` y resultado OK para forwarding de `authorization`, `x-correlation-id`, `x-firebase-id-token`, `x-api-key`.
