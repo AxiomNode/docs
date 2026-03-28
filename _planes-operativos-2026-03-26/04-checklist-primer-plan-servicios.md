@@ -33,7 +33,7 @@ Objetivo de esta hoja:
 - [x] Log schema unificado en servicios runtime.
 - [x] Metricas Prometheus por endpoint clave.
 - [x] Correlation id en logs y respuestas.
-- [ ] Alertas P0 con runbook por servicio.
+- [x] Alertas P0 con runbook por servicio.
 
 ## Bloque 5: flujo critico quiz/wordpass
 
@@ -63,6 +63,6 @@ Objetivo de esta hoja:
 | Baseline KPI por servicio |  | [x] | Informe iteracion 01 con snapshot runtime y comparativa pre/post |
 | Forwarding de headers criticos |  | [ ] |  |
 | Circuit breaker y timeout policy |  | [x] | Breaker auth AI activo + timeout policy en api-gateway, bff-backoffice y bff-mobile |
-| Observabilidad minima activa |  | [ ] | Logs estructurados con `correlation_id` + metricas Prometheus (`requests_total`, `errors_total`, `latency_ms_bucket`, `inflight_requests`) en edge/BFF + endpoint `/metrics` activo en quiz/wordpass + propagacion `traceparent/tracestate/baggage` en forwarding compartido |
+| Observabilidad minima activa |  | [x] | Logs estructurados con `correlation_id` + metricas Prometheus (`requests_total`, `errors_total`, `latency_ms_bucket`, `inflight_requests`) en edge/BFF + endpoint `/metrics` activo en quiz/wordpass + propagacion `traceparent/tracestate/baggage` + reglas P0 en `observability-platform/alerts/p0-services-alerts.rules.yml` |
 | Flujo quiz/wordpass estabilizado |  | [x] | Smoke check + abort batch + 503 por circuito abierto + dashboard requested->created + corrida final (3/3 en ambos; created=1 por servicio) |
 | Cierre iteracion del bloque actual |  | [x] | build/test + comparativa KPI + informe de resultados publicado |

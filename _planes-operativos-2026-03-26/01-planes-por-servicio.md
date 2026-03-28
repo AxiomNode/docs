@@ -367,7 +367,7 @@
 - [x] Estandarizar logs JSON con correlation_id.
 - [x] Exponer metricas Prometheus por endpoint clave.
 - [x] Activar trazas distribuidas en hops interservicio.
-- [ ] Crear alertas P0 con runbook enlazado.
+- [x] Crear alertas P0 con runbook enlazado.
 
 ### Bloque D. Eficacia funcional (foco quiz y wordpass)
 
