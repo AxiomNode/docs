@@ -17,10 +17,10 @@ Objetivo de esta hoja:
 
 ## Bloque 2: autenticacion y forwarding
 
-- [ ] Verificar forwarding de `authorization` en todos los hops.
-- [ ] Verificar forwarding de `x-firebase-id-token` donde aplique.
-- [ ] Verificar forwarding de `x-api-key` en rutas AI.
-- [ ] Añadir test de regresion por cada cabecera critica.
+- [x] Verificar forwarding de `authorization` en todos los hops.
+- [x] Verificar forwarding de `x-firebase-id-token` donde aplique.
+- [x] Verificar forwarding de `x-api-key` en rutas AI.
+- [x] Añadir test de regresion por cada cabecera critica.
 
 ## Bloque 3: resiliencia minima
 
@@ -61,7 +61,7 @@ Objetivo de esta hoja:
 | Item | Responsable | Estado | Evidencia |
 |---|---|---|---|
 | Baseline KPI por servicio | Squad SRE Platform | [x] | Informe iteracion 01 con snapshot runtime y comparativa pre/post |
-| Forwarding de headers criticos |  | [ ] |  |
+| Forwarding de headers criticos | Squad Edge Platform | [x] | Forwarding unificado en `@axiomnode/shared-sdk-client/proxy` (`authorization`, `x-firebase-id-token`, `x-api-key`, `x-correlation-id`) + propagacion de `x-correlation-id` en fetch directo de bff-backoffice + regresion en `api-gateway/src/tests/proxy.test.ts`, `bff-mobile/src/tests/mobile.test.ts` y `bff-backoffice/src/tests/backoffice.test.ts` (verde) |
 | Circuit breaker y timeout policy | Squad Edge Platform | [x] | Breaker auth AI activo + timeout policy en api-gateway, bff-backoffice y bff-mobile |
 | Observabilidad minima activa | Squad AI Observability | [x] | Logs estructurados con `correlation_id` + metricas Prometheus (`requests_total`, `errors_total`, `latency_ms_bucket`, `inflight_requests`) en edge/BFF + endpoint `/metrics` activo en quiz/wordpass + propagacion `traceparent/tracestate/baggage` + reglas P0 en `observability-platform/alerts/p0-services-alerts.rules.yml` |
 | Flujo quiz/wordpass estabilizado | Squad Games Runtime | [x] | Smoke check + abort batch + 503 por circuito abierto + dashboard requested->created + corrida final (3/3 en ambos; created=1 por servicio) |

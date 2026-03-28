@@ -393,7 +393,7 @@ Supuesto comun para presupuesto mensual: ventana de 30 dias.
 
 ### Bloque B. P0 de seguridad y resiliencia
 
-- [ ] Validar forwarding de headers criticos en edge y BFF.
+- [x] Validar forwarding de headers criticos en edge y BFF.
 - [x] Corregir rutas con auth incompleta (incluyendo AI keys donde aplique).
 - [x] Implementar timeout estandar por tipo de llamada.
 - [x] Implementar circuito de proteccion para dependencias criticas.

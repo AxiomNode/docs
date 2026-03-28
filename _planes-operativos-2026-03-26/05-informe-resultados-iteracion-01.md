@@ -125,3 +125,12 @@ Recomendacion: abrir iteracion corta enfocada en calidad estructural de payload 
 - Owner y backup tecnico definidos para todos los servicios del Plan 1.
 - Responsabilidad principal publicada en README de cada servicio del alcance.
 - SLO y error budget mensual acordados por servicio (edge 99.9%, internos 99.5%).
+
+## 8) Avance Bloque B (forwarding de headers criticos)
+
+- Forwarding de headers criticos unificado en edge/BFF: `authorization`, `x-firebase-id-token`, `x-api-key`, `x-correlation-id`.
+- Ajuste en `bff-backoffice` para incluir `x-correlation-id` en fetch directo a servicios aguas abajo.
+- Regresion automatizada agregada y en verde en:
+  - `api-gateway/src/tests/proxy.test.ts`
+  - `bff-mobile/src/tests/mobile.test.ts`
+  - `bff-backoffice/src/tests/backoffice.test.ts`
