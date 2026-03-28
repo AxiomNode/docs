@@ -80,10 +80,49 @@ Objetivo de esta hoja:
 | ai-engine-stats | rojo | endpoint en `7000` no disponible en snapshot (`DOWN`) |
 | ai-engine-api | rojo | endpoint en `7001` no disponible en snapshot (`DOWN`) |
 | llama-server | amarillo | servicio accesible en `11434` pero sin contrato de observabilidad estandar (`/health|/metrics|/monitor/*` devuelven `404`) |
-| Flujo quiz/wordpass estabilizado | Squad Games Runtime | [x] | Smoke check + abort batch + 503 por circuito abierto + dashboard requested->created + corrida final (3/3 en ambos; created=1 por servicio) |
-| Cierre iteracion del bloque actual | Tech Leads de dominio | [x] | build/test + comparativa KPI + informe de resultados publicado |
 
 ### Nota de ejecucion runtime
 
 - 2026-03-28: primer intento bloqueado por entorno offline (`WinError 10061` en puertos 7005, 7010, 7011, 7100, 7101).
 - 2026-03-28: validacion completada con `platform-infra/environments/dev/scripts/smoke-edge.sh` y resultado OK para forwarding de `authorization`, `x-correlation-id`, `x-firebase-id-token`, `x-api-key`.
+
+## Mini-iteracion AI (rojo -> verde) checklist ejecutable
+
+Objetivo:
+
+- Llevar `ai-engine-api` y `ai-engine-stats` de rojo a verde con evidencia runtime + consumo agregado via edge.
+
+### Bloque A: arranque y disponibilidad AI
+
+- [ ] Levantar `ai-engine-api` en `7001` con endpoint `/health` operativo.
+- [ ] Levantar `ai-engine-stats` en `7000` con endpoint `/health` operativo.
+- [ ] Validar `200` en `/monitor/stats` y `/monitor/logs?limit=5` para ambos servicios.
+
+### Bloque B: autenticacion y consumo agregado
+
+- [ ] Alinear `AI_ENGINE_API_KEY` y `AI_ENGINE_BRIDGE_API_KEY` en BFF y microservicios consumidores.
+- [ ] Validar `200` en edge para `/v1/backoffice/services/ai-engine-api/metrics`.
+- [ ] Validar `200` en edge para `/v1/backoffice/services/ai-engine-api/logs?limit=5`.
+- [ ] Validar `200` en edge para `/v1/backoffice/services/ai-engine-stats/metrics`.
+- [ ] Validar `200` en edge para `/v1/backoffice/services/ai-engine-stats/logs?limit=5`.
+
+### Bloque C: runbook y alertado
+
+- [ ] Publicar runbook corto de recuperacion AI (arranque, smoke, rollback de keys).
+- [ ] Enlazar runbook en alerta P0 de servicios AI.
+- [ ] Ejecutar simulacion de incidente y registrar MTTR observado.
+
+### Criterio de salida mini-iteracion AI
+
+- [ ] `ai-engine-api` clasificado en verde con evidencia runtime.
+- [ ] `ai-engine-stats` clasificado en verde con evidencia runtime.
+- [ ] Consumo agregado via edge validado con estado 200 para metrics/logs AI.
+
+### Tabla de control mini-iteracion AI
+
+| Item | Responsable | Estado | Evidencia |
+|---|---|---|---|
+| Arranque ai-engine-api y ai-engine-stats | Squad AI Platform | [ ] |  |
+| Alineacion de keys AI | Squad Edge Platform | [ ] |  |
+| Smoke agregado por edge (metrics/logs AI) | Squad Backoffice Backend | [ ] |  |
+| Runbook + alerta P0 AI | Squad AI Observability | [ ] |  |

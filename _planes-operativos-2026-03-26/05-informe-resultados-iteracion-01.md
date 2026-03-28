@@ -203,3 +203,7 @@ Acciones minimas propuestas:
 Condicion de cierre sugerida para esta mini-iteracion:
 
 - `ai-engine-api` y `ai-engine-stats` clasificados en verde con evidencia runtime + smoke agregado en edge.
+
+Checklist ejecutable asociada:
+
+- Ver seccion `Mini-iteracion AI (rojo -> verde) checklist ejecutable` en `04-checklist-primer-plan-servicios.md`.
