@@ -365,7 +365,7 @@
 ### Bloque C. P0 de observabilidad
 
 - [x] Estandarizar logs JSON con correlation_id.
-- [ ] Exponer metricas Prometheus por endpoint clave.
+- [x] Exponer metricas Prometheus por endpoint clave.
 - [ ] Activar trazas distribuidas en hops interservicio.
 - [ ] Crear alertas P0 con runbook enlazado.
 
