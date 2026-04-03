@@ -83,6 +83,36 @@ Added schema:
 - shared request/monitoring validators
 - gateway/bff health and proxy shared helpers
 
+## Phase 2 — Game Route Schemas Extraction (2026-03-29)
+
+`microservice-quizz` and `microservice-wordpass` shared ~10 identical local Zod schemas
+in their `src/app/routes/games.ts` files. These were extracted to the SDK.
+
+### New SDK module
+
+- `src/game-schemas.ts` — exports `BaseGenerateSchema`, `IngestDocumentSchema`, `IngestSchema`,
+  `RandomModelsQuerySchema`, `HistoryQuerySchema`, `GenerationProcessParamsSchema`,
+  `GenerationProcessQuerySchema`, `GenerationProcessesListQuerySchema`,
+  `ManualHistoryEntrySchema`, `HistoryItemParamsSchema`, plus inferred types.
+
+### Service adaptations
+
+- `microservice-quizz/src/app/routes/games.ts` now imports all schemas from
+  `@axiomnode/shared-sdk-client`. `GenerateSchema` is an alias for `BaseGenerateSchema`.
+- `microservice-wordpass/src/app/routes/games.ts` now imports all schemas and extends
+  `BaseGenerateSchema` with `letters: z.string().optional()`.
+
+### Additional cleanups (same date)
+
+- **`SERVICE_COMMUNICATION_TOKEN` removed** from `secrets/scripts/bootstrap-secrets.mjs`
+  and `secrets/scripts/validate-secrets-sync.mjs` — was generated but never consumed at runtime.
+- **`game-categories.v1.json`** cross-referenced with `trivia-categories.ts` via comments
+  (JSON Schema defines shape, TS module holds static data).
+
+### Validation
+
+- `shared-sdk-client/typescript`: `npx tsc` passed, `dist/game-schemas.js` emitted.
+
 ## Notes
 
 - Local-only file `microservice-users/src/.env` was not modified as part of migration.
