@@ -1,21 +1,21 @@
 # Target Architecture
 
-## Objetivo
+## Goal
 
-Definir la arquitectura objetivo para soportar clientes mobile y backoffice sobre una plataforma de microservicios y capacidades AI.
+Define the target architecture for mobile and backoffice clients on top of a microservice-based platform with AI capabilities.
 
-## Capas principales
+## Main layers
 
-1. Edge layer: `api-gateway` como punto de entrada publico.
-2. Experience layer: `bff-mobile` y `bff-backoffice` con contratos optimizados por canal.
-3. Domain services: microservicios de negocio (`microservice-users`, `microservice-quizz`, `microservice-wordpass`, `ai-engine`).
-4. Data and async: bases de datos por servicio y eventos para procesos asincronos.
-5. Platform: `platform-infra`, `observability-platform`, `contracts-and-schemas`, `shared-sdk-client`.
+1. Edge layer: `api-gateway` as the single public entry point.
+2. Experience layer: `bff-mobile` and `bff-backoffice` with channel-optimized contracts.
+3. Domain services: `microservice-users`, `microservice-quizz`, `microservice-wordpass`, `ai-engine`.
+4. Data and async: service-owned databases and event flows for asynchronous processing.
+5. Platform layer: `platform-infra`, `observability-platform`, `contracts-and-schemas`, `shared-sdk-client`, `secrets`.
 
-## Principios
+## Architecture principles
 
-- Un unico ingreso publico.
-- APIs internas privadas.
-- Contratos versionados y trazables.
-- Observabilidad desde el inicio.
-- Seguridad por defecto (least privilege, secretos externos, mTLS opcional por fase).
+- Single public ingress.
+- Private internal APIs by default.
+- Versioned and traceable contracts.
+- Observability-first runtime model.
+- Secure-by-default posture (least privilege, externalized secrets, phased hardening).

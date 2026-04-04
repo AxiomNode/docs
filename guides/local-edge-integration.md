@@ -1,28 +1,28 @@
 # Local Edge Integration
 
-## Objetivo
+## Goal
 
-Levantar `api-gateway`, `bff-mobile` y `bff-backoffice` en una sola composicion para pruebas integradas locales.
+Run `api-gateway`, `bff-mobile`, and `bff-backoffice` in one composition for local integrated testing.
 
-## Prerrequisitos
+## Prerequisites
 
-1. Tener activos los microservicios de dominio en host:
-   - `microservice-quizz` en `7100`
-   - `microservice-wordpass` en `7101`
-   - `microservice-users` en `7102`
-2. Docker Desktop corriendo.
-3. Secretos de entorno dev en repo privado `secrets`.
-4. Ejecutar `node scripts/prepare-runtime-secrets.mjs dev` desde `secrets`.
+1. Domain microservices running on host:
+   - `microservice-quizz` on `7100`
+   - `microservice-wordpass` on `7101`
+   - `microservice-users` on `7102`
+2. Docker Desktop running.
+3. Dev secrets available in private `secrets` repository.
+4. Run `node scripts/prepare-runtime-secrets.mjs dev` from `secrets`.
 
-## Levantar edge layer
+## Start edge layer
 
-Desde `platform-infra/environments/dev`:
+From `platform-infra/environments/dev`:
 
 ```bash
 docker compose -f docker-compose.edge-integration.yml up -d --build
 ```
 
-## Comprobaciones rapidas
+## Quick checks
 
 ```bash
 curl http://localhost:7005/health
@@ -30,21 +30,21 @@ curl "http://localhost:7005/v1/mobile/games/quiz/random?language=es"
 curl "http://localhost:7005/v1/backoffice/users/leaderboard?limit=5"
 ```
 
-Si `EDGE_API_TOKEN` esta configurado en gateway, incluir:
+If `EDGE_API_TOKEN` is configured in the gateway, include:
 
 ```bash
 -H "Authorization: Bearer <EDGE_API_TOKEN>"
 ```
 
-`EDGE_API_TOKEN` se carga desde `api-gateway/src/.env.secrets`, copiado desde `secrets/runtime/repositories/api-gateway/dev.env`.
+`EDGE_API_TOKEN` is loaded from `api-gateway/src/.env.secrets`, copied from `secrets/runtime/repositories/api-gateway/dev.env`.
 
-## Smoke test automatizado
+## Automated smoke test
 
 ```bash
 bash scripts/smoke-edge.sh
 ```
 
-## Apagado
+## Shutdown
 
 ```bash
 docker compose -f docker-compose.edge-integration.yml down

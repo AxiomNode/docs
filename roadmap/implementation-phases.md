@@ -1,28 +1,28 @@
 # Implementation Phases
 
-Estado: documento historico de fases ya ejecutadas. No se usa como backlog activo.
+Status: historical record of completed phases. Not used as an active backlog.
 
-## Fase 1: Baseline
+## Phase 1: Baseline
 
-- Estructura base de repos nuevos.
-- Pipelines CI minimos.
-- Health endpoints y convenciones de configuracion.
+- Base structure for new repositories.
+- Minimum CI pipelines.
+- Health endpoints and configuration conventions.
 
-## Fase 2: Integracion
+## Phase 2: Integration
 
-- Rutas reales en gateway y BFFs.
-- Primeras integraciones con microservicios existentes.
-- Contratos iniciales versionados.
+- Real route implementation in gateway and BFFs.
+- First integrations with existing microservices.
+- Initial versioned contracts.
 
-## Fase 3: Plataforma
+## Phase 3: Platform
 
-- IaC y despliegue automatizado por entorno.
-- Observabilidad operacional con dashboards y alertas.
-- SDKs generados desde contratos.
-- Secretos centralizados por entorno en repositorio `secrets`.
+- IaC and automated deployment per environment.
+- Operational observability with dashboards and alerts.
+- SDKs generated from shared contracts.
+- Centralized per-environment secrets in `secrets`.
 
-## Fase 4: Hardening
+## Phase 4: Hardening
 
-- Seguridad avanzada, politicas y auditoria.
-- SLO/SLA, performance y capacidad.
-- Automatizacion de pruebas de resiliencia.
+- Advanced security controls, policies, and auditing.
+- SLO/SLA, performance, and capacity hardening.
+- Automated resilience testing.

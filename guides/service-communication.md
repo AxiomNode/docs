@@ -1,64 +1,61 @@
 # Service Communication Model
 
-Ultima actualizacion: 2026-03-29.
+Last updated: 2026-04-05.
 
-## Flujo sincrono
+## Synchronous request flow
 
-1. Cliente mobile o backoffice llama a `api-gateway` (:7005).
-2. `api-gateway` valida politicas de borde (EDGE_API_TOKEN, CORS, correlation-id).
-3. `api-gateway` enruta al BFF correspondiente usando `forwardHttp` de shared-sdk-client.
-4. BFF agrega y transforma respuestas consultando microservicios internos.
+1. Mobile or backoffice client calls `api-gateway` (`:7005`).
+2. `api-gateway` applies edge policies (token check, CORS, correlation ID, route constraints).
+3. `api-gateway` forwards to the correct BFF using shared forwarding utilities.
+4. BFF services orchestrate internal service calls and shape response payloads.
 
-## Endpoints publicos (api-gateway → BFFs)
+## Public API surface (`api-gateway` -> BFFs)
 
-### Mobile (via bff-mobile)
+### Mobile routes (through `bff-mobile`)
 
-| Metodo | Ruta | Destino |
-|--------|------|---------|
-| GET | `/v1/mobile/games/quiz/random` | quizz:/games/models/random |
-| GET | `/v1/mobile/games/wordpass/random` | wordpass:/games/models/random |
-| POST | `/v1/mobile/games/quiz/generate` | quizz:/games/generate (120s timeout) |
-| POST | `/v1/mobile/games/wordpass/generate` | wordpass:/games/generate (120s timeout) |
+| Method | Route | Upstream target |
+|---|---|---|
+| GET | `/v1/mobile/games/quiz/random` | `microservice-quizz:/games/models/random` |
+| GET | `/v1/mobile/games/wordpass/random` | `microservice-wordpass:/games/models/random` |
+| POST | `/v1/mobile/games/quiz/generate` | `microservice-quizz:/games/generate` (generation timeout profile) |
+| POST | `/v1/mobile/games/wordpass/generate` | `microservice-wordpass:/games/generate` (generation timeout profile) |
 
-### Backoffice (via bff-backoffice)
+### Backoffice routes (through `bff-backoffice`)
 
-| Metodo | Ruta | Destino |
-|--------|------|---------|
-| POST | `/v1/backoffice/auth/session` | users:/users/firebase/session |
-| GET | `/v1/backoffice/auth/me` | users:/users/me/profile |
-| GET | `/v1/backoffice/users/leaderboard` | users:/users/leaderboard |
-| GET | `/v1/backoffice/monitor/stats` | users:/monitor/stats |
-| GET | `/v1/backoffice/admin/users/roles` | users:/users/admin/roles |
-| PATCH | `/v1/backoffice/admin/users/roles/:uid` | users:/users/admin/roles/:uid |
-| GET | `/v1/backoffice/services` | catalogo local de servicios |
-| GET | `/v1/backoffice/services/:s/metrics` | servicio:/monitor/stats |
-| GET | `/v1/backoffice/services/:s/logs` | servicio:/monitor/logs |
-| GET | `/v1/backoffice/services/:s/data` | servicio (segun dataset) |
-| GET | `/v1/backoffice/services/:s/catalogs` | servicio:/catalogs |
-| POST | `/v1/backoffice/services/:s/generation/process` | servicio:/games/generate/process |
-| POST | `/v1/backoffice/services/:s/generation/wait` | servicio:/games/generate/process/wait |
-| GET | `/v1/backoffice/services/:s/generation/processes` | servicio:/games/generate/processes |
+| Method | Route | Upstream target |
+|---|---|---|
+| POST | `/v1/backoffice/auth/session` | `microservice-users:/users/firebase/session` |
+| GET | `/v1/backoffice/auth/me` | `microservice-users:/users/me/profile` |
+| GET | `/v1/backoffice/users/leaderboard` | `microservice-users:/users/leaderboard` |
+| GET | `/v1/backoffice/monitor/stats` | `microservice-users:/monitor/stats` |
+| GET | `/v1/backoffice/services/:service/metrics` | service-specific `/monitor/stats` |
+| GET | `/v1/backoffice/services/:service/logs` | service-specific `/monitor/logs` |
+| POST | `/v1/backoffice/services/:service/generation/process` | service generation process endpoint |
 
-## Flujo asincrono
+## Asynchronous flow
 
-- Procesos de generacion batch inician con POST y devuelven taskId.
-- Polling con GET `/generation/process/:taskId` para seguimiento.
-- Los contratos de eventos se versionan en `contracts-and-schemas/schemas/events/`.
+- Batch generation endpoints return `taskId` values.
+- Clients poll process-status endpoints for progress/completion.
+- Event contracts are versioned in `contracts-and-schemas/schemas/events/`.
 
-## Reglas de comunicacion
+## Communication rules
 
-- No exponer microservicios de dominio directamente a internet.
-- Evitar llamadas BFF a BFF.
-- Definir timeouts y retries por dependencia (`UPSTREAM_TIMEOUT_MS`, `UPSTREAM_GENERATION_TIMEOUT_MS`).
-- Incluir `x-correlation-id` en toda peticion (propagado por `extractForwardHeaders` del SDK).
-- Headers de autenticacion propagados: `authorization`, `x-firebase-id-token`, `x-dev-firebase-uid`, `x-api-key`.
+- Domain services are private and not directly internet-facing.
+- BFF-to-BFF calls are disallowed.
+- Timeouts and retry strategy must be explicit per dependency.
+- `x-correlation-id` must be propagated end-to-end.
+- Auth/security headers to preserve when applicable:
+	- `authorization`
+	- `x-firebase-id-token`
+	- `x-dev-firebase-uid`
+	- `x-api-key`
 
-## Autenticacion entre capas
+## Layered authentication model
 
-| Capa | Mecanismo |
-|------|-----------|
-| Cliente → api-gateway | `Authorization: Bearer EDGE_API_TOKEN` |
-| bff-backoffice → ai-engine | `X-API-Key: AI_ENGINE_BRIDGE_API_KEY` |
-| microservice-quizz/wordpass → ai-engine | `X-API-Key: AI_ENGINE_API_KEY` |
-| Backoffice UI → Firebase | Firebase ID Token |
-| bff-backoffice → microservice-users | Forward `x-firebase-id-token` header |
+| Layer | Mechanism |
+|---|---|
+| Client -> `api-gateway` | `Authorization: Bearer EDGE_API_TOKEN` |
+| `bff-backoffice` -> `ai-engine` | `X-API-Key: AI_ENGINE_BRIDGE_API_KEY` |
+| quiz/wordpass services -> `ai-engine` | `X-API-Key: AI_ENGINE_API_KEY` |
+| Backoffice UI -> Firebase | Firebase ID token |
+| `bff-backoffice` -> `microservice-users` | Forwarded Firebase token headers |

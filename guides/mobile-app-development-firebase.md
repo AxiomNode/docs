@@ -1,173 +1,85 @@
-# Guia De Desarrollo App Movil (Juegos IA + Firebase)
+# Mobile App Development Guide (AI Games + Firebase)
 
-## Objetivo
+## Goal
 
-Definir como construir la app movil de AxiomNode para consumir juegos generados por IA, autenticando usuarios con Firebase y registrando su actividad de juego.
+Define how to build the AxiomNode mobile app to consume AI-generated games, authenticate users with Firebase, and track gameplay activity.
 
-## Vision Del Producto
+## Product scope
 
-La app movil debe permitir:
+The app should support:
 
-1. Registro e inicio de sesion con Firebase.
-2. Descubrir contenido de quiz y word-pass.
-3. Generar nuevas partidas con IA.
-4. Guardar progreso, resultados y estadisticas del jugador.
+1. Firebase sign-up/sign-in.
+2. Quiz and word-pass discovery.
+3. AI-powered game generation flows.
+4. Progress and gameplay stats tracking.
 
-## Arquitectura Recomendada
+## Recommended architecture
 
-Flujo objetivo:
+Main path:
 
-1. App movil -> api-gateway (edge)
-2. api-gateway -> bff-mobile
-3. bff-mobile -> microservice-quizz y microservice-wordpass
-4. Para identidad y estadisticas: bff-mobile -> microservice-users
+1. Mobile app -> `api-gateway`
+2. `api-gateway` -> `bff-mobile`
+3. `bff-mobile` -> `microservice-quizz` / `microservice-wordpass`
+4. Identity/stats path -> `microservice-users`
 
-Endpoints de juegos ya disponibles por edge:
+Current edge routes:
 
-- GET /v1/mobile/games/quiz/random
-- GET /v1/mobile/games/wordpass/random
-- POST /v1/mobile/games/quiz/generate
-- POST /v1/mobile/games/wordpass/generate
+- `GET /v1/mobile/games/quiz/random`
+- `GET /v1/mobile/games/wordpass/random`
+- `POST /v1/mobile/games/quiz/generate`
+- `POST /v1/mobile/games/wordpass/generate`
 
-## Nota Importante De Seguridad
+## Security note
 
-El EDGE_API_TOKEN es secreto de infraestructura. No debe embebirse en la app movil.
+`EDGE_API_TOKEN` is an infrastructure secret and must never be embedded in mobile clients.
 
-Para ambiente productivo, hay dos opciones validas:
+For production, use one of these patterns:
 
-1. api-gateway en modo publico para mobile con validacion de Firebase JWT server-side.
-2. endpoint publico intermedio (BFF publico) que inyecte credenciales internas sin exponer secretos en cliente.
+1. Public mobile edge with server-side Firebase JWT validation.
+2. Public intermediary endpoint/BFF that injects internal credentials safely.
 
-## Stack Tecnologico Recomendado
+## Recommended stack
 
 - React Native + Expo
-- TypeScript estricto
-- Navegacion: React Navigation
-- Estado remoto: TanStack Query
-- Estado local UI: Zustand o Context ligero
-- Formularios: React Hook Form + Zod
-- Almacenamiento seguro: expo-secure-store
-- Telemetria de cliente: Sentry o equivalente
+- Strict TypeScript
+- React Navigation
+- TanStack Query
+- React Hook Form + Zod
+- secure local storage (`expo-secure-store`)
 
-## Estructura Inicial Sugerida
+## Firebase authentication flow
 
-src/
-  app/
-    navigation/
-    providers/
-  modules/
-    auth/
-    home/
-    quiz/
-    wordpass/
-    profile/
-    stats/
-  shared/
-    api/
-    firebase/
-    ui/
-    hooks/
-    utils/
+1. User authenticates with Firebase provider.
+2. App obtains Firebase ID token.
+3. App sends token to backend session endpoint.
 
-## Flujo De Autenticacion Con Firebase
+Related domain endpoints:
 
-1. El usuario inicia sesion en Firebase (email/password, Google u otro provider).
-2. La app obtiene idToken de Firebase.
-3. La app envia idToken al backend para sincronizar sesion de dominio.
+- `POST /users/firebase/session`
+- `GET /users/me/profile`
+- `GET /users/me/stats`
+- `POST /users/me/games/events`
 
-Endpoint de dominio ya implementado en users:
+## Contract note
 
-- POST /users/firebase/session
+For generation requests, `categoryId` is a string (for example: `"23"`, `"27"`).
 
-Tambien existen endpoints autenticados de perfil y stats:
+## Minimum MVP flow
 
-- GET /users/me/profile
-- GET /users/me/stats
-- POST /users/me/games/events
+1. Onboarding and Firebase login.
+2. Home recommendations (random quiz/word-pass).
+3. Quiz gameplay screen.
+4. Word-pass gameplay screen.
+5. Result submission + event registration.
+6. Profile and progress summary.
 
-## Gap Actual A Resolver Para Mobile Completo
+## Configuration baseline
 
-Hoy esos endpoints de users no estan expuestos en bff-mobile/api-gateway.
+- `EXPO_PUBLIC_API_BASE_URL`
+- `EXPO_PUBLIC_FIREBASE_API_KEY`
+- `EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN`
+- `EXPO_PUBLIC_FIREBASE_PROJECT_ID`
+- `EXPO_PUBLIC_FIREBASE_APP_ID`
+- `EXPO_PUBLIC_APP_ENV`
 
-Agregar en proxima iteracion:
-
-1. Rutas en bff-mobile para session/perfil/stats/eventos.
-2. Rutas proxy equivalentes en api-gateway.
-3. Propagacion segura del bearer token Firebase hasta microservice-users.
-
-## Contratos Y Payloads
-
-Para generar juegos, categoryId es string (ejemplos validos: "23", "27").
-
-Payload base para generate:
-
-- language: string
-- categoryId: string
-- topic: string opcional
-- numQuestions: number opcional
-
-## Experiencia De Usuario Minima (MVP)
-
-1. Onboarding + login Firebase.
-2. Home con recomendaciones (random quiz/word-pass).
-3. Pantalla de juego quiz.
-4. Pantalla de juego word-pass.
-5. Resultado y registro de evento en users.
-6. Perfil con resumen de progreso.
-
-## Estrategia De Datos Y Cache
-
-1. Cache corta para random games (evitar repeticion inmediata).
-2. Reintentos con backoff en generate por latencia de IA.
-3. Fallback UX cuando generate tarde mas de lo esperado.
-4. Persistencia local de ultima partida y progreso parcial.
-
-## Errores Y Resiliencia
-
-Manejar explicitamente:
-
-1. 401 Unauthorized (token invalido o expirado).
-2. 429 rate limit (si aplica en edge).
-3. 502/504 de generacion IA (mostrar reintentar y usar contenido random cacheado).
-4. Perdida de red (modo degradado con estado local).
-
-## Entornos Y Configuracion
-
-Variables recomendadas en app:
-
-- EXPO_PUBLIC_API_BASE_URL
-- EXPO_PUBLIC_FIREBASE_API_KEY
-- EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN
-- EXPO_PUBLIC_FIREBASE_PROJECT_ID
-- EXPO_PUBLIC_FIREBASE_APP_ID
-- EXPO_PUBLIC_APP_ENV
-
-No incluir secretos internos de infraestructura en variables publicas.
-
-## Testing Recomendado
-
-1. Unit tests para logica de dominio cliente (transformaciones, hooks).
-2. Integration tests para pantallas clave (auth, generate, resultado).
-3. E2E (Detox o Maestro) para login + jugar + guardar evento.
-4. Contract tests de cliente contra respuestas reales de edge en dev.
-
-## Plan De Implementacion De Referencia
-
-Fase A (core app):
-- bootstrap Expo + navigation + auth state
-
-Fase B (juego):
-- random + generate quiz/word-pass + experiencia de juego
-
-Fase C (identidad y progreso):
-- session Firebase con users + perfil + stats + game events
-
-Fase D (hardening):
-- telemetria, crash reporting, performance, offline parcial
-
-## Entregables Esperados
-
-1. App movil funcional en dev con login Firebase.
-2. Flujos completos de juego quiz y word-pass.
-3. Persistencia de estadisticas por usuario.
-4. Pruebas E2E para caminos criticos de negocio.
+Do not expose internal infrastructure secrets in public client variables.

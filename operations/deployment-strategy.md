@@ -1,21 +1,26 @@
 # Deployment Strategy
 
-## Entornos
+## Environment model
 
-- Dev: rapido, costo optimizado, datos no productivos.
-- Stg: espejo operacional de produccion para validaciones.
-- Prod: alta disponibilidad y controles de cambio.
+- `dev`: fast feedback, lower-cost runtime profile, non-production data.
+- `stg`: staging mirror for pre-release validation.
+- `prod`: hardened runtime with stricter change controls.
 
-## Pipeline recomendado
+## Current CI/CD behavior
 
-1. Pull Request: lint, tests, build, contract checks.
-2. Merge a main: build de imagen y escaneo.
-3. Deploy a dev automatico.
-4. Promocion a stg tras checks de humo.
-5. Promocion a prod con aprobacion.
+1. Service repository CI runs build/test/lint checks.
+2. Push to `main` in service repos dispatches `platform-infra` build workflow.
+3. `platform-infra` builds and pushes images to GHCR.
+4. `platform-infra` deploy workflow runs after successful build.
+5. Automatic rollout is currently limited to `dev`.
 
-## Estrategia de versionado
+## Promotion policy
 
-- SemVer para servicios y SDKs.
-- Versionado explicito de contratos (`v1`, `v2`).
-- Deprecacion con ventana definida y comunicacion previa.
+- `stg` and `prod` are intentionally not auto-promoted in the current setup.
+- Promotion to higher environments should be controlled by explicit release criteria.
+
+## Versioning strategy
+
+- Use SemVer for services and SDK packages.
+- Maintain explicit contract versioning (`v1`, `v2`, ...).
+- Define and communicate deprecation windows before removing contract support.

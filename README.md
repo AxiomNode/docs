@@ -1,50 +1,51 @@
 # AxiomNode Documentation
 
-Ultima actualizacion: 2026-03-29.
+Last updated: 2026-04-05.
 
-Repositorio central de documentacion para la arquitectura, operacion y evolucion de AxiomNode.
+Central documentation repository for AxiomNode architecture, operations, and platform governance.
 
-## Estructura principal
+## Main sections
 
-### Arquitectura
+### Architecture
 
-- [Arquitectura objetivo](./architecture/target-architecture.md) — capas, principios y flujo general.
-- [Mapa de repositorios](./architecture/repository-map.md) — puertos, responsabilidades, dependencias y modulos SDK.
-- [Auditoria de codigo comun](./architecture/common-code-extraction-audit-2026-03-24.md)
+- [Target architecture](./architecture/target-architecture.md)
+- [Repository map](./architecture/repository-map.md)
+- [Shared code extraction audit](./architecture/common-code-extraction-audit-2026-03-24.md)
 
-### Guias
+### Guides
 
-- [Modelo de comunicacion de servicios](./guides/service-communication.md) — endpoints, auth entre capas, headers propagados.
-- [Integracion local de edge layer](./guides/local-edge-integration.md)
-- [Guia de desarrollo backoffice (React)](./guides/backoffice-react-development.md)
-- [Guia de desarrollo app movil (Firebase)](./guides/mobile-app-development-firebase.md)
-- [Migracion de repos existentes](./guides/migration-existing-repos.md)
+- [Service communication model](./guides/service-communication.md)
+- [Local edge integration](./guides/local-edge-integration.md)
+- [Backoffice React development](./guides/backoffice-react-development.md)
+- [Mobile app development (Firebase)](./guides/mobile-app-development-firebase.md)
+- [Migration guide for existing repositories](./guides/migration-existing-repos.md)
 
-### Operaciones
+### Operations
 
-- [Entornos y secretos](./operations/environments-and-secrets.md) — variables por servicio, tokens compartidos, variable huerfana.
-- [Distribucion de secretos](./operations/secrets-distribution-guide.md) — flujo de inyeccion, reglas de sincronizacion.
-- [Estrategia de despliegue](./operations/deployment-strategy.md)
-- [Runbook de servicios AI](./operations/ai-services-recovery-runbook.md)
+- [Environments and secrets](./operations/environments-and-secrets.md)
+- [Secrets distribution guide](./operations/secrets-distribution-guide.md)
+- [Deployment strategy](./operations/deployment-strategy.md)
+- [CI/CD workflow map](./operations/cicd-workflow-map.md)
+- [AI services recovery runbook](./operations/ai-services-recovery-runbook.md)
 
-### Referencia historica
+### Historical reference
 
-- [Fases de implementacion](./roadmap/implementation-phases.md) — fases ya ejecutadas.
+- [Implementation phases](./roadmap/implementation-phases.md)
 
-## Uso recomendado
+## Recommended reading order
 
-1. Revisar arquitectura y mapa de repositorios.
-2. Definir contratos en `contracts-and-schemas`.
-3. Generar tipos con `npm run generate:contracts` en `shared-sdk-client/typescript`.
-4. Implementar servicios consumiendo modulos del SDK.
-5. Desplegar con `platform-infra` y operar con `observability-platform`.
+1. Start with architecture and repository map.
+2. Define or update contracts in `contracts-and-schemas`.
+3. Regenerate SDK artifacts in `shared-sdk-client`.
+4. Implement runtime changes in service repositories.
+5. Roll out through `platform-infra` and observe via `observability-platform`.
 
-## Reglas de mantenimiento
+## Documentation maintenance rules
 
-- Mantener documentacion versionada junto a cambios de arquitectura.
-- Evitar decisiones no documentadas entre repos.
-- Registrar cambios de contratos en `contracts-and-schemas` y regenerar SDK.
+- Update docs in the same PR/commit window as architecture or workflow changes.
+- Avoid undocumented cross-repo decisions.
+- Keep contract and SDK documentation synchronized.
 
-## Diseno visual
+## Design assets
 
-Los assets de marca se mantienen en `design/`.
+Brand and UI design assets are maintained in `design/`.
