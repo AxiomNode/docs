@@ -28,6 +28,10 @@ Central documentation repository for AxiomNode architecture, operations, and pla
 - [CI/CD workflow map](./operations/cicd-workflow-map.md)
 - [AI services recovery runbook](./operations/ai-services-recovery-runbook.md)
 
+### Next steps
+
+- [Next steps index](./next-steps/README.md)
+
 ### Historical reference
 
 - [Implementation phases](./roadmap/implementation-phases.md)

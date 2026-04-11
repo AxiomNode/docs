@@ -33,6 +33,12 @@ Current edge routes:
 
 `EDGE_API_TOKEN` is an infrastructure secret and must never be embedded in mobile clients.
 
+Current repository posture:
+
+- `mobile-app` no longer consumes or generates `EDGE_API_TOKEN` in its build-time config.
+- `/v1/mobile/*` routes are expected to stay public at the gateway layer.
+- Any privileged behavior must rely on user auth or server-side credentials, not client-embedded secrets.
+
 For production, use one of these patterns:
 
 1. Public mobile edge with server-side Firebase JWT validation.

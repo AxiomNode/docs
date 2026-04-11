@@ -74,6 +74,11 @@ node scripts/audit-hardcoded-secrets.mjs
 
 This must be run from the private `secrets` repository before commits/releases.
 
+The audit now fails for two classes of violations in consumer repositories:
+
+- real secret values committed in tracked high-risk files such as `.env`, `.env.secrets`, workflow YAML, compose files, and tracked distribution env files
+- private runtime artifacts committed in tracked paths such as `google-services.json`, `GoogleService-Info.plist`, Android keystores, and generated `mobile-app` env property files
+
 ## Centralized CI model
 
 The private `secrets` repository can enforce validation for all repositories by:
@@ -82,6 +87,8 @@ The private `secrets` repository can enforce validation for all repositories by:
 2. Checking out each target repository in CI.
 3. Running `audit-hardcoded-secrets.mjs --strict` from `secrets`.
 4. Running `prepare-runtime-secrets.mjs all` to verify export flow.
+
+This means CI can now block both leaked secret values and leaked private artifact files even when the file content is not a simple `KEY=value` pair.
 
 ## Compose behavior
 

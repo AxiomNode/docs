@@ -38,7 +38,7 @@ Clients (mobile/backoffice)
 ## Current CI/CD automation map
 
 - Service repos on `main` dispatch image builds to `platform-infra` (`build-push.yaml`).
-- `platform-infra` deploy workflow runs after successful build and currently auto-deploys to `dev` only.
+- `platform-infra` deploy workflow runs after successful build and currently auto-deploys to `stg`.
 - Staging and production promotion remain controlled and non-automatic in current policy.
 
 ## Shared SDK modules (TypeScript)
