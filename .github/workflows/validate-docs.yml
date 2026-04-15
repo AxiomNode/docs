@@ -1,0 +1,59 @@
+name: Validate Docs
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-markdown-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate relative markdown links
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          import sys
+
+          root = Path('.')
+          markdown_files = sorted(root.rglob('*.md'))
+          link_pattern = re.compile(r'\[[^\]]+\]\(([^)]+)\)')
+          errors = []
+
+          for markdown_file in markdown_files:
+            text = markdown_file.read_text(encoding='utf-8')
+            for target in link_pattern.findall(text):
+              target = target.strip()
+              if not target or target.startswith('#'):
+                continue
+              if '://' in target or target.startswith('mailto:'):
+                continue
+
+              path_part = target.split('#', 1)[0]
+              if not path_part:
+                continue
+
+              resolved = (markdown_file.parent / path_part).resolve()
+              try:
+                resolved.relative_to(root.resolve())
+              except ValueError:
+                errors.append(f'{markdown_file}: link escapes repo root -> {target}')
+                continue
+
+              if not resolved.exists():
+                errors.append(f'{markdown_file}: missing target -> {target}')
+
+          if errors:
+            print('\n'.join(errors))
+            sys.exit(1)
+
+          print(f'Validated relative links across {len(markdown_files)} markdown files.')
+          PY

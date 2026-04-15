@@ -49,6 +49,7 @@ Central documentation repository for AxiomNode architecture, operations, and pla
 - Update docs in the same PR/commit window as architecture or workflow changes.
 - Avoid undocumented cross-repo decisions.
 - Keep contract and SDK documentation synchronized.
+- Preserve valid relative links across the repository; CI now checks Markdown link targets.
 
 ## Design assets
 

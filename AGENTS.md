@@ -10,9 +10,10 @@ Central architecture and operations documentation for AxiomNode.
 - roadmap/: historical implementation phases
 
 ## Local commands
-- No build required; validate links and consistency manually.
+- No build required; validate links and consistency locally before publishing.
 
 ## CI/CD notes
+- Docs now have a markdown link validation workflow; keep relative links resolvable.
 - Docs should track real workflow behavior (service CI -> platform-infra -> dev deploy).
 
 ## LLM editing rules
