@@ -14,7 +14,7 @@ Central architecture and operations documentation for AxiomNode.
 
 ## CI/CD notes
 - Docs now have a markdown link validation workflow; keep relative links resolvable.
-- Docs should track real workflow behavior (service CI -> platform-infra -> dev deploy).
+- Docs should track real workflow behavior (service CI -> platform-infra -> stg deploy by default, prod by manual promotion).
 
 ## LLM editing rules
 - Keep content concise, actionable, and in English.
