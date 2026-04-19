@@ -1,5 +1,7 @@
 # Common Code Extraction Audit (2026-03-24)
 
+Last reviewed: 2026-04-19.
+
 ## Scope
 
 Repositories audited for duplicated models, contracts, and shared logic:
@@ -82,6 +84,58 @@ Added schema:
 - service metrics base collector (`serviceMetrics.ts`)
 - shared request/monitoring validators
 - gateway/bff health and proxy shared helpers
+
+## Current assessment (2026-04-19)
+
+The original extraction pass improved reuse meaningfully, but the workspace still shows repeated patterns at higher abstraction levels.
+
+### High-value remaining consolidation targets
+
+#### 1. Game generation service foundations
+
+`microservice-quizz` and `microservice-wordpass` still share substantial structural behavior around:
+
+- generation orchestration
+- persisted model retrieval
+- history listing
+- resilience rules for invalid stored rows
+- ai-engine retry and timeout semantics
+
+These should only be extracted if the resulting abstraction remains domain-safe. The main risk is over-generalizing game-specific validation rules.
+
+#### 2. Service operational diagnostics shapes
+
+Backoffice-oriented monitoring and runtime targeting have introduced repeated concepts across repos:
+
+- service target descriptors
+- runtime source state (`env` vs `override`)
+- operator-facing diagnostics payloads
+
+Some of these may belong in shared contracts rather than local ad hoc DTOs.
+
+#### 3. Delivery-policy helpers in CI
+
+The service repos now use the same logical rule for central dispatch:
+
+- validate first
+- dispatch only on `main`
+- skip central image publication for docs-only changes
+
+This is duplicated in workflow YAML today. It is acceptable operationally, but it is a maintainability hotspot if the rule evolves again.
+
+### Extraction rule of thumb
+
+Before extracting shared logic, verify all three conditions:
+
+1. behavior is duplicated in at least two active repos
+2. the abstraction will not erase domain-specific invariants
+3. the extracted module can be versioned and tested independently
+
+### Recommended next extraction wave
+
+1. Introduce shared contracts for runtime service-target and diagnostics payloads.
+2. Evaluate a shared base for game-generation persistence filtering, but only after documenting the domain differences between quiz and word-pass.
+3. Review whether workflow templating or reusable actions are worth the complexity for dispatch gating.
 
 ## Phase 2 — Game Route Schemas Extraction (2026-03-29)
 
