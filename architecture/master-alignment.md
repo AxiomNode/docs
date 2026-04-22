@@ -1,6 +1,6 @@
 # Alineación con el Máster en Desarrollo con IA
 
-Last updated: 2026-04-22.
+Last updated: 2026-04-23.
 
 Este documento mapea los pilares del *Máster en Desarrollo con IA* (resumido en `.tmp/MásterDesarrolloIA/summary/`) con el estado actual de la plataforma AxiomNode. Para cada pilar se describe qué se cumple hoy, qué brechas existen y qué acciones concretas se proponen, enlazando a los artefactos donde se materializan.
 
@@ -16,7 +16,7 @@ El objetivo es doble: (1) usar el máster como vara de medir externa para detect
 | 6. Flujo de desarrollo con IA | Parcial: Copilot en uso, prompts ad-hoc | No hay base de conocimiento ni reglas de prompting versionadas | Añadir `docs/guides/ai-prompting-rules.md` |
 | 7. Calidad | Cubierto: vitest 90%, pytest 90%, Codecov en 8 repos, observabilidad mínima | Falta E2E de extremo a extremo y métricas DORA | Añadir Playwright E2E al menos para backoffice; medir DORA |
 | 8. Infra y Cloud | Cubierto: Docker, K8s, CI/CD, tags inmutables (ADR 0007), platform-infra centralizado (ADR 0006) | Falta LLMOps formal | ADR 0009 |
-| 9. Seguridad | Parcial: secretos centralizados, OWASP en revisiones puntuales | No hay SSDLC documentado, ni threat model, ni SAST/SCA en CI | ADR 0008 + threat model + Snyk/Trivy en CI |
+| 9. Seguridad | Parcial: secretos centralizados, SAST (CodeQL) + SCA (Trivy/`npm audit`/`pip-audit`) en CI de los 8 repos runtime | Falta threat model, prompt-injection policy y rotación de secretos | Threat model STRIDE + endurecimiento prompt-injection + runbook rotación |
 | 11. Productividad | Cubierto: governance docs, templates, plantillas PR/issue/discussion | Falta retrospectiva técnica periódica | Añadir runbook de retros trimestrales |
 
 ## Pilares y mapeo detallado
@@ -186,9 +186,14 @@ El objetivo es doble: (1) usar el máster como vara de medir externa para detect
 **Brechas:**
 
 - No hay un *threat model* (STRIDE/LINDDUN) por servicio.
-- SAST y SCA no están integrados en CI de forma sistemática (Snyk/Trivy/CodeQL).
 - No hay políticas explícitas contra prompt injection en `ai-engine` y BFFs.
 - No hay rotación documentada de secretos.
+
+**Avances recientes (2026-04-23):**
+
+- SAST con CodeQL v4 y SCA con Trivy fs (HIGH/CRITICAL bloqueante) integrados como workflow `security.yml` en los 8 repos runtime.
+- `ai-engine` añade además `pip-audit` sobre `requirements.txt`.
+- `npm audit --omit=dev --audit-level=high` ya estaba en los 7 repos Node.
 
 **Acción propuesta:**
 
