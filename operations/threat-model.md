@@ -120,7 +120,7 @@ by another component's mitigation.
 | STRIDE threat | Risk | Vector | Current mitigation | Pending actions |
 |---|---|---|---|---|
 | Spoofing | High | Reuse of `AI_ENGINE_API_KEY` | Per-service token + 90 d rotation | Sign requests with `correlation_id + nonce` (backlog) |
-| Tampering | High | Prompt injection / RAG data poisoning | Rules in [`ai-prompting-rules.md`](../guides/ai-prompting-rules.md), input sanitization, schema validation | Add a lightweight jailbreak classifier before the LLM |
+| Tampering | High | Prompt injection / RAG data poisoning | Rules in [`ai-prompting-rules.md`](../guides/ai-prompting-rules.md), input sanitization, schema validation, heuristic jailbreak classifier (`ai_engine.safety`) wired before the LLM | Replace heuristic classifier with a learned model once telemetry justifies it |
 | Repudiation | Medium | Prompt changes without traceability | `PROMPT_VERSIONS` + versioned commits | Persist `prompt_version` on every response and expose it in metrics |
 | Information disclosure | High | Leaking the system prompt or RAG docs | The system prompt forbids revealing instructions | Regression test that sends known exfiltration prompts |
 | Denial of service | High | Huge prompts / generation loops | Maximum sizes, timeouts and `llm_fallback_total` | Prometheus alert if `rate(ai_engine_llm_fallback_total) > 0.1 / 5m` |
@@ -152,7 +152,7 @@ by another component's mitigation.
 
 1. **Prompt injection and exfiltration in `ai-engine`** (Tampering /
    Disclosure, high). Backlog: jailbreak classifier + regression suite of
-   prompts.
+   prompts. _Status 2026-04-23: heuristic classifier shipped in_ `ai_engine.safety` _with regression dataset; learned classifier remains future work._
 2. **DoS at `api-gateway`** (DoS, high). Backlog: IP-based rate limiting and
    circuit breaker towards BFFs.
 3. **Audit trail of admin actions** (Repudiation, medium in BFFs and

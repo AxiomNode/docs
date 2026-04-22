@@ -54,6 +54,29 @@ before invoking the runtime. Complements ADR 0009 (LLMOps) and ADR 0008
 - Logs do not contain the full prompt content; only hash + size +
   `prompt_version` + `correlation_id`.
 
+## Defense-in-depth in `ai-engine`
+
+`ai-engine` runs the heuristic jailbreak classifier defined in
+`ai_engine.safety.jailbreak` **before** every `POST /generate` call (and
+its SDK variant). When a prompt matches a blocking pattern the request is
+rejected with HTTP 422 (`Prompt rejected by safety policy ...`) and the
+generator is **never** invoked. The block is recorded with metadata
+`safety_block_reason`, `safety_score`, `safety_categories`, exposed via the
+counters `ai_engine_prompt_safety_blocks_total` and
+`ai_engine_prompt_safety_blocks_by_reason_total{reason="..."}`.
+
+Tunable through environment variables:
+
+- `AI_ENGINE_SAFETY_ENABLED` (default `true`): kill switch for the classifier.
+- `AI_ENGINE_SAFETY_BLOCK_THRESHOLD` (default `1.0`): minimum aggregated
+  weight required to block.
+- `AI_ENGINE_SAFETY_FLAG_THRESHOLD` (default `0.4`): minimum weight to mark
+  the prompt as suspicious without blocking it.
+
+Regression dataset lives in
+`ai-engine/src/tests/test_safety/test_jailbreak.py` and must be extended
+when new attack patterns are observed in production telemetry.
+
 ## Mandatory telemetry
 
 The Prometheus metrics exposed by `ai-engine` (see
