@@ -178,6 +178,11 @@ El objetivo es doble: (1) usar el máster como vara de medir externa para detect
 
 - Ver ADR 0009 (LLMOps).
 
+**Avances recientes (2026-04-23):**
+
+- Métricas LLMOps específicas expuestas vía `/metrics` en `ai-engine`: `ai_engine_llm_latency_seconds`, `ai_engine_llm_latency_p95_seconds`, `ai_engine_llm_fallback_total`, `ai_engine_llm_tokens_total{direction}`, `ai_engine_llm_errors_total{kind}`.
+- Dashboard Grafana `ai-engine-llmops.json` añadido en `observability-platform/dashboards/` con panels para latencia avg/p95, fallback total, tokens in/out, errores y success/retry rate.
+
 ### 9. Seguridad (Bloque 9)
 
 **Master:** security by design, OWASP Top 10, SSDLC, DevSecOps, prácticas de codificación segura, IA en seguridad y nuevos riesgos (prompt injection).
