@@ -16,6 +16,7 @@ Central documentation repository for AxiomNode architecture, operations, and pla
 - [Key sequence flows](./architecture/key-sequence-flows.md)
 - [Quality attribute scenarios](./architecture/quality-attributes.md)
 - [Glossary](./architecture/glossary.md)
+- [Master alignment (mapping with AI development master)](./architecture/master-alignment.md)
 - [Architecture Decision Records](./architecture/decision-records/README.md)
 
 ### Guides
