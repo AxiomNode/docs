@@ -90,7 +90,7 @@ by another component's mitigation.
 | Tampering | Medium | Payload modification in transit | HTTPS terminated at gateway/edge | Force HSTS and review internal mTLS to BFFs |
 | Repudiation | Medium | Lack of audit on admin changes | `X-Correlation-ID` propagated, structured logs | Persist admin logs in a dedicated backend with retention >= 90 days |
 | Information disclosure | Medium | Permissive CORS or stack-trace errors | CORS policy restricted per distribution | Quarterly CORS audit + review of error messages |
-| Denial of service | High | Public traffic saturation | Hard timeouts documented in `inter-service-communication.md` | Add IP-based rate limiting + circuit breaker towards BFFs |
+| Denial of service | High | Public traffic saturation | Hard timeouts documented in `inter-service-communication.md`, IP-based fixed-window rate limiter (`app/services/rateLimiter.ts`) with stricter quotas on generation/auth/admin categories, and `CircuitBreaker` (shared SDK) on every BFF/AI upstream | Promote in-memory limiter to a shared store (Redis) once horizontal scaling is enabled |
 | Elevation of privilege | High | Leaked `X-Internal-Token` header | Token rotated through `secrets/scripts/bootstrap-secrets.mjs` | Move to a per-distribution signed token validated in BFFs |
 
 ### `bff-mobile` and `bff-backoffice`
@@ -154,7 +154,10 @@ by another component's mitigation.
    Disclosure, high). Backlog: jailbreak classifier + regression suite of
    prompts. _Status 2026-04-23: heuristic classifier shipped in_ `ai_engine.safety` _with regression dataset; learned classifier remains future work._
 2. **DoS at `api-gateway`** (DoS, high). Backlog: IP-based rate limiting and
-   circuit breaker towards BFFs.
+   circuit breaker towards BFFs. _Status 2026-04-23: per-IP fixed-window rate
+   limiter shipped in_ `api-gateway/src/app/services/rateLimiter.ts` _with
+   stricter quotas for generation/auth/admin categories and Prometheus
+   counters_ `gateway_rate_limit_blocks_total` _/_ `gateway_rate_limit_blocks_by_category_total`_; `CircuitBreaker` already in place on every BFF/AI upstream. Distributed-store upgrade remains future work._
 3. **Audit trail of admin actions** (Repudiation, medium in BFFs and
    support). Backlog: centralized persistence with retention >= 90 days.
 4. **Rotation and least scope for CI/CD tokens** (Spoofing / EoP,
