@@ -141,12 +141,12 @@ by another component's mitigation.
 
 | STRIDE threat | Risk | Vector | Current mitigation | Pending actions |
 |---|---|---|---|---|
-| Spoofing | Medium | Malicious workflow impersonating a dispatch | `PLATFORM_INFRA_DISPATCH_TOKEN` rotated | Limit `permissions:` per workflow and require `environments` with reviewers |
+| Spoofing | Medium | Malicious workflow impersonating a dispatch | `PLATFORM_INFRA_DISPATCH_TOKEN` rotated, every workflow declares an explicit top-level `permissions:` block, and the policy in [`github-actions-hardening.md`](./github-actions-hardening.md) requires GitHub Environments with reviewers for `stg`/`prod` deploys | Finish provisioning the Environment reviewer matrix in the GitHub UI as tracked in §5 of the hardening policy |
 | Tampering | High | Commit with hardcoded secret | `audit-hardcoded-secrets.mjs` + push protection | Add a mandatory pre-commit hook in every repo |
 | Repudiation | Medium | Infra changes without a clear owner | CODEOWNERS per folder | Keep up to date and review at retros |
-| Information disclosure | High | Pipeline logs exposing secrets | `::add-mask::` and output review | Document in `docs/operations/cicd-workflow-map.md` which outputs are safe |
+| Information disclosure | High | Pipeline logs exposing secrets | `::add-mask::` and output review; multi-line PEM keys (`K3S_SSH_KEY`) are re-masked line by line in `platform-infra/.github/workflows/deploy.yaml` | Document in `docs/operations/cicd-workflow-map.md` which outputs are safe |
 | Denial of service | Low | Infinite workflow | Per-job timeouts (GitHub default) | — |
-| Elevation of privilege | High | Token with `repo` scope leaked | Per-purpose tokens (dispatch / read) | Migrate to fine-grained tokens and validate the minimum `permissions:` |
+| Elevation of privilege | High | Token with `repo` scope leaked | Per-purpose tokens (dispatch / read), most CI tokens already migrated to fine-grained PATs with the matrix documented in [`github-actions-hardening.md`](./github-actions-hardening.md) | Replace the remaining classic `GHCR_PULL_TOKEN` with a fine-grained PAT scoped to `packages:read` |
 
 ## Top risks and next iteration
 
@@ -167,6 +167,15 @@ by another component's mitigation.
 4. **Rotation and least scope for CI/CD tokens** (Spoofing / EoP,
    medium-high). Backlog: migrate to fine-grained tokens and require
    `environments` with reviewers.
+   _Status 2026-04-23: hardening policy published in_
+   [`github-actions-hardening.md`](./github-actions-hardening.md) _with the
+   Environment reviewer matrix, fine-grained token inventory, workflow
+   standards, and a migration plan. `platform-infra/.github/workflows/build-push.yaml`
+   and_ `deploy.yaml` _now ship annotated minimum `permissions:` blocks and
+   re-mask the multi-line `K3S_SSH_KEY` line by line. Remaining work:
+   provision the GitHub Environments in the UI, replace the classic_
+   `GHCR_PULL_TOKEN` _with a fine-grained PAT, and roll out CODEOWNERS for_
+   `.github/workflows/` _across every repo._
 
 ## Cadence and maintenance
 
