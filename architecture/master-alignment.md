@@ -205,6 +205,10 @@ El objetivo es doble: (1) usar el máster como vara de medir externa para detect
 - SAST con CodeQL v4 y SCA con Trivy fs (HIGH/CRITICAL bloqueante) integrados como workflow `security.yml` en los 8 repos runtime.
 - `ai-engine` añade además `pip-audit` sobre `requirements.txt`.
 - `npm audit --omit=dev --audit-level=high` ya estaba en los 7 repos Node.
+- Política contra prompt injection formalizada en [`docs/guides/ai-prompting-rules.md`](../guides/ai-prompting-rules.md), con reglas duras para `ai-engine` y BFFs y referencias a las métricas LLMOps de ADR 0009.
+- Procedimiento de rotación de secretos publicado en [`docs/operations/secrets-rotation-policy.md`](../operations/secrets-rotation-policy.md) (cadencias, roles, rotación de emergencia y auditoría continua).
+- Reglas duras de comunicación entre servicios consolidadas en [`docs/guides/inter-service-communication.md`](../guides/inter-service-communication.md), apoyadas en `service-communication.md`.
+- Proceso de retros y post-mortems documentado en [`docs/operations/retrospective-process.md`](../operations/retrospective-process.md).
 
 **Acción propuesta:**
 
