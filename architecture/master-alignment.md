@@ -209,11 +209,13 @@ El objetivo es doble: (1) usar el máster como vara de medir externa para detect
 - Procedimiento de rotación de secretos publicado en [`docs/operations/secrets-rotation-policy.md`](../operations/secrets-rotation-policy.md) (cadencias, roles, rotación de emergencia y auditoría continua).
 - Reglas duras de comunicación entre servicios consolidadas en [`docs/guides/inter-service-communication.md`](../guides/inter-service-communication.md), apoyadas en `service-communication.md`.
 - Proceso de retros y post-mortems documentado en [`docs/operations/retrospective-process.md`](../operations/retrospective-process.md).
+- Threat model STRIDE inicial publicado en [`docs/operations/threat-model.md`](../operations/threat-model.md) con riesgos top, mitigaciones actuales y backlog de seguridad.
+- Backoffice añade smoke E2E con Playwright (`backoffice/src/e2e/smoke.spec.ts`) gating del job `e2e-smoke` antes del trigger de platform-infra.
 
 **Acción propuesta:**
 
 - Ver ADR 0008 (DevSecOps + SSDLC) más abajo.
-- Añadir `docs/operations/threat-model.md` cuando se ejecute el primer ejercicio.
+- ~~Añadir `docs/operations/threat-model.md` cuando se ejecute el primer ejercicio.~~ Hecho 2026-04-23.
 
 ### 10. Desarrollo potenciado por IA (Bloque 10)
 
