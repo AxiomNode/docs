@@ -12,7 +12,7 @@ El objetivo es doble: (1) usar el máster como vara de medir externa para detect
 |---|---|---|---|
 | 2. Ingeniería de software | Cubierto: ciclo de vida, requisitos como casos de uso, principios de diseño aplicados por repo | No hay un mapa de historias de usuario formal por canal | Añadir story map por canal en `docs/architecture/use-cases.md` |
 | 3. Arquitectura de software | Cubierto: C4 L1-L3, dominio, ADRs 0001-0007, monolito modular + microservicios + event-driven parcial | Falta formalizar Outbox y la matriz síncrono/asíncrono entre servicios | Documentar Outbox y comunicación inter-servicios; ADR si hay decisión nueva |
-| 4. Fundamentos de IA | Cubierto: split AI runtime (ADR 0004), generación + stats + cache + llama | No hay eval harness ni métricas de calidad de respuestas | ADR 0009 + eval harness en `ai-engine` |
+| 4. Fundamentos de IA | Cubierto: split AI runtime (ADR 0004), generación + stats + cache + llama, eval harness baseline + prompts versionados | Faltan métricas de calidad sobre LLM real y documento de IA responsable | Promover eval a real-LLM gate; redactar `responsible-ai.md` |
 | 6. Flujo de desarrollo con IA | Parcial: Copilot en uso, prompts ad-hoc | No hay base de conocimiento ni reglas de prompting versionadas | Añadir `docs/guides/ai-prompting-rules.md` |
 | 7. Calidad | Cubierto: vitest 90%, pytest 90%, Codecov en 8 repos, observabilidad mínima | Falta E2E de extremo a extremo y métricas DORA | Añadir Playwright E2E al menos para backoffice; medir DORA |
 | 8. Infra y Cloud | Cubierto: Docker, K8s, CI/CD, tags inmutables (ADR 0007), platform-infra centralizado (ADR 0006) | Falta LLMOps formal | ADR 0009 |
@@ -85,9 +85,15 @@ El objetivo es doble: (1) usar el máster como vara de medir externa para detect
 
 **Brechas:**
 
-- No hay *eval harness* para medir calidad de generación a lo largo del tiempo.
+- No hay métricas de calidad sobre LLM real (el harness actual usa respuestas canned).
 - No hay métricas de RAG (si se añade RAG en el futuro).
 - No hay documento de *IA responsable* con políticas de privacidad de prompts y datos de usuario.
+
+**Avances recientes (2026-04-23):**
+
+- Eval harness baseline en `ai-engine/src/tests/eval/` con dataset YAML, runner, reporte JSON y test pytest (`@pytest.mark.eval`).
+- Job CI `eval` no bloqueante añadido en `ai-engine/.github/workflows/ci.yml` con upload del reporte como artifact.
+- Versionado explícito de prompts en `ai_engine/games/prompts.py` (`PROMPT_VERSIONS`, `get_prompt_version`).
 
 **Acción propuesta:**
 
