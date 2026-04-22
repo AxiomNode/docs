@@ -99,7 +99,7 @@ by another component's mitigation.
 |---|---|---|---|---|
 | Spoofing | High | Direct calls bypassing the gateway | `INTERNAL_API_TOKEN` required on every request | Block public binding on the VPS (internal overlay only) |
 | Tampering | Medium | Manipulation of forwarded payload | Schema validation in BFF before upstream | Generate contracts from `contracts-and-schemas/` and fail CI on drift |
-| Repudiation | Medium | Admin actions (backoffice) without traceability | Logs with `correlation_id` + operator role | Add a persistent audit trail for critical actions (runtime changes, rotations) |
+| Repudiation | Medium | Admin actions (backoffice) without traceability | Logs with `correlation_id` + operator role, append-only JSONL audit trail (`bff-backoffice/src/app/services/auditTrailStore.ts`) with daily rotation and 90-day retention exposed via `GET /v1/backoffice/admin/audit` | Replicate audit trail to a tamper-evident store (object lock / WORM) for long-term retention |
 | Information disclosure | Medium | Internal metadata leaked to the client | Typed and sanitized responses | Add a negative contract test (no internal properties) |
 | Denial of service | Medium | Concurrent calls to `ai-engine` | Timeouts (8 s domain / 20 s ai-engine) | Per-user queue/limit and declared backpressure |
 | Elevation of privilege | High (backoffice) | Bypass of `roleHasBackofficeAccess` | Validation at login + server-side role | Add an E2E test that asserts 403 on admin routes without role |
@@ -160,6 +160,10 @@ by another component's mitigation.
    counters_ `gateway_rate_limit_blocks_total` _/_ `gateway_rate_limit_blocks_by_category_total`_; `CircuitBreaker` already in place on every BFF/AI upstream. Distributed-store upgrade remains future work._
 3. **Audit trail of admin actions** (Repudiation, medium in BFFs and
    support). Backlog: centralized persistence with retention >= 90 days.
+   _Status 2026-04-23: append-only JSONL audit trail shipped in_
+   `bff-backoffice/src/app/services/auditTrailStore.ts` _with daily rotation,
+   90-day retention, and a query endpoint at_ `GET /v1/backoffice/admin/audit`.
+   _Tamper-evident replication remains future work._
 4. **Rotation and least scope for CI/CD tokens** (Spoofing / EoP,
    medium-high). Backlog: migrate to fine-grained tokens and require
    `environments` with reviewers.
