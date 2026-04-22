@@ -12,6 +12,8 @@ Runtime services currently covered by the automated image build and staging depl
 - `bff-mobile`
 - `bff-backoffice`
 - `backoffice`
+- `ai-engine-api`
+- `ai-engine-stats`
 - `microservice-quizz`
 - `microservice-wordpass`
 - `microservice-users`
@@ -19,7 +21,7 @@ Runtime services currently covered by the automated image build and staging depl
 Excluded from this specific chain:
 
 - `mobile-app`: validated in its own repository, but it does not publish a GHCR runtime image or deploy to k3s through `platform-infra`
-- `ai-engine`: publishes separately and is currently optional for staging because the active staging topology allows the engine to run outside the cluster
+- external llama runtime hosts: the split staging topology can still rely on a llama target outside the cluster even when the API and stats images are deployed automatically
 
 ## Delivery model
 
@@ -155,7 +157,16 @@ Expected behavior:
 
 ### Use case 4: staging with externalized ai-engine
 
-The service deployment chain continues to auto-update the cluster services even when `ai-engine` is external to the cluster. Runtime wiring for the engine is then controlled from the backoffice routing layer, not by auto-deploying the engine itself.
+The service deployment chain continues to auto-update the cluster services even when the effective AI model runtime is external to the cluster. In the current split topology, `ai-engine-api` and `ai-engine-stats` may still auto-deploy in-cluster while runtime wiring for the llama target is controlled through persisted routing state.
+
+### Use case 5: full in-cluster AI verification
+
+Expected behavior:
+
+1. operator uses manual `platform-infra` deploy with `include_ai_engine=true`
+2. the `stg-with-ai-engine` overlay is rendered deliberately
+3. staging receives the full AI topology, including llama runtime
+4. in-cluster canary and diagnostic measurements can be executed without relying on external llama reachability
 
 ## Failure domains
 

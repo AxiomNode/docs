@@ -28,6 +28,25 @@ This document defines how AxiomNode promotes runtime changes across environments
 | `stg` | automatic from covered services on `main` | immutable short-SHA from triggering run | apply-based rollout without forced restart for immutable tags | medium |
 | `prod` | manual only | mutable `prod` tag or explicitly selected release artifact | controlled rollout | high |
 
+## Covered automatic staging deployment set
+
+The current automatic staging rollout chain covers:
+
+- `api-gateway`
+- `bff-mobile`
+- `bff-backoffice`
+- `backoffice`
+- `ai-engine-api`
+- `ai-engine-stats`
+- `microservice-quizz`
+- `microservice-wordpass`
+- `microservice-users`
+
+It does not automatically cover:
+
+- `mobile-app`
+- external llama runtime hosts used by split-AI staging
+
 ## Automatic staging deployment
 
 Automatic deployment to staging is enabled for the covered runtime services.
@@ -105,9 +124,18 @@ Expected outcome:
 Expected outcome:
 
 - covered services still auto-deploy to staging
-- `ai-engine` runtime target remains a routing concern controlled from backoffice/gateway runtime state
+- `ai-engine-api` and `ai-engine-stats` may still be deployed in-cluster
+- llama reachability remains a routing concern controlled through persisted runtime state
 
-### Case 4: controlled production release
+### Case 4: split-AI staging topology
+
+Expected outcome:
+
+- `ai-engine-api` and `ai-engine-stats` are deployed by the standard staging overlay
+- llama runtime remains external or workstation-hosted
+- successful rollout validation requires checking both Kubernetes health and effective llama reachability
+
+### Case 5: controlled production release
 
 Expected outcome:
 
@@ -135,8 +163,8 @@ Preferred approach:
 
 ## Operational constraints
 
-- externalized `ai-engine` means not every end-to-end behavior in staging is driven only by Kubernetes manifests
-- routing overrides in `bff-backoffice` and `api-gateway` can influence effective runtime topology
+- split or externalized AI runtime means not every end-to-end behavior in staging is driven only by Kubernetes manifests
+- routing overrides in `bff-backoffice`, `api-gateway`, and `ai-engine-api` can influence effective runtime topology
 - deployment documentation must therefore distinguish between cluster deployment state and effective runtime routing state
 
 ## Recommended release criteria

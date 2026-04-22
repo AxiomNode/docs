@@ -34,6 +34,14 @@ Responsibilities:
 - hold the active live ai-engine target used by the runtime request path
 - enforce approved-host rules through environment-level allowlists
 
+### `ai-engine-api`
+
+Responsibilities:
+
+- hold the active llama target used by generation requests
+- preserve effective model-runtime selection across restart or pod recreation
+- allow split-AI staging to keep API/stats in-cluster while the model runtime remains elsewhere
+
 ### `backoffice`
 
 Responsibilities:
@@ -61,6 +69,15 @@ The preset list is stored in `bff-backoffice` persisted runtime state so all bro
 
 The routing layer supports returning from override state back to environment-derived endpoints.
 
+### Use case 4: split-AI staging keeps API in-cluster but llama external
+
+Effective path:
+
+1. cluster services call `ai-engine-api`
+2. `ai-engine-api` resolves its active llama target
+3. model traffic reaches the selected external or alternate llama runtime
+4. API/stats remain observable through the cluster even if model execution lives elsewhere
+
 ## Persistence model
 
 ### `bff-backoffice`
@@ -82,6 +99,16 @@ Persists:
 
 This design survives pod recreation. It is not limited to in-memory process state.
 
+### `ai-engine-api`
+
+Stores the active llama target in its own persistent runtime state file on mounted storage.
+
+Persists:
+
+- active llama host/port target used by generation traffic
+
+This means the AI execution path can diverge from environment defaults even when the API deployment itself is healthy.
+
 ## Security boundaries
 
 Runtime retargeting is constrained by allowlists.
@@ -100,7 +127,8 @@ sequenceDiagram
   participant Backoffice
   participant BFF as bff-backoffice
   participant Gateway as api-gateway
-  participant AI as External ai-engine
+  participant API as ai-engine-api
+  participant Llama as External or in-cluster llama
 
   Operator->>Backoffice: Select saved ai-engine destination
   Backoffice->>BFF: PUT /v1/backoffice/ai-engine/target
@@ -108,7 +136,8 @@ sequenceDiagram
   Gateway-->>BFF: Ack
   BFF-->>Backoffice: Current runtime target
   Backoffice-->>Operator: Updated runtime topology
-  Gateway->>AI: Forward runtime traffic
+  Gateway->>API: Forward runtime traffic
+  API->>Llama: Use active llama target
 ```
 
 ## Design trade-offs

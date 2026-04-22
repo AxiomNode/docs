@@ -4,10 +4,10 @@
 Central architecture and operations documentation for AxiomNode.
 
 ## Key paths
-- architecture/: target architecture and repository map
+- architecture/: current platform architecture and repository map
 - guides/: implementation and integration guides
 - operations/: deployment, environments, CI/CD, runbooks
-- roadmap/: historical implementation phases
+- design/: current brand and UI assets
 
 ## Local commands
 - No build required; validate links and consistency locally before publishing.
@@ -20,3 +20,4 @@ Central architecture and operations documentation for AxiomNode.
 - Keep content concise, actionable, and in English.
 - Prioritize current-state accuracy over historical narrative.
 - Cross-link related docs when changing workflow/architecture sections.
+- Do not add roadmap, backlog, audit-history, or retrospective-only documents here.

@@ -13,7 +13,24 @@ Last updated: 2026-04-19.
 | `microservice-users` | 7102 (DB: 7434) | Identity, profile, leaderboard, gameplay analytics | PostgreSQL |
 | `microservice-quizz` | 7100 (DB: 7432) | Quiz generation, persistence, and retrieval | PostgreSQL, `ai-engine` |
 | `microservice-wordpass` | 7101 (DB: 7433) | Word-pass generation, persistence, and retrieval | PostgreSQL, `ai-engine` |
-| `ai-engine` | 7000 (stats), 7001 (api), 7002 (llama) | AI generation, RAG, model serving, AI observability | Redis, llama server |
+| `ai-engine` | 7000 (stats), 7001 (api), 7002 (llama) | AI generation, RAG, cache-aware generation, model serving, AI observability | Redis, llama server |
+
+## Runtime state ownership
+
+| Repository | Persisted runtime state | Why it matters |
+|---|---|---|
+| `api-gateway` | Active ai-engine API/stats target | Determines where live AI traffic is forwarded |
+| `bff-backoffice` | Service target overrides and shared ai-engine presets | Shapes operator-visible effective topology |
+| `ai-engine` | Active llama target inside `ai-engine-api` | Controls where generation calls reach the model runtime |
+
+## Client and operator entry points
+
+| Consumer | Entry point | Downstream path |
+|---|---|---|
+| Mobile app | `api-gateway` | `api-gateway` -> `bff-mobile` -> quiz/word-pass services |
+| Backoffice SPA | `api-gateway` | `api-gateway` -> `bff-backoffice` -> users/services/ai diagnostics |
+| Internal AI producers | service-local clients | quiz/word-pass -> `ai-engine-api` |
+| Operators changing AI routing | `backoffice` through `bff-backoffice` | backoffice -> `bff-backoffice` -> `api-gateway` / `ai-engine-api` |
 
 ## Delivery-chain classification
 
@@ -25,6 +42,8 @@ These repositories participate in the current automatic image publication and st
 - `bff-mobile`
 - `bff-backoffice`
 - `backoffice`
+- `ai-engine-api`
+- `ai-engine-stats`
 - `microservice-users`
 - `microservice-quizz`
 - `microservice-wordpass`
@@ -32,7 +51,7 @@ These repositories participate in the current automatic image publication and st
 ### Outside the current automatic staging chain
 
 - `mobile-app`: validated in its own CI, but not published as a k3s runtime image through `platform-infra`
-- `ai-engine`: architecturally relevant, but currently optional in-cluster for staging because the active topology can externalize it to a workstation or relay target
+- external llama runtime: still operationally external in the split staging topology unless the optional full in-cluster AI overlay is rendered deliberately
 
 ## Platform repositories
 
@@ -62,7 +81,8 @@ Reason:
 
 - `api-gateway` can hold the active ai-engine target at runtime
 - `bff-backoffice` can persist shared ai-engine presets and service-target overrides
-- staging can therefore operate with `ai-engine` outside the cluster while the rest of the services remain auto-deployed on k3s
+- `ai-engine-api` can hold the active llama target at runtime
+- staging can therefore operate in split-AI mode even while the rest of the services remain auto-deployed on k3s
 
 ## Current CI/CD automation map
 
@@ -81,6 +101,12 @@ Reason:
 | `ai-engine-client` | quiz/wordpass services | AI engine client wrappers and config models |
 | `trivia-categories` | quiz/wordpass services | language/category catalogs |
 | `private-docs` | internal services | private docs token resolution and auth helpers |
+
+## Documentation placement rule of thumb
+
+- keep cross-repository topology, delivery rules, and runtime routing policy in `docs`
+- keep repository-specific routes, ports, local workflows, and smoke checks in each repository README or local docs folder
+- when a runtime state holder changes, update both the owning repository docs and the central runtime-routing documents
 
 ## Ownership model
 

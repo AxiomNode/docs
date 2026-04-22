@@ -1,8 +1,8 @@
-# Target Architecture
+# Current Platform Architecture
 
 ## Goal
 
-Define the target runtime and delivery architecture for mobile and backoffice channels on top of a microservice platform with AI-assisted generation capabilities and centralized deployment governance.
+Define the current runtime and delivery architecture for mobile and backoffice channels on top of a microservice platform with AI-assisted generation capabilities and centralized deployment governance.
 
 ## Architectural overview
 
@@ -65,6 +65,30 @@ flowchart TB
 4. Data and async layer: service-owned data stores and deferred generation flows.
 5. Platform layer: `platform-infra`, `observability-platform`, `contracts-and-schemas`, `shared-sdk-client`, and `secrets`.
 
+## Repository responsibility boundaries
+
+### Edge and experience ownership
+
+- `api-gateway` owns the public ingress contract, edge auth, CORS, and internal route fan-out.
+- `bff-mobile` owns mobile-facing shaping and shields mobile clients from internal domain-service topology.
+- `bff-backoffice` owns backoffice-facing shaping plus runtime routing control APIs used by operators.
+- `backoffice` owns the operator UI and must expose the difference between environment defaults and runtime overrides.
+
+### Domain ownership
+
+- `microservice-users` is the system of record for player identity, profile reads, gameplay events, and leaderboard-oriented metrics.
+- `microservice-quizz` owns quiz validation, persistence, retrieval semantics, and its generation request contract toward AI.
+- `microservice-wordpass` owns the equivalent behavior for the word-pass domain.
+- `ai-engine` owns retrieval-augmented generation, ingest semantics, cache-aware generation behavior, observability of AI requests, and llama runtime integration.
+
+### Platform ownership
+
+- `contracts-and-schemas` is the contract source of truth.
+- `shared-sdk-client` is the shared client and validation distribution point.
+- `platform-infra` owns packaging and deployment policy.
+- `secrets` owns real runtime secret material and sync rules.
+- `observability-platform` owns shared telemetry assets and alerts.
+
 ## Runtime topology
 
 ### Default deployable core
@@ -85,10 +109,21 @@ The deployable core for staging and production-oriented flows is:
 
 The current architecture supports two valid runtime modes:
 
-1. in-cluster AI runtime
-2. external workstation-hosted AI runtime reachable through controlled routing
+1. split AI runtime: `ai-engine-api` and `ai-engine-stats` in-cluster, llama runtime externalized and selected at runtime
+2. full in-cluster AI runtime rendered deliberately for diagnostics, canary validation, or controlled benchmarking
+3. fully external workstation-hosted AI runtime reachable through controlled routing when staging recovery requires it
 
 That distinction is important: deployment topology and effective runtime topology are no longer always the same thing.
+
+### Effective runtime state holders
+
+The current architecture contains a narrow operational state plane outside static manifests:
+
+- `bff-backoffice` persists service-target overrides and shared ai-engine presets
+- `api-gateway` persists the live ai-engine API and stats target used by forwarded runtime traffic
+- `ai-engine-api` persists the active llama target used by generation requests
+
+These states survive pod recreation through mounted storage and must be documented as part of the effective topology.
 
 ## Runtime routing control plane
 
@@ -148,9 +183,19 @@ This preserves local service autonomy without fragmenting the deployment contrac
 
 ## Current architectural constraints
 
-- staging still depends on certain mutable environment tags for manual operations
+- staging automatic deploys are pinned to immutable short-SHA artifacts, but manual recovery paths can still use mutable environment tags
 - runtime overrides introduce a second operational state plane that must be documented and observed
 - not every repository in the workspace is part of the GHCR-to-k3s delivery chain
+- AI runtime behavior in staging must always be described in terms of both in-cluster services and external llama reachability
+
+## Documentation implications
+
+To keep architecture documentation correct:
+
+- describe both deployed resources and effective live targets
+- document where runtime state is persisted and which repository owns that persistence
+- keep repository-local docs concrete and central docs cross-repository
+- treat AI topology as an operational mode matrix, not as a single fixed shape
 
 ## Related documents
 

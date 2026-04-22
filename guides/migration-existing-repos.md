@@ -2,7 +2,7 @@
 
 ## Goal
 
-Adapt existing repositories to the target architecture without interrupting current runtime behavior.
+Adapt existing repositories to the current platform architecture without interrupting current runtime behavior.
 
 ## Migrated repositories
 
