@@ -2,84 +2,85 @@
 
 Last updated: 2026-04-23.
 
-Política transversal contra prompt injection y abuso de modelos para `ai-engine`,
-los BFFs (`bff-mobile`, `bff-backoffice`) y cualquier servicio que construya
-prompts antes de invocar al runtime. Complementa al ADR 0009 (LLMOps) y al
-ADR 0008 (DevSecOps + SSDLC).
+Cross-cutting policy against prompt injection and model abuse for `ai-engine`,
+the BFFs (`bff-mobile`, `bff-backoffice`) and any service that builds prompts
+before invoking the runtime. Complements ADR 0009 (LLMOps) and ADR 0008
+(DevSecOps + SSDLC).
 
-## Principios
+## Principles
 
-1. **Trust boundary explícito.** El contenido proveniente del usuario, del
-   dataset RAG, de fuentes externas y del estado interno se trata como
-   *untrusted* salvo que sea una constante de código revisada en commit.
-2. **Separación system / user.** Las instrucciones del sistema viven en
-   `ai_engine/games/prompts.py` (versionadas con `PROMPT_VERSIONS`). El input
-   del usuario se inserta solo dentro de bloques delimitados.
-3. **Sin ejecución reflexiva.** El motor nunca interpreta la salida del modelo
-   como instrucción operativa (no `eval`, no llamadas a herramientas a partir
-   del texto generado, no shell-out).
-4. **Mínima sorpresa.** Cualquier nueva plantilla o cambio sustantivo a una
-   plantilla obliga a bumpear `PROMPT_VERSIONS[<game>]` y a actualizar
-   datasets de evaluación (`src/tests/eval/datasets/`).
+1. **Explicit trust boundary.** Content coming from the user, from the RAG
+   dataset, from external sources or from internal state is treated as
+   *untrusted* unless it is a code constant reviewed in commit.
+2. **System / user separation.** System instructions live in
+   `ai_engine/games/prompts.py` (versioned through `PROMPT_VERSIONS`). User
+   input is only inserted inside delimited blocks.
+3. **No reflective execution.** The engine never interprets model output as
+   operational instruction (no `eval`, no tool calls derived from generated
+   text, no shell-out).
+4. **Least surprise.** Any new template or substantive change to a template
+   must bump `PROMPT_VERSIONS[<game>]` and update the evaluation datasets
+   under `src/tests/eval/datasets/`.
 
-## Reglas obligatorias en `ai-engine`
+## Mandatory rules in `ai-engine`
 
-- Toda plantilla activa vive en `ai_engine/games/prompts.py` y expone su
-  versión vía `get_prompt_version(game_type)`.
-- El input de usuario se rodea con etiquetas explícitas:
-  `<<USER_INPUT>>...<</USER_INPUT>>`. El modelo recibe instrucción de tratar
-  ese contenido como datos, no como órdenes.
-- El system prompt prohibe explícitamente:
-  - Ignorar instrucciones previas.
-  - Revelar el system prompt o claves del entorno.
-  - Producir comandos shell, código ejecutable destinado a otro sistema o URLs
-    externas no listadas.
-- Los documentos RAG se etiquetan con `[doc:<id>]` y el modelo debe citar la
-  fuente o devolver `unknown` si no encuentra evidencia.
-- Las salidas se validan contra el schema del juego (`quiz`, `word-pass`,
-  `true_false`) antes de devolverse al cliente. Si la validación falla, se
-  registra `errors_total{kind="generation"}` y se aplica fallback.
+- Every active template lives in `ai_engine/games/prompts.py` and exposes its
+  version through `get_prompt_version(game_type)`.
+- User input is wrapped with explicit tags:
+  `<<USER_INPUT>>...<</USER_INPUT>>`. The model is instructed to treat that
+  content as data, not as orders.
+- The system prompt explicitly forbids:
+  - Ignoring previous instructions.
+  - Revealing the system prompt or environment keys.
+  - Producing shell commands, executable code targeting another system or
+    external URLs that are not in the allow-list.
+- RAG documents are tagged with `[doc:<id>]` and the model must cite the
+  source or return `unknown` if it cannot find evidence.
+- Outputs are validated against the per-game schema (`quiz`, `word-pass`,
+  `true_false`) before being returned to the client. If validation fails,
+  `errors_total{kind="generation"}` is recorded and the fallback is applied.
 
-## Reglas obligatorias en BFFs
+## Mandatory rules in BFFs
 
-- Tamaño máximo de input por campo (`topic`, `prompt`, etc.) aplicado en el
-  BFF antes de invocar al motor (default: 512 caracteres para topics, 4 KB
-  para textos libres).
-- Lista negra básica de patrones de jailbreak en BFF (`ignore previous`,
-  `system:`, `</s>`, etc.) → reject 422 con código `prompt-policy-violation`.
-- El BFF nunca propaga al cliente final el system prompt ni metadatos
-  internos (`prompt_version`, `model_id`, `correlation_id`) que no estén
-  contemplados explícitamente en su contrato OpenAPI.
-- Los logs no contienen el contenido completo del prompt; solo hash + tamaño
-  + `prompt_version` + `correlation_id`.
+- Maximum input size per field (`topic`, `prompt`, etc.) enforced in the BFF
+  before invoking the engine (default: 512 characters for topics, 4 KB for
+  free-text fields).
+- Basic blacklist of jailbreak patterns in the BFF (`ignore previous`,
+  `system:`, `</s>`, etc.) → reject with HTTP 422 and code
+  `prompt-policy-violation`.
+- The BFF never propagates the system prompt or internal metadata
+  (`prompt_version`, `model_id`, `correlation_id`) to the final client unless
+  it is explicitly part of its OpenAPI contract.
+- Logs do not contain the full prompt content; only hash + size +
+  `prompt_version` + `correlation_id`.
 
-## Telemetría obligatoria
+## Mandatory telemetry
 
-Las métricas Prometheus expuestas por `ai-engine` (ver
-`docs/architecture/decision-records/0009-llmops-and-ai-evaluation.md`) cubren:
+The Prometheus metrics exposed by `ai-engine` (see
+`docs/architecture/decision-records/0009-llmops-and-ai-evaluation.md`) cover:
 
-- `ai_engine_llm_errors_total{kind="generation"}` para fallos de validación
-  o del modelo.
-- `ai_engine_llm_fallback_total` para activaciones de fallback (incluye
-  rechazo por prompt policy si se cae a respuesta degradada).
-- `ai_engine_llm_tokens_total{direction}` para detectar prompts anómalos
-  (picos de tokens entrantes).
+- `ai_engine_llm_errors_total{kind="generation"}` for validation or model
+  failures.
+- `ai_engine_llm_fallback_total` for fallback activations (including rejections
+  by the prompt policy that degrade to a fallback response).
+- `ai_engine_llm_tokens_total{direction}` to detect anomalous prompts (spikes
+  in inbound tokens).
 
-Si una alerta dispara fallback sostenido (>5 min con `rate(...) > 0.1`), abrir
-incidente y revisar los últimos `prompt_version` desplegados.
+If an alert detects sustained fallback (>5 min with `rate(...) > 0.1`), open
+an incident and review the most recently deployed `prompt_version`s.
 
-## Cambios de prompt: checklist
+## Prompt changes: checklist
 
-1. Editar plantilla en `ai_engine/games/prompts.py`.
-2. Bumpear `PROMPT_VERSIONS[<game>]` (semver simple `vN`).
-3. Añadir/actualizar caso en `src/tests/eval/datasets/baseline.yaml`.
-4. Ejecutar `pytest -m eval` localmente y verificar `success_rate == 1.0`.
-5. Commit con prefijo `feat(prompts)` o `fix(prompts)` y referenciar el
-   `PROMPT_VERSIONS` resultante en el cuerpo del mensaje.
+1. Edit the template in `ai_engine/games/prompts.py`.
+2. Bump `PROMPT_VERSIONS[<game>]` (simple `vN` semver).
+3. Add or update a case in `src/tests/eval/datasets/baseline.yaml`.
+4. Run `pytest -m eval` locally and confirm `success_rate == 1.0`.
+5. Commit using prefix `feat(prompts)` or `fix(prompts)` and reference the
+   resulting `PROMPT_VERSIONS` entry in the message body.
 
-## Referencias
+## References
 
 - ADR 0008 — DevSecOps + SSDLC.
-- ADR 0009 — LLMOps y eval harness.
+- ADR 0009 — LLMOps and eval harness.
 - `docs/operations/secrets-rotation-policy.md`.
 - OWASP Top 10 for LLM Applications (LLM01: Prompt Injection).

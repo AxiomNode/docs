@@ -2,94 +2,94 @@
 
 Last updated: 2026-04-23.
 
-AxiomNode opera con retros ligeras pero recurrentes para mantener la
-calidad de plataforma multi-repo y la alineación con el temario del máster.
+AxiomNode runs lightweight but recurrent retros to keep multi-repo platform
+quality high and to stay aligned with the master syllabus.
 
-## Cadencia
+## Cadence
 
-| Tipo | Frecuencia | Duración objetivo | Participantes |
+| Type | Frequency | Target duration | Participants |
 |---|---|---|---|
-| Retro semanal de plataforma | semanal (viernes) | 30 min | core team |
-| Retro de release | tras cada corte a `pro` | 45 min | core team + service owners afectados |
-| Post-mortem | dentro de 5 días tras un incidente Sev1/Sev2 | 60 min | responder + service owners + secrets owner si aplica |
-| Retro trimestral de arquitectura | cada 3 meses | 90 min | core team + revisión cruzada |
+| Platform weekly retro | weekly (Friday) | 30 min | core team |
+| Release retro | after every cut to `pro` | 45 min | core team + affected service owners |
+| Post-mortem | within 5 days after a Sev1/Sev2 incident | 60 min | responder + service owners + secrets owner if applicable |
+| Quarterly architecture retro | every 3 months | 90 min | core team + cross review |
 
-## Retro semanal
+## Weekly retro
 
-Estructura fija (timebox sugerido entre paréntesis):
+Fixed structure (suggested timebox in parentheses):
 
-1. **Métricas clave (5 min)**
-   - Estado CI por repo (verde / rojo / flaky).
-   - Cobertura `ai-engine` (gate 90%).
-   - Métricas LLMOps (`ai_engine_llm_fallback_total`, `errors_total`,
+1. **Key metrics (5 min)**
+   - CI status per repo (green / red / flaky).
+   - `ai-engine` coverage (90% gate).
+   - LLMOps metrics (`ai_engine_llm_fallback_total`, `errors_total`,
      `latency_p95_seconds`).
-   - Alertas activas en `observability-platform`.
-2. **Avances (5 min)** — qué se cerró desde la retro anterior, referenciando
-   commits / PRs / ADRs.
-3. **Bloqueos (5 min)** — qué impide progresar y quién lo desbloquea.
-4. **Acciones (10 min)** — máximo 5 acciones, cada una con owner y fecha
-   objetivo. Se trasladan al backlog o issue tracker correspondiente.
-5. **Riesgos y aprendizajes (5 min)** — registrar en notas si aparece algo
-   que valga la pena memorizar (ver sección "Memoria operativa").
+   - Active alerts in `observability-platform`.
+2. **Progress (5 min)** — what was closed since the previous retro,
+   referencing commits / PRs / ADRs.
+3. **Blockers (5 min)** — what is preventing progress and who unblocks it.
+4. **Actions (10 min)** — at most 5 actions, each with owner and target
+   date. They roll over to the backlog or the relevant issue tracker.
+5. **Risks and learnings (5 min)** — record anything worth memorizing in the
+   notes (see "Operational memory").
 
-Las notas se guardan en `docs/operations/retros/<YYYY-MM-DD>.md` (crear esta
-carpeta cuando se ejecute la primera retro). Mantener una estructura mínima:
-`Métricas`, `Avances`, `Bloqueos`, `Acciones`, `Riesgos`.
+Notes are stored in `docs/operations/retros/<YYYY-MM-DD>.md` (create that
+folder when the first retro is run). Keep a minimum structure: `Metrics`,
+`Progress`, `Blockers`, `Actions`, `Risks`.
 
-## Retro de release
+## Release retro
 
-- Revisar tags inmutables publicados (ADR 0007).
-- Confirmar que `cicd-workflow-map.md` sigue alineado con la realidad.
-- Validar que no quedaron secretos rotados a medias
+- Review the immutable tags published (ADR 0007).
+- Confirm `cicd-workflow-map.md` still matches reality.
+- Validate that no secrets were left rotated halfway
   ([`secrets-rotation-policy.md`](./secrets-rotation-policy.md)).
-- Registrar issues nuevos detectados durante el rollout.
+- Record new issues detected during the rollout.
 
 ## Post-mortems
 
-Plantilla mínima recomendada:
+Recommended minimum template:
 
 ```
-# Post-mortem <título>
-- Fecha del incidente:
-- Severidad: Sev1 | Sev2 | Sev3
-- Servicios afectados:
-- Detección (¿quién y cuándo lo vio?):
-- Línea de tiempo (UTC):
-- Causa raíz:
-- Impacto cuantificado:
-- Acciones inmediatas:
-- Acciones de prevención (con owner y fecha):
-- Lecciones aprendidas:
+# Post-mortem <title>
+- Incident date:
+- Severity: Sev1 | Sev2 | Sev3
+- Affected services:
+- Detection (who and when?):
+- Timeline (UTC):
+- Root cause:
+- Quantified impact:
+- Immediate actions:
+- Prevention actions (with owner and date):
+- Lessons learned:
 ```
 
-Reglas:
+Rules:
 
-- **Blameless**: se discuten sistemas y procesos, no personas.
-- **Acciones medibles**: cada acción de prevención termina en un PR, ADR o
-  cambio operativo concreto.
-- **Visibilidad**: el post-mortem se guarda en
+- **Blameless**: discuss systems and processes, not people.
+- **Measurable actions**: every prevention action ends in a PR, ADR or
+  concrete operational change.
+- **Visibility**: the post-mortem is stored in
   `docs/operations/post-mortems/<YYYY-MM-DD>-<slug>.md`.
 
-## Retro trimestral de arquitectura
+## Quarterly architecture retro
 
-- Revisar `docs/architecture/master-alignment.md` y mover brechas cerradas a
-  "Avances recientes".
-- Evaluar si algún ADR amerita superseed.
-- Confirmar que la lista de repos en `repository-map.md` sigue completa.
-- Decidir el siguiente lote de mejoras a abordar.
+- Review `docs/architecture/master-alignment.md` and move closed gaps into
+  "Recent progress".
+- Evaluate whether any ADR needs to be superseded.
+- Confirm the repo list in `repository-map.md` is still complete.
+- Decide the next batch of improvements to tackle.
 
-## Memoria operativa
+## Operational memory
 
-Decisiones puntuales o aprendizajes con valor a largo plazo se registran en:
+One-off decisions or learnings with long-term value are stored in:
 
-- ADRs (cuando hay decisión estructural).
-- `docs/operations/*.md` (cuando son políticas operativas).
-- Notas internas del repo `docs/next-steps/` cuando son seguimiento corto.
+- ADRs (when there is a structural decision).
+- `docs/operations/*.md` (when they are operational policies).
+- Internal notes in `docs/next-steps/` when they are short-term follow-ups.
 
-Si una acción de retro implica cambios en varios repos, abrir issues
-coordinados y referenciarlos desde el documento de retro.
+If a retro action implies changes across several repos, open coordinated
+issues and reference them from the retro document.
 
-## Referencias
+## References
 
 - [`environments-and-secrets.md`](./environments-and-secrets.md).
 - [`secrets-rotation-policy.md`](./secrets-rotation-policy.md).

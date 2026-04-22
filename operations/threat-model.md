@@ -2,46 +2,46 @@
 
 Last updated: 2026-04-23.
 
-Primer ejercicio formal de modelado de amenazas para AxiomNode. Cubre los
-servicios runtime y los repositorios de soporte. Se aplica STRIDE
-(Spoofing, Tampering, Repudiation, Information disclosure, Denial of
-service, Elevation of privilege) por componente y se prioriza con un score
-cualitativo (low / medium / high). Documento vivo: cada cambio relevante de
-arquitectura obliga a actualizar la sección afectada y a abrir un issue de
-seguimiento si surge una mitigación nueva.
+First formal threat-modeling exercise for AxiomNode. Covers the runtime
+services and the supporting repositories. Applies STRIDE (Spoofing,
+Tampering, Repudiation, Information disclosure, Denial of service,
+Elevation of privilege) per component and ranks each row with a qualitative
+score (low / medium / high). Living document: every relevant architecture
+change must update the affected section and open a follow-up issue if a new
+mitigation appears.
 
-Fuentes de referencia:
+Reference sources:
 
-- ADR 0006 — platform-infra centralizado.
-- ADR 0007 — tags inmutables.
+- ADR 0006 — centralized platform-infra.
+- ADR 0007 — immutable tags.
 - ADR 0008 — DevSecOps + SSDLC.
-- ADR 0009 — LLMOps y eval harness.
+- ADR 0009 — LLMOps and eval harness.
 - [`docs/guides/inter-service-communication.md`](../guides/inter-service-communication.md).
 - [`docs/guides/ai-prompting-rules.md`](../guides/ai-prompting-rules.md).
 - [`docs/operations/secrets-rotation-policy.md`](./secrets-rotation-policy.md).
 - [`docs/operations/environments-and-secrets.md`](./environments-and-secrets.md).
 
-## Alcance y supuestos
+## Scope and assumptions
 
-- **Servicios runtime**: `api-gateway`, `bff-mobile`, `bff-backoffice`,
+- **Runtime services**: `api-gateway`, `bff-mobile`, `bff-backoffice`,
   `microservice-quizz`, `microservice-wordpass`, `microservice-users`,
-  `ai-engine` (incluido llama runtime), `backoffice`, `mobile-app`.
-- **Repositorios de soporte**: `secrets`, `platform-infra`,
+  `ai-engine` (including the llama runtime), `backoffice`, `mobile-app`.
+- **Support repositories**: `secrets`, `platform-infra`,
   `observability-platform`, `contracts-and-schemas`, `shared-sdk-client`,
   `docs`.
-- **Distribuciones**: `dev` (PC del developer + VPS dev), `stg` (VPS),
-  `pro` (VPS + ai-engine local).
-- **Supuestos de confianza**:
-  - El proveedor de identidad (Firebase Auth) es de confianza.
-  - El registry de imágenes (GHCR) está protegido por token rotativo.
-  - GitHub branch protection y `security.yml` (CodeQL + Trivy) están
-    activos en los 8 repos runtime.
-  - El operador con acceso al PC que despliega `ai-engine` es interno.
+- **Distributions**: `dev` (developer PC + dev VPS), `stg` (VPS),
+  `pro` (VPS + local ai-engine).
+- **Trust assumptions**:
+  - The identity provider (Firebase Auth) is trusted.
+  - The image registry (GHCR) is protected by a rotated token.
+  - GitHub branch protection and `security.yml` (CodeQL + Trivy) are active
+    on all 8 runtime repos.
+  - The operator with access to the PC that deploys `ai-engine` is internal.
 
 ## Trust boundaries
 
 ```
-[ Client mobile / browser backoffice ]
+[ Mobile client / browser backoffice ]
               | (HTTPS, JWT)
               v
         [ api-gateway :7005 ]   <-- public boundary
@@ -58,114 +58,114 @@ Fuentes de referencia:
                                               [ llama runtime ]
 ```
 
-Boundaries críticos:
+Critical boundaries:
 
-1. Internet ↔ `api-gateway` (autenticación + cuotas).
-2. `api-gateway` ↔ BFFs (token interno + cabeceras de origen).
-3. BFFs ↔ microservicios de dominio (token compartido por distribución).
-4. `ai-engine-api` ↔ llama runtime (canal local, no expuesto a internet).
-5. Cualquier servicio ↔ `secrets` (vía artefactos de despliegue, no en
-   runtime).
+1. Internet ↔ `api-gateway` (authentication + quotas).
+2. `api-gateway` ↔ BFFs (internal token + origin headers).
+3. BFFs ↔ domain services (per-distribution shared token).
+4. `ai-engine-api` ↔ llama runtime (local channel, not exposed to internet).
+5. Any service ↔ `secrets` (via deployment artifacts, not at runtime).
 
-## Activos
+## Assets
 
-| Activo | Clasificación | Notas |
+| Asset | Classification | Notes |
 |---|---|---|
-| Datos de usuario (`microservice-users`) | PII | Necesita cifrado en tránsito y en reposo |
-| Tokens internos (`API_TOKEN`, `AI_ENGINE_*`, `INTERNAL_API_TOKEN`) | Confidencial | Rotación reglada, ver `secrets-rotation-policy.md` |
-| Modelos LLM cargados localmente | Confidencial | Riesgo de exfiltración por endpoints internos |
-| Prompts, datasets RAG y eval | Interno | Pueden contener IP del producto |
-| Logs y métricas Prometheus | Interno | Pueden filtrar PII si no se sanea |
-| Configuración runtime persistida (rutas, presets) | Interno | Cambia comportamiento sin reinicio |
+| User data (`microservice-users`) | PII | Requires encryption in transit and at rest |
+| Internal tokens (`API_TOKEN`, `AI_ENGINE_*`, `INTERNAL_API_TOKEN`) | Confidential | Regulated rotation, see `secrets-rotation-policy.md` |
+| Locally loaded LLM models | Confidential | Risk of exfiltration via internal endpoints |
+| Prompts, RAG and eval datasets | Internal | May contain product IP |
+| Logs and Prometheus metrics | Internal | May leak PII if not sanitized |
+| Persisted runtime configuration (routes, presets) | Internal | Changes behavior without restart |
 
-## Resumen STRIDE por componente
+## STRIDE summary per component
 
-Las celdas marcadas con `—` indican amenaza de baja relevancia o cubierta
-por la mitigación de otro componente.
+Cells marked with `—` indicate a low-relevance threat or one already covered
+by another component's mitigation.
 
 ### `api-gateway`
 
-| Amenaza STRIDE | Riesgo | Vector | Mitigación actual | Acciones pendientes |
+| STRIDE threat | Risk | Vector | Current mitigation | Pending actions |
 |---|---|---|---|---|
-| Spoofing | High | Token JWT robado o reutilizado | Validación de firma, `Authorization: Bearer`, expiración corta | Revisar TTL y refresh policy (`ai-prompting-rules.md` no aplica) |
-| Tampering | Medium | Modificación de payload en tránsito | HTTPS terminado en gateway/edge | Forzar HSTS y revisar mTLS interno hacia BFFs |
-| Repudiation | Medium | Falta de auditoría sobre cambios admin | `X-Correlation-ID` propagado, log estructurado | Persistir logs de admin en backend dedicado con retención >= 90 días |
-| Information disclosure | Medium | CORS permisivo o errores con stack | Política CORS restringida por distribución | Auditoría trimestral CORS + revisar mensajes de error |
-| Denial of service | High | Saturación pública | Timeouts duros documentados (`inter-service-communication.md`) | Añadir rate limiting por IP + circuit breaker hacia BFFs |
-| Elevation of privilege | High | Cabecera `X-Internal-Token` filtrada | Token rotado por `secrets/scripts/bootstrap-secrets.mjs` | Mover a token firmado por distribución y validar en BFFs |
+| Spoofing | High | Stolen or replayed JWT | Signature validation, `Authorization: Bearer`, short expiration | Review TTL and refresh policy |
+| Tampering | Medium | Payload modification in transit | HTTPS terminated at gateway/edge | Force HSTS and review internal mTLS to BFFs |
+| Repudiation | Medium | Lack of audit on admin changes | `X-Correlation-ID` propagated, structured logs | Persist admin logs in a dedicated backend with retention >= 90 days |
+| Information disclosure | Medium | Permissive CORS or stack-trace errors | CORS policy restricted per distribution | Quarterly CORS audit + review of error messages |
+| Denial of service | High | Public traffic saturation | Hard timeouts documented in `inter-service-communication.md` | Add IP-based rate limiting + circuit breaker towards BFFs |
+| Elevation of privilege | High | Leaked `X-Internal-Token` header | Token rotated through `secrets/scripts/bootstrap-secrets.mjs` | Move to a per-distribution signed token validated in BFFs |
 
-### `bff-mobile` y `bff-backoffice`
+### `bff-mobile` and `bff-backoffice`
 
-| Amenaza STRIDE | Riesgo | Vector | Mitigación actual | Acciones pendientes |
+| STRIDE threat | Risk | Vector | Current mitigation | Pending actions |
 |---|---|---|---|---|
-| Spoofing | High | Llamadas directas saltándose el gateway | `INTERNAL_API_TOKEN` exigido en cada request | Bloquear binding público en VPS (solo overlay interno) |
-| Tampering | Medium | Manipulación del payload reenviado | Validación de schema en BFF antes de upstream | Generar contratos desde `contracts-and-schemas/` y fallar en CI ante drift |
-| Repudiation | Medium | Acciones admin (backoffice) sin trazabilidad | Logs con `correlation_id` + role del operador | Añadir audit trail persistente para acciones críticas (cambios de runtime, rotaciones) |
-| Information disclosure | Medium | Filtrado de metadatos internos al cliente | Respuestas tipadas y sanitizadas | Añadir test de contrato negativo (no propiedades internas) |
-| Denial of service | Medium | Llamadas concurrentes a `ai-engine` | Timeouts (8s dominio / 20s ai-engine) | Cola/limit por usuario y backpressure declarado |
-| Elevation of privilege | High (backoffice) | Bypass de `roleHasBackofficeAccess` | Validación en login + role server-side | Añadir test E2E que verifique 403 a rutas admin sin rol |
+| Spoofing | High | Direct calls bypassing the gateway | `INTERNAL_API_TOKEN` required on every request | Block public binding on the VPS (internal overlay only) |
+| Tampering | Medium | Manipulation of forwarded payload | Schema validation in BFF before upstream | Generate contracts from `contracts-and-schemas/` and fail CI on drift |
+| Repudiation | Medium | Admin actions (backoffice) without traceability | Logs with `correlation_id` + operator role | Add a persistent audit trail for critical actions (runtime changes, rotations) |
+| Information disclosure | Medium | Internal metadata leaked to the client | Typed and sanitized responses | Add a negative contract test (no internal properties) |
+| Denial of service | Medium | Concurrent calls to `ai-engine` | Timeouts (8 s domain / 20 s ai-engine) | Per-user queue/limit and declared backpressure |
+| Elevation of privilege | High (backoffice) | Bypass of `roleHasBackofficeAccess` | Validation at login + server-side role | Add an E2E test that asserts 403 on admin routes without role |
 
-### Microservicios de dominio (`quizz`, `word-pass`, `users`)
+### Domain microservices (`quizz`, `word-pass`, `users`)
 
-| Amenaza STRIDE | Riesgo | Vector | Mitigación actual | Acciones pendientes |
+| STRIDE threat | Risk | Vector | Current mitigation | Pending actions |
 |---|---|---|---|---|
-| Spoofing | Medium | Llamadas con token de otro servicio | `API_TOKEN` por distribución | Pasar a tokens por servicio cuando madure el modelo |
-| Tampering | Medium | Inyección en parámetros de query | Validación con Zod / Pydantic | Auditar endpoints sin validador y cubrirlos en tests |
-| Repudiation | Medium | Cambios sobre datos de usuario sin trazabilidad | Logs estructurados | Añadir tabla `audit_log` para mutaciones en `users` |
-| Information disclosure | High (`users`) | Endpoints que devuelven más PII de la necesaria | Schemas `Public*` separados | Revisión periódica + Trivy fs / SAST cubre el resto |
-| Denial of service | Medium | Bucket sin limit en endpoints públicos vía gateway | Limit aplicado en gateway (planificado) | Definir SLO por endpoint y alertar en `observability-platform` |
-| Elevation of privilege | Medium | Control de roles solo en BFF | Validación duplicada server-side parcial | Mover decisiones de autorización al microservicio dueño del recurso |
+| Spoofing | Medium | Calls with another service's token | Per-distribution `API_TOKEN` | Move to per-service tokens once the model matures |
+| Tampering | Medium | Injection in query parameters | Validation with Zod / Pydantic | Audit endpoints without validators and cover them with tests |
+| Repudiation | Medium | Changes on user data without traceability | Structured logs | Add an `audit_log` table for mutations in `users` |
+| Information disclosure | High (`users`) | Endpoints returning more PII than needed | Separate `Public*` schemas | Periodic review + Trivy fs / SAST cover the rest |
+| Denial of service | Medium | Bucket without limit on public endpoints via gateway | Limit applied at gateway (planned) | Define per-endpoint SLO and alert in `observability-platform` |
+| Elevation of privilege | Medium | Role check only in BFF | Partial server-side duplicate validation | Move authorization decisions to the microservice owning the resource |
 
 ### `ai-engine` (api + stats + llama runtime)
 
-| Amenaza STRIDE | Riesgo | Vector | Mitigación actual | Acciones pendientes |
+| STRIDE threat | Risk | Vector | Current mitigation | Pending actions |
 |---|---|---|---|---|
-| Spoofing | High | Reuse de `AI_ENGINE_API_KEY` | Token por servicio + rotación 90d | Firmar requests con `correlation_id + nonce` (backlog) |
-| Tampering | High | Prompt injection / data poisoning RAG | Reglas en [`ai-prompting-rules.md`](../guides/ai-prompting-rules.md), sanitización de input, schema validation | Añadir clasificador de jailbreak ligero antes del LLM |
-| Repudiation | Medium | Cambios de prompt sin trazabilidad | `PROMPT_VERSIONS` + commits versionados | Persistir `prompt_version` en cada respuesta y exponerlo en métricas |
-| Information disclosure | High | Filtrado del system prompt o de docs RAG | System prompt prohibe revelar instrucciones | Test de regresión que envía prompts de exfiltración conocidos |
-| Denial of service | High | Prompts gigantes / loops de generación | Tamaños máximos, timeouts y `llm_fallback_total` | Alerta Prometheus si `rate(ai_engine_llm_fallback_total) > 0.1 / 5m` |
-| Elevation of privilege | Medium | Endpoints admin (`/admin/*`) accesibles sin token | Token específico (`AI_ENGINE_BRIDGE_API_KEY`) | Separar binding del puerto admin a interfaz interna |
+| Spoofing | High | Reuse of `AI_ENGINE_API_KEY` | Per-service token + 90 d rotation | Sign requests with `correlation_id + nonce` (backlog) |
+| Tampering | High | Prompt injection / RAG data poisoning | Rules in [`ai-prompting-rules.md`](../guides/ai-prompting-rules.md), input sanitization, schema validation | Add a lightweight jailbreak classifier before the LLM |
+| Repudiation | Medium | Prompt changes without traceability | `PROMPT_VERSIONS` + versioned commits | Persist `prompt_version` on every response and expose it in metrics |
+| Information disclosure | High | Leaking the system prompt or RAG docs | The system prompt forbids revealing instructions | Regression test that sends known exfiltration prompts |
+| Denial of service | High | Huge prompts / generation loops | Maximum sizes, timeouts and `llm_fallback_total` | Prometheus alert if `rate(ai_engine_llm_fallback_total) > 0.1 / 5m` |
+| Elevation of privilege | Medium | Admin endpoints (`/admin/*`) reachable without token | Specific token (`AI_ENGINE_BRIDGE_API_KEY`) | Bind the admin port to the internal interface |
 
-### `backoffice` y `mobile-app`
+### `backoffice` and `mobile-app`
 
-| Amenaza STRIDE | Riesgo | Vector | Mitigación actual | Acciones pendientes |
+| STRIDE threat | Risk | Vector | Current mitigation | Pending actions |
 |---|---|---|---|---|
-| Spoofing | Medium | Suplantación de sesión Firebase | Firebase Auth + role server-side en BFF | Forzar reauth ante cambios sensibles |
-| Tampering | Medium | Manipulación del bundle servido | Tags inmutables (ADR 0007) + integridad del registry | Habilitar SRI en assets cuando aplique |
-| Repudiation | Low | Acciones del usuario sin log | `correlation_id` enviado en cada request | — |
-| Information disclosure | Medium | Logs de cliente con PII | Logging mínimo en producción | Auditar `console.log` antes de release |
-| Denial of service | Low | Cliente puede saturar gateway | Limites en gateway | — |
-| Elevation of privilege | Medium | Manipulación del token en localStorage | Token en memoria + refresh corto | Mover a cookies HttpOnly cuando se evalúe |
+| Spoofing | Medium | Firebase session impersonation | Firebase Auth + server-side role in BFF | Force reauth on sensitive changes |
+| Tampering | Medium | Manipulation of the served bundle | Immutable tags (ADR 0007) + registry integrity | Enable SRI on assets when applicable |
+| Repudiation | Low | User actions without log | `correlation_id` sent on every request | — |
+| Information disclosure | Medium | Client logs with PII | Minimal logging in production | Audit `console.log` before release |
+| Denial of service | Low | Client able to saturate the gateway | Limits at gateway | — |
+| Elevation of privilege | Medium | Token manipulation in localStorage | In-memory token + short refresh | Move to HttpOnly cookies once evaluated |
 
-### Soporte: `secrets`, `platform-infra`, `observability-platform`
+### Support: `secrets`, `platform-infra`, `observability-platform`
 
-| Amenaza STRIDE | Riesgo | Vector | Mitigación actual | Acciones pendientes |
+| STRIDE threat | Risk | Vector | Current mitigation | Pending actions |
 |---|---|---|---|---|
-| Spoofing | Medium | Workflow malicioso suplantando dispatch | `PLATFORM_INFRA_DISPATCH_TOKEN` rotado | Limitar `permissions:` por workflow y exigir `environments` con reviewers |
-| Tampering | High | Commit con secreto hardcodeado | `audit-hardcoded-secrets.mjs` + push protection | Añadir pre-commit hook obligatorio para todos los repos |
-| Repudiation | Medium | Cambios de infra sin owner claro | CODEOWNERS por carpeta | Mantener vigente y revisar en retros |
-| Information disclosure | High | Logs de pipelines exponen secretos | `::add-mask::` y revisión de outputs | Documentar en `docs/operations/cicd-workflow-map.md` qué outputs son seguros |
-| Denial of service | Low | Workflow infinito | Timeouts por job (default GitHub) | — |
-| Elevation of privilege | High | Token con `repo` scope filtrado | Tokens por uso (dispatch / read) | Migrar a fine-grained tokens y validar `permissions:` mínimo |
+| Spoofing | Medium | Malicious workflow impersonating a dispatch | `PLATFORM_INFRA_DISPATCH_TOKEN` rotated | Limit `permissions:` per workflow and require `environments` with reviewers |
+| Tampering | High | Commit with hardcoded secret | `audit-hardcoded-secrets.mjs` + push protection | Add a mandatory pre-commit hook in every repo |
+| Repudiation | Medium | Infra changes without a clear owner | CODEOWNERS per folder | Keep up to date and review at retros |
+| Information disclosure | High | Pipeline logs exposing secrets | `::add-mask::` and output review | Document in `docs/operations/cicd-workflow-map.md` which outputs are safe |
+| Denial of service | Low | Infinite workflow | Per-job timeouts (GitHub default) | — |
+| Elevation of privilege | High | Token with `repo` scope leaked | Per-purpose tokens (dispatch / read) | Migrate to fine-grained tokens and validate the minimum `permissions:` |
 
-## Riesgos top y siguiente iteración
+## Top risks and next iteration
 
-1. **Prompt injection y exfiltración en `ai-engine`** (Tampering / Disclosure
-   high). Backlog: clasificador de jailbreak + suite de prompts de regresión.
-2. **DoS en `api-gateway`** (DoS high). Backlog: rate limit por IP y circuit
-   breaker hacia BFFs.
-3. **Audit trail de acciones admin** (Repudiation medium en BFFs y soporte).
-   Backlog: persistencia centralizada con retención >= 90 días.
-4. **Rotación y scope mínimo de tokens CI/CD** (Spoofing / EoP medium-high).
-   Backlog: migrar a fine-grained tokens y exigir `environments` con
-   reviewers.
+1. **Prompt injection and exfiltration in `ai-engine`** (Tampering /
+   Disclosure, high). Backlog: jailbreak classifier + regression suite of
+   prompts.
+2. **DoS at `api-gateway`** (DoS, high). Backlog: IP-based rate limiting and
+   circuit breaker towards BFFs.
+3. **Audit trail of admin actions** (Repudiation, medium in BFFs and
+   support). Backlog: centralized persistence with retention >= 90 days.
+4. **Rotation and least scope for CI/CD tokens** (Spoofing / EoP,
+   medium-high). Backlog: migrate to fine-grained tokens and require
+   `environments` with reviewers.
 
-## Cadencia y mantenimiento
+## Cadence and maintenance
 
-- Revisión trimestral en la retro de arquitectura
+- Quarterly review at the architecture retro
   ([`retrospective-process.md`](./retrospective-process.md)).
-- Actualización ad-hoc cuando se incorpore un servicio nuevo o cambie un
-  trust boundary (publicar nuevo endpoint, conectar proveedor externo, etc.).
-- Cualquier acción pendiente no resuelta a los 90 días se eleva a riesgo
-  aceptado o se replanifica en la retro siguiente.
+- Ad-hoc update when a new service is added or a trust boundary changes
+  (publishing a new endpoint, connecting an external provider, etc.).
+- Any pending action unresolved at 90 days is escalated to "accepted risk"
+  or replanned in the next retro.
