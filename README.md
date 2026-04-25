@@ -25,6 +25,7 @@ Central documentation repository for AxiomNode architecture, operations, and pla
 - [Local edge integration](./guides/local-edge-integration.md)
 - [Backoffice React development](./guides/backoffice-react-development.md)
 - [Mobile app development (Firebase)](./guides/mobile-app-development-firebase.md)
+- [Primary validation workflows](./guides/primary-workflows-validation.md)
 - [Migration guide for existing repositories](./guides/migration-existing-repos.md)
 - [Repository standards adoption guide](./guides/repository-standards-adoption.md)
 
