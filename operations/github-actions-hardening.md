@@ -121,7 +121,7 @@ team review for workflow changes:
 | 4. Replace classic `GHCR_PULL_TOKEN` with a fine-grained PAT scoped to `packages: read` only. | Platform on-call | **Pending** — depends on next rotation window |
 | 5. Configure GitHub Environments (`stg`, `prod`, `build`, `npm-publish`, `audit`) with the reviewer matrix in §1. | Platform on-call | **In progress** — workflow keys shipped 2026-04-26; reviewer setup still UI-only |
 | 6. Add `.github/CODEOWNERS` with `.github/workflows/` rule across every active repo. | Platform on-call | **Done** (2026-04-26) |
-| 7. Annotate every workflow's `permissions:` block with a comment explaining each grant. | Platform team    | In progress (`platform-infra/build-push.yaml`, `deploy.yaml` done 2026-04-23) |
+| 7. Annotate every workflow's `permissions:` block with a comment explaining each grant. | Platform team    | In progress (`platform-infra/build-push.yaml`, `deploy.yaml` done 2026-04-23; `shared-sdk-client` workflows updated 2026-04-26) |
 
 The remaining steps are tracked alongside top-risk #4 in
 [`threat-model.md`](./threat-model.md).
