@@ -11,8 +11,9 @@ Actions pipelines. It complements the workflow map in
 [`secrets-rotation-policy.md`](./secrets-rotation-policy.md). The goals are:
 
 1. Every workflow runs with the **least privilege** necessary.
-2. Every CI/CD secret is a **fine-grained personal access token** (or a
-   purpose-scoped credential) with the smallest possible blast radius.
+2. Every CI/CD secret is a **fine-grained personal access token** or a
+   **GitHub App credential**, always scoped to the smallest possible blast
+   radius.
 3. Every deploy to `stg` or `prod` goes through a **GitHub Environment with
    required reviewers**.
 4. Every workflow change is reviewed by a CODEOWNER from the platform team.
@@ -47,6 +48,7 @@ deprecated and being phased out (see migration plan in §5).
 | Secret name                     | Owner repo(s)                     | Token type   | Resource owner | Repository access            | Permissions                                | Rotation |
 |---------------------------------|-----------------------------------|--------------|----------------|------------------------------|--------------------------------------------|----------|
 | `PLATFORM_INFRA_DISPATCH_TOKEN` | every service repo                | Fine-grained | `AxiomNode`    | `platform-infra` only        | `actions: write`                           | 180 days |
+| `PLATFORM_INFRA_DISPATCH_APP_CLIENT_ID` / `PLATFORM_INFRA_DISPATCH_APP_PRIVATE_KEY` | every service repo | GitHub App var + secret | `AxiomNode` | `platform-infra` only | installation token with `actions: write`   | app-managed |
 | `CROSS_REPO_READ_TOKEN`         | `platform-infra`, BFFs, services  | Fine-grained | `AxiomNode`    | All AxiomNode repos          | `contents: read`, `metadata: read`         | 180 days |
 | `SECRETS_CROSS_REPO_READ_TOKEN` | `secrets`                         | Fine-grained | `AxiomNode`    | All AxiomNode repos          | `contents: read`, `metadata: read`         | 180 days |
 | `GHCR_PULL_TOKEN`               | `platform-infra` (deploy.yaml)    | Fine-grained | `AxiomNode`    | `platform-infra` only        | `packages: read`                           | 180 days |
@@ -80,7 +82,9 @@ merge. The platform team enforces this through CODEOWNERS review.
    `::add-mask::` to defend against multi-line redaction gaps in the runner.
 5. **Cross-repo dispatches MUST validate the dispatch token** before running
    `curl`/`gh workflow run`, fail fast if it is empty, and surface the HTTP
-   status in the job log.
+   status in the job log. Prefer a short-lived GitHub App installation token;
+   keep the fine-grained PAT only as compatibility fallback while app
+   credentials are being rolled out.
 6. **Pinned action versions**: third-party actions are pinned to a SHA or a
    major release; `@latest` and floating `@v*` tags on community actions are
    forbidden in deploy workflows.
@@ -111,6 +115,7 @@ team review for workflow changes:
 | Step | Owner          | Status (2026-04-23) |
 |------|----------------|---------------------|
 | 1. Issue fine-grained PAT for `PLATFORM_INFRA_DISPATCH_TOKEN` and rotate the old one. | Platform on-call | **Done** (2026-04-22) |
+| 1b. Roll out optional GitHub App credentials (`PLATFORM_INFRA_DISPATCH_APP_CLIENT_ID` + `PLATFORM_INFRA_DISPATCH_APP_PRIVATE_KEY`) to every service repo so dispatch can stop depending on PATs. | Platform on-call | **In progress** — workflow fallback shipped 2026-04-26 |
 | 2. Issue fine-grained PAT for `CROSS_REPO_READ_TOKEN`.                                | Platform on-call | **Done** (2026-04-22) |
 | 3. Issue fine-grained PAT for `SECRETS_CROSS_REPO_READ_TOKEN`.                        | Platform on-call | **Done** (2026-04-22) |
 | 4. Replace classic `GHCR_PULL_TOKEN` with a fine-grained PAT scoped to `packages: read` only. | Platform on-call | **Pending** — depends on next rotation window |
