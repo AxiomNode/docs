@@ -8,6 +8,8 @@ on:
   pull_request:
   workflow_dispatch:
 
+# Workflow-level permissions are intentionally minimal because this workflow
+# only checks repository documentation and does not write back to GitHub.
 permissions:
   contents: read
 
