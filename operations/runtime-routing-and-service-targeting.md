@@ -1,10 +1,16 @@
 # Runtime Routing And Service Targeting
 
-Last updated: 2026-04-19.
+Last updated: 2026-05-03.
 
 ## Purpose
 
 This document explains the runtime routing controls that exist outside the static Kubernetes manifests. It is intentionally separate from deployment documentation because the effective topology can differ from the deployed topology, especially for `ai-engine`.
+
+## When to use this
+
+- when diagnosing traffic that does not match the deployed Kubernetes manifests
+- when operators need to apply, inspect, or clear runtime target overrides
+- when validating how `bff-backoffice`, `api-gateway`, and `ai-engine-api` interact as runtime state holders
 
 ## Why this exists
 
@@ -77,6 +83,24 @@ Effective path:
 2. `ai-engine-api` resolves its active llama target
 3. model traffic reaches the selected external or alternate llama runtime
 4. API/stats remain observable through the cluster even if model execution lives elsewhere
+
+## Validation
+
+- current effective targets can be read back from the runtime control surfaces
+- gateway and backoffice diagnostics reflect the selected target state clearly
+- end-to-end traffic reaches the intended upstream after an override or reset
+
+## Risks and cautions
+
+- persisted overrides can outlive pod restarts and redeploys
+- operators can misread effective topology if they only inspect manifests
+- rollback is incomplete if images are reverted but runtime target state is left unchanged
+
+## Related documents
+
+- `docs/operations/deployment-strategy.md`
+- `docs/architecture/target-architecture.md`
+- `docs/guides/capabilities/operations/runtime-routing-control.md`
 
 ## Persistence model
 

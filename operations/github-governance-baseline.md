@@ -1,12 +1,18 @@
 # GitHub Governance Baseline
 
-Last updated: 2026-04-22.
+Last updated: 2026-05-03.
 
-## Intent
+## Purpose
 
 This document defines the minimum GitHub governance baseline expected across AxiomNode repositories.
 
 It complements the repository minimum standards, branch protection policy, PR templates, issue templates, and discussion templates by describing the target GitHub repository posture at a platform level.
+
+## When to use this
+
+- when configuring repository-level GitHub features and community files
+- when auditing drift between documented governance and live GitHub settings
+- when standardizing intake and collaboration posture across repositories
 
 ## Baseline repository features
 
@@ -78,7 +84,7 @@ The combined expected posture for repository intake is:
 - blank issues stay disabled unless a repository owner has a documented reason to allow free-form intake
 - discussions, when enabled, use shared category forms for general, ideas, and Q&A threads
 
-## Drift management
+## Risks and cautions
 
 Repository owners should treat the following as governance drift:
 
@@ -87,9 +93,13 @@ Repository owners should treat the following as governance drift:
 - discussions enabled with no template baseline or with inconsistent category naming
 - repository-local community files that contradict the central governance docs
 
+## Drift management
+
+Correct drift in repository settings or org-level rulesets as soon as it is detected; do not let docs and GitHub posture diverge for long-lived repos.
+
 ## Related documents
 
 - [Repository minimum standards](./repository-minimum-standards.md)
 - [Branch protection policy](./branch-protection-policy.md)
 - [CI/CD workflow map](./cicd-workflow-map.md)
-- [Repository standards adoption guide](../guides/repository-standards-adoption.md)
+- [Repository standards adoption guide](../guides/governance/repository-standards-adoption.md)

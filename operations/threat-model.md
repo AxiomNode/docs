@@ -1,6 +1,8 @@
 # Threat Model — STRIDE baseline
 
-Last updated: 2026-04-23.
+Last updated: 2026-05-03.
+
+## Purpose
 
 First formal threat-modeling exercise for AxiomNode. Covers the runtime
 services and the supporting repositories. Applies STRIDE (Spoofing,
@@ -10,14 +12,20 @@ score (low / medium / high). Living document: every relevant architecture
 change must update the affected section and open a follow-up issue if a new
 mitigation appears.
 
-Reference sources:
+## When to use this
+
+- when evaluating security impact after architecture, topology, or workflow changes
+- when deciding whether a risk belongs in backlog, accepted risk, or immediate mitigation work
+- when aligning security controls across runtime services and supporting repositories
+
+## Reference sources
 
 - ADR 0006 — centralized platform-infra.
 - ADR 0007 — immutable tags.
 - ADR 0008 — DevSecOps + SSDLC.
 - ADR 0009 — LLMOps and eval harness.
-- [`docs/guides/inter-service-communication.md`](../guides/inter-service-communication.md).
-- [`docs/guides/ai-prompting-rules.md`](../guides/ai-prompting-rules.md).
+- [`docs/guides/communication/inter-service-communication.md`](../guides/communication/inter-service-communication.md).
+- [`docs/guides/governance/ai-prompting-rules.md`](../guides/governance/ai-prompting-rules.md).
 - [`docs/operations/secrets-rotation-policy.md`](./secrets-rotation-policy.md).
 - [`docs/operations/environments-and-secrets.md`](./environments-and-secrets.md).
 
@@ -120,7 +128,7 @@ by another component's mitigation.
 | STRIDE threat | Risk | Vector | Current mitigation | Pending actions |
 |---|---|---|---|---|
 | Spoofing | High | Reuse of `AI_ENGINE_API_KEY` | Per-service token + 90 d rotation | Sign requests with `correlation_id + nonce` (backlog) |
-| Tampering | High | Prompt injection / RAG data poisoning | Rules in [`ai-prompting-rules.md`](../guides/ai-prompting-rules.md), input sanitization, schema validation, heuristic jailbreak classifier (`ai_engine.safety`) wired before the LLM | Replace heuristic classifier with a learned model once telemetry justifies it |
+| Tampering | High | Prompt injection / RAG data poisoning | Rules in [`ai-prompting-rules.md`](../guides/governance/ai-prompting-rules.md), input sanitization, schema validation, heuristic jailbreak classifier (`ai_engine.safety`) wired before the LLM | Replace heuristic classifier with a learned model once telemetry justifies it |
 | Repudiation | Medium | Prompt changes without traceability | `PROMPT_VERSIONS` + versioned commits | Persist `prompt_version` on every response and expose it in metrics |
 | Information disclosure | High | Leaking the system prompt or RAG docs | The system prompt forbids revealing instructions | Regression test that sends known exfiltration prompts |
 | Denial of service | High | Huge prompts / generation loops | Maximum sizes, timeouts and `llm_fallback_total` | Prometheus alert if `rate(ai_engine_llm_fallback_total) > 0.1 / 5m` |
@@ -185,3 +193,10 @@ by another component's mitigation.
   (publishing a new endpoint, connecting an external provider, etc.).
 - Any pending action unresolved at 90 days is escalated to "accepted risk"
   or replanned in the next retro.
+
+## Related documents
+
+- [`github-actions-hardening.md`](./github-actions-hardening.md)
+- [`secrets-rotation-policy.md`](./secrets-rotation-policy.md)
+- [`environments-and-secrets.md`](./environments-and-secrets.md)
+- [`retrospective-process.md`](./retrospective-process.md)

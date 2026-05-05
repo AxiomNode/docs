@@ -1,10 +1,16 @@
 # Deployment Strategy
 
-Last updated: 2026-04-19.
+Last updated: 2026-05-03.
 
-## Intent
+## Purpose
 
 This document defines how AxiomNode promotes runtime changes across environments, how image versioning is used, and what is considered automatic versus controlled release behavior.
+
+## When to use this
+
+- when changing deployment policy or rollout ordering
+- when deciding whether a repository belongs to the automatic staging chain
+- when validating rollback behavior and release criteria across environments
 
 ## Environment model
 
@@ -160,6 +166,13 @@ Preferred approach:
 1. restore previous release artifact or previous approved mutable `prod` state
 2. re-run controlled deployment
 3. confirm runtime stability and external connectivity
+
+## Validation
+
+- covered service CI succeeds before dispatch
+- central image build succeeds in `platform-infra`
+- rollout converges in the target environment
+- smoke paths and runtime target state are verified after deployment or rollback
 
 ## Operational constraints
 

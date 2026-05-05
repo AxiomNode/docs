@@ -1,6 +1,16 @@
 # Coverage Baseline Report
 
-Last updated: 2026-04-22.
+Last updated: 2026-05-03.
+
+## Purpose
+
+This report summarizes the current measured or instrumented automated test-coverage state for AxiomNode executable repositories.
+
+## When to use this
+
+- when comparing the policy target against the currently measured repository baseline
+- when deciding which repositories still need coverage hardening or instrumentation work
+- when reading central coverage status without reopening every repository CI report
 
 ## Scope
 
@@ -34,3 +44,9 @@ The table below is updated from repository-local coverage runs performed during 
 - Baselines above were collected from local manual runs intended to measure the current state before full compliance work.
 - `ai-engine` currently uses coverage.py semantics rather than Vitest semantics; documentation must not imply that function coverage is already emitted there or that branches are gated independently.
 - Non-executable documentation, contracts, secrets, and infrastructure repositories are outside line/function/branch coverage scope and should be validated through their own structural checks instead.
+
+## Related documents
+
+- [Test coverage policy](./test-coverage-policy.md)
+- [Repository minimum standards](./repository-minimum-standards.md)
+- [Branch protection policy](./branch-protection-policy.md)

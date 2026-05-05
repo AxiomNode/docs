@@ -1,8 +1,16 @@
 # CI/CD Workflow Map
 
-Last updated: 2026-04-19.
+Last updated: 2026-05-03.
+
+## Purpose
 
 This document describes the current production-grade CI/CD chain across the AxiomNode workspace. It focuses on the services that publish container images and can trigger automatic rollout to the staging VPS.
+
+## When to use this
+
+- when tracing how a change moves from service CI into `platform-infra` packaging and deployment
+- when diagnosing which stage in the delivery chain failed
+- when validating whether a repository belongs to the covered automatic staging chain
 
 ## Scope
 
@@ -182,6 +190,13 @@ The chain can fail in the following distinct places:
 
 Each failure domain stops promotion at its own level and should be diagnosed in the repository that owns that stage.
 
+## Validation
+
+- service repository CI succeeds before dispatch
+- the central build publishes the intended immutable image tag
+- the deploy workflow applies the expected target overlay
+- post-rollout smoke checks confirm public and internal health where applicable
+
 ## Required secrets
 
 ### In service repositories
@@ -206,6 +221,12 @@ Each failure domain stops promotion at its own level and should be diagnosed in 
 - Deployment policy is centralized in `platform-infra`, not duplicated across service repositories.
 - Mutable environment tags exist for operations convenience, but automatic staging deploys use immutable short-SHA image references.
 - Documentation that still mentions automatic `dev` deployment is obsolete and should be considered superseded by this document.
+
+## Risks and cautions
+
+- split AI runtime means a successful cluster rollout does not prove end-to-end AI reachability on its own
+- dispatch-token or cross-repo-read drift can break the chain before packaging even starts
+- mutable tags are operationally useful but should never be treated as the authoritative record of automatic staging state
 
 ## Related documents
 

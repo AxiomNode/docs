@@ -1,6 +1,16 @@
 # Environments and Secrets
 
-Last updated: 2026-04-05.
+Last updated: 2026-05-03.
+
+## Purpose
+
+This document defines the cross-repository environment model, secret classes, and the boundary between environment configuration and persisted runtime state.
+
+## When to use this
+
+- when deciding whether a value belongs in `.env`, `.env.example`, or `.env.secrets`
+- when tracing which repository owns a token or secret-distribution rule
+- when diagnosing configuration issues that may actually be caused by persisted runtime overrides
 
 ## Environment configuration model
 
@@ -67,3 +77,9 @@ Those repository-local references should explain:
 ## Known orphan variable
 
 `SERVICE_COMMUNICATION_TOKEN` is still generated and validated by secrets tooling but is not currently consumed by runtime services.
+
+## Related documents
+
+- `docs/operations/secrets-distribution-guide.md`
+- `docs/operations/secrets-rotation-policy.md`
+- `docs/operations/runtime-routing-and-service-targeting.md`

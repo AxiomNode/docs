@@ -2,8 +2,22 @@
 
 Last updated: 2026-04-23.
 
+## Purpose
+
 AxiomNode runs lightweight but recurrent retros to keep multi-repo platform
 quality high and to stay aligned with the master syllabus.
+
+## When to use this
+
+- when scheduling regular platform retros or release retros
+- when opening a post-mortem after a Sev1 or Sev2 incident
+- when deciding where to store durable learnings from operational reviews
+
+## Preconditions
+
+- access to the current operational metrics, rollout history, and incident context
+- relevant owners available for the retro or post-mortem type being run
+- a place to record the agreed actions and durable outcomes
 
 ## Cadence
 
@@ -84,12 +98,18 @@ One-off decisions or learnings with long-term value are stored in:
 
 - ADRs (when there is a structural decision).
 - `docs/operations/*.md` (when they are operational policies).
-- Internal notes in `docs/next-steps/` when they are short-term follow-ups.
+- the relevant issue tracker or coordinated repository issues when they are short-term follow-ups.
 
 If a retro action implies changes across several repos, open coordinated
 issues and reference them from the retro document.
 
-## References
+## Risks and cautions
+
+- action lists with no owner or due date are noise, not operational improvement
+- retros should not become a second backlog hidden inside docs
+- post-mortems must stay blameless and still end in concrete preventive changes
+
+## Related documents
 
 - [`environments-and-secrets.md`](./environments-and-secrets.md).
 - [`secrets-rotation-policy.md`](./secrets-rotation-policy.md).

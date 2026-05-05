@@ -1,6 +1,8 @@
 # Migration Of Existing Repositories To Gateway And BFF
 
-## Goal
+Last updated: 2026-05-03.
+
+## Purpose
 
 Adapt existing repositories to the current platform architecture without interrupting current runtime behavior.
 

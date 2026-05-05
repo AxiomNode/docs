@@ -1,8 +1,20 @@
 # Test Coverage Policy
 
-## Scope
+Last updated: 2026-05-03.
+
+## Purpose
 
 This document defines the minimum automated test-coverage rule for AxiomNode executable code repositories.
+
+## When to use this
+
+- when setting or auditing repository coverage gates
+- when deciding whether a repository is currently subject to enforceable coverage policy
+- when interpreting central coverage reports against repository CI behavior
+
+## Scope
+
+This policy applies to executable code repositories and to any shared-code repository that exposes a meaningful, instrumented test surface.
 
 ## Rule
 
@@ -61,3 +73,9 @@ Coverage baseline reports in central docs must distinguish:
 1. measured current coverage
 2. enforced threshold
 3. whether the repository is currently compliant
+
+## Related documents
+
+- [Repository minimum standards](./repository-minimum-standards.md)
+- [Test coverage baseline](./test-coverage-baseline.md)
+- [Branch protection policy](./branch-protection-policy.md)

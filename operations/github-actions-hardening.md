@@ -1,14 +1,20 @@
 # GitHub Actions hardening policy
 
+Last updated: 2026-05-03.
+
 > Status: 2026-04-23 — first revision shipped alongside top-risk #4 of
 > [`threat-model.md`](./threat-model.md). Pairs with
 > [`environments-and-secrets.md`](./environments-and-secrets.md) and
 > [`secrets-rotation-policy.md`](./secrets-rotation-policy.md).
 
+## Purpose
+
 This document is the source of truth for how AxiomNode hardens its GitHub
 Actions pipelines. It complements the workflow map in
 [`cicd-workflow-map.md`](./cicd-workflow-map.md) and the rotation cadence in
 [`secrets-rotation-policy.md`](./secrets-rotation-policy.md). The goals are:
+
+## Scope
 
 1. Every workflow runs with the **least privilege** necessary.
 2. Every CI/CD secret is a **fine-grained personal access token** or a
@@ -18,7 +24,9 @@ Actions pipelines. It complements the workflow map in
    required reviewers**.
 4. Every workflow change is reviewed by a CODEOWNER from the platform team.
 
-## 1. Required GitHub Environments
+## Required controls
+
+### Required GitHub Environments
 
 GitHub Environments are configured in repo `Settings → Environments`. The
 following matrix MUST be honoured:
@@ -39,7 +47,7 @@ Notes:
 - The `prod` reviewer set MUST include at least one operator outside of the
   person opening the deployment PR (no self-approvals).
 
-## 2. Token inventory and minimum scopes
+### Token inventory and minimum scopes
 
 All CI/CD tokens are **fine-grained PATs** issued from a service account
 (`axiomnode-ci`) with explicit expiration. Classic PATs with `repo` scope are
@@ -65,7 +73,7 @@ Anti-patterns to remove on sight:
 - A single PAT shared across `dispatch`, `read`, and `packages` purposes.
 - Storing tokens at the repo level when an Environment can scope them tighter.
 
-## 3. Workflow standards
+### Workflow standards
 
 Every `.github/workflows/*.yml` MUST satisfy the following checklist before
 merge. The platform team enforces this through CODEOWNERS review.
@@ -96,7 +104,7 @@ The current state of compliance is summarised in
 quarterly architecture retro
 ([`retrospective-process.md`](./retrospective-process.md)).
 
-## 4. CODEOWNERS expectations
+### CODEOWNERS expectations
 
 Each repository SHOULD ship a `.github/CODEOWNERS` that requires a platform
 team review for workflow changes:
@@ -110,7 +118,9 @@ team review for workflow changes:
 `platform-infra`, `secrets`, and `shared-sdk-client` MUST also gate
 `Dockerfile`, `kubernetes/`, and `terraform/` paths through the same team.
 
-## 5. Migration plan: classic PATs → fine-grained
+## Migration and rollout
+
+### Migration plan: classic PATs → fine-grained
 
 | Step | Owner          | Status (2026-04-23) |
 |------|----------------|---------------------|
@@ -126,7 +136,9 @@ team review for workflow changes:
 The remaining steps are tracked alongside top-risk #4 in
 [`threat-model.md`](./threat-model.md).
 
-## 6. Operational runbook: onboarding a new repo
+## Execution guidance
+
+### Operational runbook: onboarding a new repo
 
 When a new repository joins the AxiomNode org:
 
@@ -139,10 +151,23 @@ When a new repository joins the AxiomNode org:
 6. Update [`cicd-workflow-map.md`](./cicd-workflow-map.md) with the new
    dispatch arrows.
 
-## 7. Out of scope (future work)
+## Risks and cautions
+
+- environment protections in GitHub UI can lag behind what workflow YAML already declares
+- compatibility fallbacks for PAT-based dispatch reduce migration risk but keep a larger secret surface alive
+- hardening policy is only effective if CODEOWNERS and environment reviewers are enforced consistently across repos
+
+## Out of scope
 
 - OIDC federation between GitHub Actions and the GHCR / VPS so we can drop
   the static `GHCR_PULL_TOKEN` and `K3S_SSH_KEY` entirely.
 - Replacing `peter-evans/repository-dispatch`-style raw `curl` with reusable
   workflows that inherit secrets via `secrets: inherit`.
 - Sigstore / cosign signature on every image pushed to GHCR.
+
+## Related documents
+
+- `docs/operations/cicd-workflow-map.md`
+- `docs/operations/environments-and-secrets.md`
+- `docs/operations/secrets-rotation-policy.md`
+- `docs/operations/threat-model.md`

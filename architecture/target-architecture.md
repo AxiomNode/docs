@@ -1,10 +1,17 @@
 # Current Platform Architecture
 
-## Goal
+Last updated: 2026-05-03.
 
-Define the current runtime and delivery architecture for mobile and backoffice channels on top of a microservice platform with AI-assisted generation capabilities and centralized deployment governance.
+## Scope
 
-## Architectural overview
+This document defines the current runtime and delivery architecture for mobile and backoffice channels on top of a microservice platform with AI-assisted generation capabilities and centralized deployment governance.
+
+## Why this matters
+
+- it is the cross-repository architectural reference for platform shape, ownership, and runtime topology
+- it captures the difference between deployable topology and effective runtime topology, which is operationally critical in AxiomNode
+
+## Structural view
 
 ```mermaid
 flowchart TB
@@ -65,23 +72,25 @@ flowchart TB
 4. Data and async layer: service-owned data stores and deferred generation flows.
 5. Platform layer: `platform-infra`, `observability-platform`, `contracts-and-schemas`, `shared-sdk-client`, and `secrets`.
 
-## Repository responsibility boundaries
+## Context and boundaries
 
-### Edge and experience ownership
+### Repository responsibility boundaries
+
+#### Edge and experience ownership
 
 - `api-gateway` owns the public ingress contract, edge auth, CORS, and internal route fan-out.
 - `bff-mobile` owns mobile-facing shaping and shields mobile clients from internal domain-service topology.
 - `bff-backoffice` owns backoffice-facing shaping plus runtime routing control APIs used by operators.
 - `backoffice` owns the operator UI and must expose the difference between environment defaults and runtime overrides.
 
-### Domain ownership
+#### Domain ownership
 
 - `microservice-users` is the system of record for player identity, profile reads, gameplay events, and leaderboard-oriented metrics.
 - `microservice-quizz` owns quiz validation, persistence, retrieval semantics, and its generation request contract toward AI.
 - `microservice-wordpass` owns the equivalent behavior for the word-pass domain.
 - `ai-engine` owns retrieval-augmented generation, ingest semantics, cache-aware generation behavior, observability of AI requests, and llama runtime integration.
 
-### Platform ownership
+#### Platform ownership
 
 - `contracts-and-schemas` is the contract source of truth.
 - `shared-sdk-client` is the shared client and validation distribution point.
@@ -89,9 +98,11 @@ flowchart TB
 - `secrets` owns real runtime secret material and sync rules.
 - `observability-platform` owns shared telemetry assets and alerts.
 
-## Runtime topology
+## Key flows
 
-### Default deployable core
+### Runtime topology
+
+#### Default deployable core
 
 The deployable core for staging and production-oriented flows is:
 
@@ -103,7 +114,7 @@ The deployable core for staging and production-oriented flows is:
 - `microservice-quizz`
 - `microservice-wordpass`
 
-### Optional AI topology
+#### Optional AI topology
 
 `ai-engine` is architecturally part of the platform, but it is no longer assumed to be always in-cluster for staging.
 
@@ -115,7 +126,7 @@ The current architecture supports two valid runtime modes:
 
 That distinction is important: deployment topology and effective runtime topology are no longer always the same thing.
 
-### Effective runtime state holders
+#### Effective runtime state holders
 
 The current architecture contains a narrow operational state plane outside static manifests:
 
@@ -125,7 +136,7 @@ The current architecture contains a narrow operational state plane outside stati
 
 These states survive pod recreation through mounted storage and must be documented as part of the effective topology.
 
-## Runtime routing control plane
+### Runtime routing control plane
 
 Backoffice operational tooling now acts as a lightweight runtime control plane for non-static upstream selection.
 
@@ -138,7 +149,7 @@ Current capabilities:
 
 This control-plane behavior is intentionally narrow in scope: it does not replace GitOps or declarative infrastructure, but it provides pragmatic runtime flexibility for operational AI connectivity.
 
-## Delivery architecture
+### Delivery architecture
 
 The delivery architecture is intentionally split:
 
@@ -147,7 +158,9 @@ The delivery architecture is intentionally split:
 
 This preserves local service autonomy without fragmenting the deployment contract.
 
-## Architecture principles
+## Design constraints
+
+### Architecture principles
 
 - single public ingress
 - private internal APIs by default
@@ -157,7 +170,9 @@ This preserves local service autonomy without fragmenting the deployment contrac
 - immutable artifacts for automated deployment
 - operational flexibility only where topology genuinely requires it
 
-## Quality attributes
+## Tradeoffs and consequences
+
+### Quality attributes
 
 ### Maintainability
 
@@ -181,14 +196,14 @@ This preserves local service autonomy without fragmenting the deployment contrac
 - the architecture can support in-cluster or external AI execution
 - production can remain stricter than staging without changing the service contract model
 
-## Current architectural constraints
+### Current architectural constraints
 
 - staging automatic deploys are pinned to immutable short-SHA artifacts, but manual recovery paths can still use mutable environment tags
 - runtime overrides introduce a second operational state plane that must be documented and observed
 - not every repository in the workspace is part of the GHCR-to-k3s delivery chain
 - AI runtime behavior in staging must always be described in terms of both in-cluster services and external llama reachability
 
-## Documentation implications
+### Documentation implications
 
 To keep architecture documentation correct:
 

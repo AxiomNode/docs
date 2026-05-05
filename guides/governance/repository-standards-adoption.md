@@ -2,7 +2,7 @@
 
 Last updated: 2026-04-22.
 
-## Goal
+## Purpose
 
 This guide explains how to adopt the repository minimum standards in an existing AxiomNode repository without blocking delivery unnecessarily.
 
@@ -10,7 +10,7 @@ Use this guide when:
 
 - bringing an older repository up to the current engineering baseline
 - creating a new repository that must align with workspace governance
-- auditing a repository that only partially satisfies the standards in [Repository minimum standards](../operations/repository-minimum-standards.md)
+- auditing a repository that only partially satisfies the standards in [Repository minimum standards](../../operations/repository-minimum-standards.md)
 
 ## Adoption order
 
@@ -135,7 +135,7 @@ Target end state:
 
 ## Related documents
 
-- [Repository minimum standards](../operations/repository-minimum-standards.md)
-- [Test coverage policy](../operations/test-coverage-policy.md)
-- [Deployment strategy](../operations/deployment-strategy.md)
-- [CI/CD workflow map](../operations/cicd-workflow-map.md)
+- [Repository minimum standards](../../operations/repository-minimum-standards.md)
+- [Test coverage policy](../../operations/test-coverage-policy.md)
+- [Deployment strategy](../../operations/deployment-strategy.md)
+- [CI/CD workflow map](../../operations/cicd-workflow-map.md)

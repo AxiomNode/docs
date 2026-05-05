@@ -6,6 +6,10 @@ Last updated: 2026-04-25.
 
 Provide a practical validation script for the most important AxiomNode runtime workflows, with explicit expected outcomes and evidence to collect.
 
+Use [Critical workflow smoke matrix](./critical-workflow-smoke-matrix.md) alongside this guide to see which workflows already have executable smoke or E2E coverage and which ones still require manual evidence.
+
+When you need a narrow local repro for `WF-05` without bringing up gateway, BFFs, or backoffice, use [WF-05 quiz local smoke](./wf05-quiz-local-smoke.md) or [WF-05 word-pass local smoke](./wf05-wordpass-local-smoke.md).
+
 ## Scope
 
 This guide focuses on cross-repository runtime flows:
@@ -149,15 +153,22 @@ Validate the operational flow where AI produces content for microservice invento
 
 ### Steps
 
-1. Execute generation/ingestion workflow through backoffice or service API.
-2. Confirm generated artifacts are persisted in quiz/wordpass storage.
-3. Call microservice random endpoints and verify new items are eligible for selection.
-4. Re-run `WF-02` and `WF-03` to confirm mobile can consume refreshed inventory.
+1. Execute quiz or word-pass AI generation through the service APIs, preferably `POST /games/generate` for a single item or `POST /games/generate/process/wait` when a blocking batch result is needed.
+2. Confirm the generation response returns `201` and includes `gameType` plus generated content or generated items.
+3. Capture `GET /games/history` before and after a blocking generation run and verify persisted history grows by the reported `task.created` count.
+4. Call `GET /games/models/random` on the same microservice and verify the selected item belongs to the exact persistence window created by that blocking generation run.
+5. Re-run `WF-02` and `WF-03` to confirm mobile still consumes the refreshed inventory through the edge without route changes.
+
+For narrow local repros, the dedicated scripts cover both branches independently:
+
+- [WF-05 quiz local smoke](./wf05-quiz-local-smoke.md)
+- [WF-05 word-pass local smoke](./wf05-wordpass-local-smoke.md)
 
 ### Expected result
 
 - AI pipeline produces new inventory entries successfully.
-- Microservices expose new entries through random model queries.
+- Persisted generation history grows in line with the reported created count.
+- Microservices expose newly persisted entries through random model queries with traceable item identity.
 - Mobile-facing flows consume refreshed inventory without route changes.
 
 ### Negative checks
@@ -167,8 +178,9 @@ Validate the operational flow where AI produces content for microservice invento
 
 ### Evidence
 
+- Request and response samples for `POST /games/generate` or `POST /games/generate/process/wait`.
 - Backoffice diagnostics snapshots before/after ingestion.
-- Microservice query samples showing newly available items.
+- Microservice history and random-query samples showing that a selected random item id belongs to the exact ids persisted by the validated generation window.
 
 ## WF-06 Runtime routing diagnostics and rollback
 
@@ -210,6 +222,9 @@ A validation cycle is complete when:
 
 ## Related documents
 
-- [Key sequence flows](../architecture/key-sequence-flows.md)
-- [Mobile app development guide](./mobile-app-development-firebase.md)
-- [Runtime routing and service targeting](../operations/runtime-routing-and-service-targeting.md)
+- [Critical workflow smoke matrix](./critical-workflow-smoke-matrix.md)
+- [WF-05 quiz local smoke](./wf05-quiz-local-smoke.md)
+- [WF-05 word-pass local smoke](./wf05-wordpass-local-smoke.md)
+- [Key sequence flows](../../architecture/key-sequence-flows.md)
+- [Mobile app development guide](../experience/mobile-app-development-firebase.md)
+- [Runtime routing and service targeting](../../operations/runtime-routing-and-service-targeting.md)

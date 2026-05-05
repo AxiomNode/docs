@@ -8,6 +8,7 @@ Central documentation repository for AxiomNode architecture, operations, and pla
 
 ### Architecture
 
+- [Architecture index](./architecture/README.md)
 - [Platform architecture](./architecture/target-architecture.md)
 - [Repository map](./architecture/repository-map.md)
 - [Use cases](./architecture/use-cases.md)
@@ -21,16 +22,26 @@ Central documentation repository for AxiomNode architecture, operations, and pla
 
 ### Guides
 
-- [Service communication model](./guides/service-communication.md)
-- [Local edge integration](./guides/local-edge-integration.md)
-- [Backoffice React development](./guides/backoffice-react-development.md)
-- [Mobile app development (Firebase)](./guides/mobile-app-development-firebase.md)
-- [Primary validation workflows](./guides/primary-workflows-validation.md)
-- [Migration guide for existing repositories](./guides/migration-existing-repos.md)
-- [Repository standards adoption guide](./guides/repository-standards-adoption.md)
+- [Guides index](./guides/README.md)
+- [Platform functional overview](./guides/foundations/platform-functional-overview.md)
+- [Platform capability matrix](./guides/foundations/platform-capability-matrix.md)
+- [Documentation architecture](./guides/governance/documentation-architecture.md)
+- [Capability analysis template](./guides/templates/capability-analysis-template.md)
+- [Architecture document template](./guides/templates/architecture-document-template.md)
+- [Operations runbook template](./guides/templates/operations-runbook-template.md)
+- [Repository documentation template](./guides/templates/repository-documentation-template.md)
+- [Capability dossiers index](./guides/capabilities/README.md)
+- [Service communication model](./guides/communication/service-communication.md)
+- [Local edge integration](./guides/communication/local-edge-integration.md)
+- [Backoffice React development](./guides/experience/backoffice-react-development.md)
+- [Mobile app development (Firebase)](./guides/experience/mobile-app-development-firebase.md)
+- [Primary validation workflows](./guides/validation/primary-workflows-validation.md)
+- [Migration guide for existing repositories](./guides/governance/migration-existing-repos.md)
+- [Repository standards adoption guide](./guides/governance/repository-standards-adoption.md)
 
 ### Operations
 
+- [Operations index](./operations/README.md)
 - [Environments and secrets](./operations/environments-and-secrets.md)
 - [Secrets distribution guide](./operations/secrets-distribution-guide.md)
 - [Deployment strategy](./operations/deployment-strategy.md)
@@ -38,6 +49,7 @@ Central documentation repository for AxiomNode architecture, operations, and pla
 - [GitHub governance baseline](./operations/github-governance-baseline.md)
 - [CI/CD workflow map](./operations/cicd-workflow-map.md)
 - [Repository minimum standards](./operations/repository-minimum-standards.md)
+- [Functionality review baseline](./operations/functionality-review-baseline.md)
 - [Test coverage policy](./operations/test-coverage-policy.md)
 - [Coverage baseline report](./operations/test-coverage-baseline.md)
 - [Runtime routing and service targeting](./operations/runtime-routing-and-service-targeting.md)

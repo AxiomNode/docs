@@ -27,4 +27,4 @@ CI enforces the chain: contracts validated -> SDK regenerated -> consumers compi
 ## Related
 
 - [QA-M1 in quality attributes](../quality-attributes.md)
-- [shared-sdk-client adoption](../../guides/repository-standards-adoption.md)
+- [shared-sdk-client adoption](../../guides/governance/repository-standards-adoption.md)

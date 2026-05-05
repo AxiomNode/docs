@@ -13,7 +13,7 @@ El objetivo es doble: (1) usar el máster como vara de medir externa para detect
 | 2. Ingeniería de software | Cubierto: ciclo de vida, requisitos como casos de uso, principios de diseño aplicados por repo | No hay un mapa de historias de usuario formal por canal | Añadir story map por canal en `docs/architecture/use-cases.md` |
 | 3. Arquitectura de software | Cubierto: C4 L1-L3, dominio, ADRs 0001-0007, monolito modular + microservicios + event-driven parcial | Falta formalizar Outbox y la matriz síncrono/asíncrono entre servicios | Documentar Outbox y comunicación inter-servicios; ADR si hay decisión nueva |
 | 4. Fundamentos de IA | Cubierto: split AI runtime (ADR 0004), generación + stats + cache + llama, eval harness baseline + prompts versionados | Faltan métricas de calidad sobre LLM real y documento de IA responsable | Promover eval a real-LLM gate; redactar `responsible-ai.md` |
-| 6. Flujo de desarrollo con IA | Parcial: Copilot en uso, prompts ad-hoc | No hay base de conocimiento ni reglas de prompting versionadas | Añadir `docs/guides/ai-prompting-rules.md` |
+| 6. Flujo de desarrollo con IA | Parcial: Copilot en uso, prompts ad-hoc | No hay base de conocimiento ni reglas de prompting versionadas | Añadir `docs/guides/governance/ai-prompting-rules.md` |
 | 7. Calidad | Cubierto: vitest 90%, pytest 90%, Codecov en 8 repos, observabilidad mínima | Falta E2E de extremo a extremo y métricas DORA | Añadir Playwright E2E al menos para backoffice; medir DORA |
 | 8. Infra y Cloud | Cubierto: Docker, K8s, CI/CD, tags inmutables (ADR 0007), platform-infra centralizado (ADR 0006) | Falta LLMOps formal | ADR 0009 |
 | 9. Seguridad | Parcial: secretos centralizados, SAST (CodeQL) + SCA (Trivy/`npm audit`/`pip-audit`) en CI de los 8 repos runtime | Falta threat model, prompt-injection policy y rotación de secretos | Threat model STRIDE + endurecimiento prompt-injection + runbook rotación |
@@ -131,7 +131,7 @@ El objetivo es doble: (1) usar el máster como vara de medir externa para detect
 
 **Acción propuesta:**
 
-- Añadir `docs/guides/ai-prompting-rules.md` con plantillas reutilizables (futura iteración).
+- Añadir `docs/guides/governance/ai-prompting-rules.md` con plantillas reutilizables (futura iteración).
 - Considerar indexar `docs/` con un asistente RAG interno (proyecto P3 del máster).
 
 ### 7. Calidad (Bloque 7)
@@ -205,9 +205,9 @@ El objetivo es doble: (1) usar el máster como vara de medir externa para detect
 - SAST con CodeQL v4 y SCA con Trivy fs (HIGH/CRITICAL bloqueante) integrados como workflow `security.yml` en los 8 repos runtime.
 - `ai-engine` añade además `pip-audit` sobre `requirements.txt`.
 - `npm audit --omit=dev --audit-level=high` ya estaba en los 7 repos Node.
-- Política contra prompt injection formalizada en [`docs/guides/ai-prompting-rules.md`](../guides/ai-prompting-rules.md), con reglas duras para `ai-engine` y BFFs y referencias a las métricas LLMOps de ADR 0009.
+- Política contra prompt injection formalizada en [`docs/guides/governance/ai-prompting-rules.md`](../guides/governance/ai-prompting-rules.md), con reglas duras para `ai-engine` y BFFs y referencias a las métricas LLMOps de ADR 0009.
 - Procedimiento de rotación de secretos publicado en [`docs/operations/secrets-rotation-policy.md`](../operations/secrets-rotation-policy.md) (cadencias, roles, rotación de emergencia y auditoría continua).
-- Reglas duras de comunicación entre servicios consolidadas en [`docs/guides/inter-service-communication.md`](../guides/inter-service-communication.md), apoyadas en `service-communication.md`.
+- Reglas duras de comunicación entre servicios consolidadas en [`docs/guides/communication/inter-service-communication.md`](../guides/communication/inter-service-communication.md), apoyadas en `service-communication.md`.
 - Proceso de retros y post-mortems documentado en [`docs/operations/retrospective-process.md`](../operations/retrospective-process.md).
 - Threat model STRIDE inicial publicado en [`docs/operations/threat-model.md`](../operations/threat-model.md) con riesgos top, mitigaciones actuales y backlog de seguridad.
 - Backoffice añade smoke E2E con Playwright (`backoffice/src/e2e/smoke.spec.ts`) gating del job `e2e-smoke` antes del trigger de platform-infra.

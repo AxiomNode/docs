@@ -1,10 +1,24 @@
 # Secrets Rotation Policy
 
-Last updated: 2026-04-23.
+Last updated: 2026-05-03.
+
+## Purpose
 
 Operational procedure to rotate shared secrets in AxiomNode. Complements
 [`environments-and-secrets.md`](./environments-and-secrets.md) and
 [`secrets-distribution-guide.md`](./secrets-distribution-guide.md).
+
+## When to use this
+
+- when rotating shared runtime or CI/CD secrets on cadence
+- when responding to suspected secret exposure
+- when coordinating multi-repository secret cutovers
+
+## Preconditions
+
+- access to the private `secrets` repository and the target distributions
+- clarity about which services or workflows consume the secret being rotated
+- a validated distribution path for local, VPS, or Kubernetes targets
 
 ## Baseline cadence
 
@@ -82,7 +96,19 @@ rotation within 24 h.
 - GitHub secret-scanning + push protection must remain enabled in every
   repo.
 
-## References
+## Validation
+
+- affected services recover healthy `/healthz` and `/readyz` status after cutover
+- minimum smoke checks succeed without sustained `401` or `403` spikes
+- rotation issue or audit record captures the date and effective change set
+
+## Risks and cautions
+
+- shared tokens require coordinated restart order or temporary auth failures will appear
+- environment-specific drift can make one distribution look healthy while another still uses the previous secret
+- audit and rotation records are part of the security control, not optional paperwork
+
+## Related documents
 
 - [`environments-and-secrets.md`](./environments-and-secrets.md).
 - [`secrets-distribution-guide.md`](./secrets-distribution-guide.md).

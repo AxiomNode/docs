@@ -1,14 +1,20 @@
 # Branch Protection Policy
 
-Last updated: 2026-04-22.
+Last updated: 2026-05-03.
 
-## Intent
+## Purpose
 
 This document defines the minimum branch protection expectations for AxiomNode repositories.
 
 It is a governance baseline for the active delivery branch, which is currently `main` across the workspace.
 
 Until repository rulesets are managed centrally, this document should be treated as the per-repository source of truth for the minimum GitHub protection posture that owners are expected to apply.
+
+## When to use this
+
+- when configuring or auditing branch protection for `main`
+- when deciding which CI workflows must be merge-blocking
+- when checking whether repository GitHub settings still match platform governance
 
 ## Minimum policy for `main`
 
@@ -63,7 +69,7 @@ For platform, shared-code, and documentation repositories:
 - branch protection should still require pull requests and one approving review
 - repositories with multiple validation workflows should require all workflows that protect correctness of published artifacts or governed assets
 
-## Operational note
+## Risks and cautions
 
 This document defines the required protection posture. It does not, by itself, prove that every GitHub repository already has the corresponding settings configured.
 
@@ -75,4 +81,4 @@ Repository owners should treat drift between this document and GitHub settings a
 - [GitHub governance baseline](./github-governance-baseline.md)
 - [CI/CD workflow map](./cicd-workflow-map.md)
 - [Deployment strategy](./deployment-strategy.md)
-- [Repository standards adoption guide](../guides/repository-standards-adoption.md)
+- [Repository standards adoption guide](../guides/governance/repository-standards-adoption.md)

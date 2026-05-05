@@ -1,12 +1,18 @@
 # Repository Minimum Standards
 
-Last updated: 2026-04-22.
+Last updated: 2026-05-03.
 
-## Intent
+## Purpose
 
 This document defines the minimum engineering standards that every AxiomNode repository must satisfy.
 
 These standards are intentionally small, enforceable, and cross-repository. They are meant to reduce variance between repositories and make quality gates predictable.
+
+## When to use this
+
+- when creating a new repository or auditing an existing one
+- when deciding which governance rules are mandatory by repository class
+- when reviewing whether a repository is ready to be treated as production-grade
 
 ## Scope
 
@@ -225,7 +231,7 @@ Operational note:
 
 - the external llama runtime can also be outside the current automatic staging chain when staging runs in split-AI mode; this is a runtime-topology concern rather than a standalone repository classification
 
-## Review checklist
+## Validation
 
 Use this checklist when creating or auditing a repository:
 
@@ -236,11 +242,15 @@ Use this checklist when creating or auditing a repository:
 5. Is coverage enforced at 90% or higher when the repository is executable?
 6. If the repository is deployable to staging, does a green `main` update continue automatically through the centralized staging deployment chain?
 
+## Review checklist
+
+Use the validation section as the minimum audit gate and this section as a shorthand reminder during review.
+
 ## Related documents
 
 - [Test coverage policy](./test-coverage-policy.md)
 - [Branch protection policy](./branch-protection-policy.md)
 - [Deployment strategy](./deployment-strategy.md)
 - [CI/CD workflow map](./cicd-workflow-map.md)
-- [Migration guide for existing repositories](../guides/migration-existing-repos.md)
-- [Repository standards adoption guide](../guides/repository-standards-adoption.md)
+- [Migration guide for existing repositories](../guides/governance/migration-existing-repos.md)
+- [Repository standards adoption guide](../guides/governance/repository-standards-adoption.md)

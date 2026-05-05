@@ -28,8 +28,8 @@ Last updated: 2026-04-05.
 |---|---|---|
 | GET | `/v1/mobile/games/quiz/random` | `microservice-quizz:/games/models/random` |
 | GET | `/v1/mobile/games/wordpass/random` | `microservice-wordpass:/games/models/random` |
-| POST | `/v1/mobile/games/quiz/generate` | `microservice-quizz:/games/generate` (generation timeout profile) |
-| POST | `/v1/mobile/games/wordpass/generate` | `microservice-wordpass:/games/generate` (generation timeout profile) |
+| POST | `/v1/mobile/games/quiz/generate` | `microservice-quizz:/games/models/random` (inventory lookup under the generation-timeout profile) |
+| POST | `/v1/mobile/games/wordpass/generate` | `microservice-wordpass:/games/models/random` (inventory lookup under the generation-timeout profile) |
 
 ### Backoffice routes (through `bff-backoffice`)
 

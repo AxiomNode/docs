@@ -41,7 +41,7 @@ captures the **hard rules** that any new service or route must respect.
 | `X-Distribution: dev|stg|pro` | `api-gateway` | Route and policy selection |
 
 Token details: see
-[`docs/operations/environments-and-secrets.md`](../operations/environments-and-secrets.md).
+[`docs/operations/environments-and-secrets.md`](../../operations/environments-and-secrets.md).
 
 ## Errors and response contract
 
@@ -61,7 +61,7 @@ Every service exposes:
 
 For `ai-engine` the LLMOps metrics defined in ADR 0009 also apply, as
 described in
-[`ai-prompting-rules.md`](./ai-prompting-rules.md#mandatory-telemetry).
+[`ai-prompting-rules.md`](../governance/ai-prompting-rules.md#mandatory-telemetry).
 
 ## Contract changes
 
@@ -70,12 +70,12 @@ described in
 2. Validate with `validate-contracts` in CI.
 3. Version the route (`/v1/...`, `/v2/...`); never break an active `/v1`.
 4. Announce the change in the weekly retro
-   ([`docs/operations/retrospective-process.md`](../operations/retrospective-process.md)).
+  ([`docs/operations/retrospective-process.md`](../../operations/retrospective-process.md)).
 
 ## References
 
 - [`service-communication.md`](./service-communication.md) — detailed contract.
-- [`docs/operations/environments-and-secrets.md`](../operations/environments-and-secrets.md).
-- [`docs/operations/secrets-rotation-policy.md`](../operations/secrets-rotation-policy.md).
+- [`docs/operations/environments-and-secrets.md`](../../operations/environments-and-secrets.md).
+- [`docs/operations/secrets-rotation-policy.md`](../../operations/secrets-rotation-policy.md).
 - ADR 0006 (centralized platform-infra).
 - ADR 0007 (immutable tags).

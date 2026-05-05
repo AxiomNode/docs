@@ -1,5 +1,9 @@
 # Architecture Decision Records (ADRs)
 
+Last updated: 2026-05-03.
+
+## Purpose
+
 ADRs document significant architectural decisions: context, alternatives considered, decision, and consequences.
 
 Format: each file is `NNNN-short-title.md`, numbered sequentially. Status is one of `Proposed`, `Accepted`, `Superseded by NNNN`, or `Deprecated`.
