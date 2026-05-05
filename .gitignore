@@ -11,3 +11,6 @@
 runtime/**/*.env
 *firebase*service-account*.json
 *service-account*.json
+
+# Local planning/backlog drafts are not published from the central docs repo.
+roadmap/
