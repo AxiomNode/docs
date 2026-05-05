@@ -4,7 +4,7 @@ Last updated: 2026-05-03.
 
 ## Purpose
 
-This capability gives operators a single UI and BFF-backed surface to inspect service health, logs, metrics, deployment history, Kubernetes state, and AI runtime context.
+This capability gives operators a single UI and BFF-backed surface to inspect service health, logs, metrics, the packaged backoffice version, Kubernetes state, and AI runtime context.
 
 ## Functional objective
 
@@ -32,7 +32,7 @@ This capability gives operators a single UI and BFF-backed surface to inspect se
 
 - owns operator-facing visualization in backoffice panels such as `ServiceOverviewPanel.tsx` and `ServiceConsolePanel.tsx`
 - owns BFF aggregation logic in `bff-backoffice/src/app/routes/backoffice.ts`
-- reads deployment history and Kubernetes state but does not own the health of the underlying services it displays
+- reads Kubernetes state and exposes the packaged backoffice version, but does not own the health of the underlying services it displays
 - overlaps with runtime routing control only where diagnostics must reflect current effective targets
 
 ## Entrypoints and contracts
@@ -42,14 +42,13 @@ This capability gives operators a single UI and BFF-backed surface to inspect se
 | Type | Location | Notes |
 |---|---|---|
 | UI flow | backoffice dashboards and operational panels | operator entry surface |
-| HTTP route | BFF metrics, logs, data, deployment-history, and Kubernetes routes | aggregated diagnostics data |
+| HTTP route | BFF metrics, logs, data, and Kubernetes routes | aggregated diagnostics data |
 | Service call | backoffice `operationalSummary.ts` | front-end composition of diagnostics calls |
 
 ### Inputs
 
 - operator auth/session state from backoffice
 - downstream service metrics, logs, and data endpoints
-- deployment history records from `deploymentHistoryStore.ts`
 - Kubernetes overview data from `kubernetesObservability.ts`
 - effective target state and AI probe results where relevant
 
@@ -57,7 +56,7 @@ This capability gives operators a single UI and BFF-backed surface to inspect se
 
 - service-overview panels and drill-down console views
 - enriched diagnostics summaries through the BFF
-- operator-visible deployment history and Kubernetes overview payloads
+- operator-visible packaged version and Kubernetes overview payloads
 
 ### Contract sources
 
@@ -70,21 +69,20 @@ This capability gives operators a single UI and BFF-backed surface to inspect se
 
 1. An operator opens a diagnostics screen in backoffice.
 2. The UI calls gateway-exposed backoffice routes that land in `bff-backoffice`.
-3. The BFF queries downstream services, deployment history, and Kubernetes observability helpers.
-4. The UI merges those responses into operator panels for health, logs, metrics, deployments, and runtime topology.
+3. The BFF queries downstream services and Kubernetes observability helpers.
+4. The UI merges those responses with the packaged version into operator panels for health, logs, metrics, deployments, and runtime topology.
 5. Operators use the same surface to correlate a visible issue with the current effective routing and deployment state.
 
 ## Persistence and runtime state
 
 ### Owned persistence
 
-- deployment-history records via `bff-backoffice/src/app/services/deploymentHistoryStore.ts`
 - UI screen state and BFF-managed routing/preset state used by diagnostics panels
 
 ### Runtime state
 
 - downstream availability directly affects what panels can render
-- Kubernetes overview and deployment history can become stale relative to the actual effective routing path
+- Kubernetes overview can become stale relative to the actual effective routing path
 - operator screen state may lag behind new probes or target changes until refreshed
 
 ### State risks
@@ -103,7 +101,7 @@ This capability gives operators a single UI and BFF-backed surface to inspect se
 ### Operational signals
 
 - service metrics/logs endpoints
-- deployment history reads
+- packaged backoffice version display
 - service overview and console panels in the UI
 
 ### Verification evidence
@@ -123,7 +121,7 @@ This capability gives operators a single UI and BFF-backed surface to inspect se
 ## Security and access model
 
 - diagnostics surfaces are operator-facing and should remain protected by backoffice auth and route guards
-- logs, metrics, target state, and deployment history can reveal internal topology and must not leak publicly
+- logs, metrics, and target state can reveal internal topology and must not leak publicly
 - read-only diagnostics and mutating operational controls should remain clearly separated in the UI and BFF API
 
 ## Deployment and rollback implications
@@ -136,7 +134,7 @@ This capability gives operators a single UI and BFF-backed surface to inspect se
 ### Rollback impact
 
 - partial rollback can leave the UI expecting routes an older BFF or gateway version does not expose
-- deployment history and diagnostics panels remain useful only if rollback preserves minimum visibility paths
+- diagnostics panels remain useful only if rollback preserves minimum visibility paths
 
 ## Related capabilities
 

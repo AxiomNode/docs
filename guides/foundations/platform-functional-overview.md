@@ -105,7 +105,7 @@ The workspace contains four broad kinds of assets:
 - renders dashboards for service status, traffic, and diagnostics
 - exposes operational controls for AI targeting and runtime changes
 - supports inspection of service inventories, logs, metrics, and health data
-- presents deployment-history and operator-oriented runtime summaries
+- presents operator-oriented runtime summaries and the packaged backoffice version
 - gates access by roles such as `SuperAdmin`, `Admin`, `Viewer`, and `Gamer`
 
 **Main dependencies:** `api-gateway`, `bff-backoffice`

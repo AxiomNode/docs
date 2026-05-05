@@ -94,7 +94,7 @@ This capability packages runtime services, publishes images, and rolls environme
 
 - GitHub Actions build and deploy runs
 - rollout logs and cluster events
-- deployment history surfaced through operational diagnostics
+- packaged backoffice version surfaced through operational diagnostics
 
 ### Verification evidence
 

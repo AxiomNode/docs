@@ -71,7 +71,7 @@ How easy it is to prove that the capability works through tests, smoke checks, r
 
 - runtime routing control spans `bff-backoffice`, `api-gateway`, and `ai-engine`, so effective topology can diverge from static manifests
 - player-facing continuity spans mobile local persistence, BFF-side player snapshot storage, and `microservice-users` authoritative persistence
-- diagnostics surfaces combine UI state, BFF state, deployment history, and live downstream health, which makes stale or partial views more likely without explicit labeling
+- diagnostics surfaces combine UI state, BFF state, runtime routing state, and live downstream health, which makes stale or partial views more likely without explicit labeling
 
 ## Most important current gaps
 
