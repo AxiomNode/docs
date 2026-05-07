@@ -101,4 +101,4 @@ Use this document when reviewing whether a capability should be:
 - exposed better because it exists but is hard to reach,
 - removed because the platform no longer has a meaningful consumer path for it.
 
-Use [../roadmap/functionality-gap-backlog.md](../roadmap/functionality-gap-backlog.md) for the prioritized follow-up actions derived from this review.
+Track prioritized follow-up actions outside this current-state documentation repository, for example in issues or the active delivery board.

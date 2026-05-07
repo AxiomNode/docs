@@ -87,5 +87,4 @@ Do not expose internal infrastructure secrets in mobile-distributed configuratio
 
 - [Mobile gameplay orchestration](../capabilities/player/mobile-gameplay-orchestration.md)
 - [Player identity and profile](../capabilities/player/player-identity-and-profile.md)
-- [mobile-app/App/README.md](../../../mobile-app/App/README.md)
-- [mobile-app/App/FIREBASE_SETUP.md](../../../mobile-app/App/FIREBASE_SETUP.md)
+- Repository-local references: `mobile-app/App/README.md` and `mobile-app/App/FIREBASE_SETUP.md`

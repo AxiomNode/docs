@@ -76,5 +76,4 @@ These tests do not replace a cross-repository smoke, but they narrow the uncerta
 
 - [Primary validation workflows](./primary-workflows-validation.md)
 - [Functionality review baseline](../../operations/functionality-review-baseline.md)
-- [Functionality gap backlog](../../roadmap/functionality-gap-backlog.md)
 - [Local edge integration](../communication/local-edge-integration.md)

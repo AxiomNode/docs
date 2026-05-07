@@ -84,5 +84,4 @@ Detailed operator-facing diagnostics behavior belongs in the operations capabili
 
 - [Backoffice operational diagnostics](../capabilities/operations/backoffice-operational-diagnostics.md)
 - [Runtime routing control](../capabilities/operations/runtime-routing-control.md)
-- [backoffice/docs/architecture/README.md](../../../backoffice/docs/architecture/README.md)
-- [backoffice/docs/operations/README.md](../../../backoffice/docs/operations/README.md)
+- Repository-local references: `backoffice/docs/architecture/README.md` and `backoffice/docs/operations/README.md`
