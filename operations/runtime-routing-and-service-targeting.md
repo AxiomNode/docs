@@ -39,6 +39,7 @@ Responsibilities:
 
 - hold the active live ai-engine target used by the runtime request path
 - enforce approved-host rules through environment-level allowlists
+- proxy operator-facing ai-engine target, preset, connection, probe, and plugin-capability routes to `bff-backoffice`
 
 ### `ai-engine-api`
 
@@ -89,6 +90,7 @@ Effective path:
 - current effective targets can be read back from the runtime control surfaces
 - gateway and backoffice diagnostics reflect the selected target state clearly
 - end-to-end traffic reaches the intended upstream after an override or reset
+- llama reachability should be checked through `/v1/backoffice/ai-engine/probe` and runtime capability readback when diagnosing split-AI mode
 
 ## Risks and cautions
 
