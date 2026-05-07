@@ -106,7 +106,7 @@ The workspace contains four broad kinds of assets:
 - exposes operational controls for AI targeting and runtime changes
 - supports inspection of service inventories, logs, metrics, and health data
 - presents operator-oriented runtime summaries and the packaged backoffice version
-- gates access by roles such as `SuperAdmin`, `Admin`, `Viewer`, and `Gamer`
+- gates access by roles such as `SuperAdmin`, `Admin`, `Inspector`, `Viewer`, and `Gamer`
 
 **Main dependencies:** `api-gateway`, `bff-backoffice`
 

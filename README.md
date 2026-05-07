@@ -1,6 +1,6 @@
 # AxiomNode Documentation
 
-Last updated: 2026-04-22.
+Last updated: 2026-05-08.
 
 Central documentation repository for AxiomNode architecture, operations, and platform governance.
 
@@ -101,6 +101,8 @@ Each runtime or platform repository should document its own concrete implementat
 | Domain runtime | `microservice-users`, `microservice-quizz`, `microservice-wordpass` | Private business services with owned persistence |
 | AI capability | `ai-engine` | Generation API, stats API, cache, llama runtime |
 | Platform governance | `platform-infra`, `contracts-and-schemas`, `shared-sdk-client`, `secrets`, `observability-platform` | Delivery, contracts, SDKs, secrets, and operations tooling |
+
+Backoffice access is role-gated through `microservice-users`. The current role model includes `SuperAdmin`, `Admin`, `Inspector`, `Viewer`, and `Gamer`; `Inspector` is a read-only review role that can inspect Backoffice role assignments without mutating user permissions.
 
 ### Current runtime reality to document explicitly
 
