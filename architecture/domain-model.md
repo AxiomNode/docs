@@ -122,12 +122,14 @@ classDiagram
 
 ## Cross-context contracts
 
-| Contract | Producer | Consumer | Source |
+> Updated 2026-11-12: the Zod schemas below are defined in `shared-sdk-client/typescript/src/game-schemas.ts` and imported by the services. The JSON Schema and OpenAPI copies in `contracts-and-schemas` are hand-written documentation; nothing is generated from them.
+
+| Contract | Defined in (code) | Consumer | Documented in |
 |---|---|---|---|
-| `RandomGameQuerySchema` | `contracts-and-schemas` | `api-gateway`, `bff-mobile`, `microservice-{quizz,wordpass}` | shared SDK |
-| `LeaderboardQuerySchema` | `contracts-and-schemas` | `api-gateway`, `bff-mobile`, `microservice-users` | shared SDK |
-| `GameCategoriesSchema` | `contracts-and-schemas` (json) | `shared-sdk-client/typescript`, gameplay services | generated at SDK build |
-| AI generation request | `contracts-and-schemas/openapi/ai-engine` | quiz/wordpass, bff-backoffice | generated client |
+| `RandomGameQuerySchema` | `shared-sdk-client` (`game-schemas.ts`) | `api-gateway`, `bff-mobile`, `microservice-{quizz,wordpass}` | `contracts-and-schemas/schemas/json/random-game.query.v1.json` |
+| `LeaderboardQuerySchema` | `shared-sdk-client` (`game-schemas.ts`) | `api-gateway`, `bff-mobile`, `microservice-users` | `contracts-and-schemas/schemas/json/leaderboard.query.v1.json` |
+| `GameCategoriesSchema` | `shared-sdk-client` (`game-schemas.ts`) | gameplay services | `contracts-and-schemas/schemas/json/game-categories.v1.json` |
+| AI generation request | `ai-engine` (FastAPI app) and `shared-sdk-client` `ai-engine-client.ts` | quiz/wordpass (through the gateway) | `contracts-and-schemas/schemas/openapi/internal-ai-engine.v1.yaml` (partial) |
 
 ## Anti-patterns explicitly rejected
 

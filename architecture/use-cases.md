@@ -102,7 +102,7 @@ This document enumerates the primary use cases supported by the AxiomNode platfo
 
 - Trigger: PR to `contracts-and-schemas` or `shared-sdk-client`.
 - Path: `validate-contracts` / `typescript-sdk-ci` workflows.
-- Post-conditions: Failing contract changes block downstream services from compiling against drift.
+- Post-conditions: Failing contract changes block downstream services from compiling against drift. *Target:* today `validate-contracts` only checks that the contract files are valid, and `typescript-sdk-ci` builds the TypeScript library; neither compiles services against the contracts.
 
 ### UC-15 Recover AI services (Platform Engineer)
 

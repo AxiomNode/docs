@@ -1,6 +1,15 @@
 # Current Platform Architecture
 
-Last updated: 2026-05-03.
+Last updated: 2026-11-12.
+
+> **Current vs target (reviewed 2026-11-12 against `origin/main`).** The diagram and the layers below describe the *current* code unless an item is explicitly marked *target* or *not implemented*. Corrections made in this review:
+>
+> - Quizz and word-pass call `ai-engine` **through the gateway**, not directly: `AI_ENGINE_BASE_URL=http://api-gateway:7005/internal/ai-engine` (`platform-infra/kubernetes/base/microservice-quizz/api-deployment.yaml`). The gateway forwards `/internal/ai-engine/{generate,ingest}/{quiz,word-pass}`, `catalogs`, `health` and `stats` to `ai-engine`.
+> - `contracts-and-schemas` is not a build or runtime input of any service: its OpenAPI files are hand-written documentation validated by CI, and there are none for the gateway or the BFFs.
+> - `shared-sdk-client` is an internal TypeScript library imported by the gateway, both BFFs and the users, quizz and word-pass services. It does not generate clients.
+> - There is no message broker, event bus or Outbox. Asynchronous work is in-process (generation tasks and the runtime worker inside each game service). The event schemas in `contracts-and-schemas/schemas/events/` are *target / not implemented*.
+> - `true-false` generation exists only in `ai-engine`; no service, BFF or app uses it.
+> - The k3s staging host no longer exists and `platform-infra` `deploy.yaml` is manual-only; the deployment topology below describes the manifests, not a live environment.
 
 ## Scope
 
@@ -46,18 +55,22 @@ flowchart TB
 	BffBackoffice --> Wordpass
 	BffBackoffice --> AISTATS
 	Gateway --> AIAPI
+	Gateway --> AISTATS
+	Quiz -->|AI generation via /internal/ai-engine| Gateway
+	Wordpass -->|AI generation via /internal/ai-engine| Gateway
 	Platform -. deploys .-> Gateway
 	Platform -. deploys .-> BffMobile
 	Platform -. deploys .-> BffBackoffice
 	Platform -. deploys .-> Quiz
 	Platform -. deploys .-> Wordpass
 	Platform -. deploys .-> Users
-	Contracts -. shared contracts .-> Gateway
-	Contracts -. shared contracts .-> BffMobile
-	Contracts -. shared contracts .-> BffBackoffice
-	SDK -. shared client libs .-> Gateway
-	SDK -. shared client libs .-> BffMobile
-	SDK -. shared client libs .-> BffBackoffice
+	Contracts -. hand-written docs, CI validation only .-> SDK
+	SDK -. internal TypeScript library .-> Gateway
+	SDK -. internal TypeScript library .-> BffMobile
+	SDK -. internal TypeScript library .-> BffBackoffice
+	SDK -. internal TypeScript library .-> Users
+	SDK -. internal TypeScript library .-> Quiz
+	SDK -. internal TypeScript library .-> Wordpass
 	Secrets -. runtime config .-> Platform
 	Obs -. telemetry .-> Gateway
 	Obs -. telemetry .-> BffMobile
@@ -69,7 +82,7 @@ flowchart TB
 1. Edge layer: `api-gateway` is the single public ingress and policy boundary.
 2. Experience layer: `bff-mobile` and `bff-backoffice` expose channel-shaped contracts.
 3. Domain services: `microservice-users`, `microservice-quizz`, `microservice-wordpass`, and optional `ai-engine` endpoints.
-4. Data and async layer: service-owned data stores and deferred generation flows.
+4. Data and async layer: service-owned data stores and deferred generation flows. Deferred generation means in-process generation tasks and a runtime worker inside the quizz and word-pass services; there is no broker, queue or event bus (event-driven integration is *target / not implemented*).
 5. Platform layer: `platform-infra`, `observability-platform`, `contracts-and-schemas`, `shared-sdk-client`, and `secrets`.
 
 ## Context and boundaries
@@ -92,8 +105,8 @@ flowchart TB
 
 #### Platform ownership
 
-- `contracts-and-schemas` is the contract source of truth.
-- `shared-sdk-client` is the shared client and validation distribution point.
+- `contracts-and-schemas` holds the hand-written OpenAPI and JSON Schema documents for the internal services and a generated route inventory for the gateway and BFFs. It is validated in CI but nothing generates code from it, so the code remains the effective source of truth (*target*: contract-first).
+- `shared-sdk-client` is an internal TypeScript library (Zod schemas, HTTP proxy helpers, game-service runtime) imported by six services.
 - `platform-infra` owns packaging and deployment policy.
 - `secrets` owns real runtime secret material and sync rules.
 - `observability-platform` owns shared telemetry assets and alerts.
@@ -116,7 +129,7 @@ The deployable core for staging and production-oriented flows is:
 
 #### Optional AI topology
 
-`ai-engine` is architecturally part of the platform, but it is no longer assumed to be always in-cluster for staging.
+`ai-engine` is architecturally part of the platform, but it is no longer assumed to be always in-cluster for staging. Its `true-false` routes are not used by any service, BFF or app; the platform only plays quiz and word-pass.
 
 The current architecture supports two valid runtime modes:
 

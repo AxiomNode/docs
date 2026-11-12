@@ -13,6 +13,8 @@ Multiple services and channels exchange request/response payloads. Without a sin
 
 CI enforces the chain: contracts validated -> SDK regenerated -> consumers compiled against new SDK.
 
+> **Status note (2026-11-12): partially implemented.** Contracts are validated in CI, but nothing regenerates the SDK: `shared-sdk-client` is a hand-written internal TypeScript library and there are no Python or Kotlin clients. The OpenAPI files cover the internal services only (not the gateway or the BFFs), and the event schemas have no producer or consumer. Treat the chain above as the intended direction, not as the current behaviour.
+
 ## Alternatives considered
 
 1. Per-service schemas duplicated locally: rejected; produced silent drift historically.

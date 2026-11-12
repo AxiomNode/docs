@@ -1,6 +1,8 @@
 # Alineación con el Máster en Desarrollo con IA
 
-Last updated: 2026-04-23.
+Last updated: 2026-11-12.
+
+> **Correction (2026-11-12):** earlier versions of this document claimed a partial event-driven architecture. On `origin/main` there is no message broker, no domain events and no Outbox in any service. The event schemas in `contracts-and-schemas/schemas/events/` have no producer and no consumer and are marked not implemented. The only asynchronous telemetry is the HTTP `POST /events` ingestion of the `ai-engine` stats app. References to events or Outbox below are *future work*.
 
 Este documento mapea los pilares del *Máster en Desarrollo con IA* (resumido en `.tmp/MásterDesarrolloIA/summary/`) con el estado actual de la plataforma AxiomNode. Para cada pilar se describe qué se cumple hoy, qué brechas existen y qué acciones concretas se proponen, enlazando a los artefactos donde se materializan.
 
@@ -11,7 +13,7 @@ El objetivo es doble: (1) usar el máster como vara de medir externa para detect
 | Pilar del máster | Estado AxiomNode | Brecha principal | Acción propuesta |
 |---|---|---|---|
 | 2. Ingeniería de software | Cubierto: ciclo de vida, requisitos como casos de uso, principios de diseño aplicados por repo | No hay un mapa de historias de usuario formal por canal | Añadir story map por canal en `docs/architecture/use-cases.md` |
-| 3. Arquitectura de software | Cubierto: C4 L1-L3, dominio, ADRs 0001-0007, monolito modular + microservicios + event-driven parcial | Falta formalizar Outbox y la matriz síncrono/asíncrono entre servicios | Documentar Outbox y comunicación inter-servicios; ADR si hay decisión nueva |
+| 3. Arquitectura de software | Cubierto: C4 L1-L3, dominio, ADRs 0001-0007, monolito modular + microservicios con comunicación REST síncrona (event-driven: no implementado, trabajo futuro) | No hay broker ni eventos; Outbox y la matriz síncrono/asíncrono quedan como trabajo futuro | Documentar Outbox y comunicación inter-servicios; ADR si hay decisión nueva |
 | 4. Fundamentos de IA | Cubierto: split AI runtime (ADR 0004), generación + stats + cache + llama, eval harness baseline + prompts versionados | Faltan métricas de calidad sobre LLM real y documento de IA responsable | Promover eval a real-LLM gate; redactar `responsible-ai.md` |
 | 6. Flujo de desarrollo con IA | Parcial: Copilot en uso, prompts ad-hoc | No hay base de conocimiento ni reglas de prompting versionadas | Añadir `docs/guides/governance/ai-prompting-rules.md` |
 | 7. Calidad | Cubierto: vitest 90%, pytest 90%, Codecov en 8 repos, observabilidad mínima | Falta E2E de extremo a extremo y métricas DORA | Añadir Playwright E2E al menos para backoffice; medir DORA |
@@ -62,12 +64,12 @@ El objetivo es doble: (1) usar el máster como vara de medir externa para detect
 - C4 L1, L2, L3 documentados en [c4-views.md](./c4-views.md).
 - Dominio modelado en [domain-model.md](./domain-model.md) con bounded contexts.
 - 7 ADRs cubren edge único, BFF por canal, contratos como SoT, split AI, runtime control plane, infra centralizada, tags inmutables.
-- Comunicación principalmente síncrona REST. Hay eventos puntuales en `ai-engine` y `microservice-quizz`, no formalizados.
+- Comunicación síncrona REST. No hay broker ni eventos de dominio (verificado en `origin/main` el 2026-11-12). El trabajo asíncrono es en proceso: tareas de generación y worker dentro de quizz/word-pass. Los esquemas `game-generation-completed/failed.v1.json` no están implementados.
 
 **Brechas:**
 
 - No hay un documento de comunicación inter-servicios que enumere qué llamadas son síncronas vs asíncronas.
-- No se aplica patrón Outbox de forma sistemática para garantizar consistencia eventual.
+- No se aplica patrón Outbox: no existe (no hay broker al que publicar). Trabajo futuro, solo si se introduce un broker.
 
 **Acción propuesta:**
 
