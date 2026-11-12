@@ -87,7 +87,7 @@ Reason:
 ## Current CI/CD automation map
 
 - Service repos on `main` dispatch image builds to `platform-infra` (`build-push.yaml`).
-- `platform-infra` deploy workflow runs after successful build and currently auto-deploys to `stg`.
+- `platform-infra` build workflow is dispatch-only and publishes images to GHCR; the deploy workflow is manual-only because the k3s host no longer exists (it used to auto-deploy to `stg` after a successful build).
 - Staging and production promotion remain controlled and non-automatic in current policy.
 - Dispatch now occurs only after the service repository validation jobs succeed.
 - Docs-only pushes should not dispatch central image builds from the covered service repositories.

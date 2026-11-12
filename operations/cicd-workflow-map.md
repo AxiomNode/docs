@@ -1,6 +1,8 @@
 # CI/CD Workflow Map
 
-Last updated: 2026-05-03.
+Last updated: 2026-11-12.
+
+> **Status (2026-11):** the k3s staging host no longer exists and `platform-infra/.github/workflows/deploy.yaml` is manual-only (`workflow_dispatch`). Nothing deploys automatically today; `Build & Push Docker Images` (dispatch-only) still publishes images to GHCR when a service repository dispatches it. The automatic flow below documents the thesis-era design.
 
 ## Purpose
 
@@ -51,7 +53,7 @@ flowchart LR
 	E --> F[Build image in platform-infra]
 	F --> G[Push immutable SHA tag to GHCR]
 	G --> H[Publish mutable env tags dev and stg]
-	H --> I[platform-infra deploy workflow_run]
+	H -. thesis-era, disabled .-> I[platform-infra deploy workflow_run]
 	I --> J[Render stg manifests with immutable SHA]
 	J --> K[Apply to axiomnode-stg in k3s VPS]
 	K --> L[Rollout checks and smoke tests]
@@ -103,12 +105,14 @@ The deployment workflow prefers immutable short-SHA references for automatic sta
 
 ## Automatic deployment policy
 
-`platform-infra/.github/workflows/deploy.yaml` is triggered in two modes:
+Current state: `platform-infra/.github/workflows/deploy.yaml` only runs on manual dispatch. The `workflow_run` trigger described below was removed when the k3s host was decommissioned and can be restored once a deploy target exists again.
 
-1. `workflow_run` after successful completion of `Build & Push Docker Images` on `main`
-2. manual dispatch for targeted environment deployment
+Thesis-era design (for reference), `deploy.yaml` was triggered in two modes:
 
-Current policy:
+1. `workflow_run` after successful completion of `Build & Push Docker Images` on `main` (disabled)
+2. manual dispatch for targeted environment deployment (the only mode today)
+
+Thesis-era policy:
 
 - automatic target environment is `stg`
 - automatic deploys render the staging overlay with immutable image overrides derived from the triggering build run
