@@ -15,7 +15,7 @@ This document defines how AxiomNode promotes runtime changes across environments
 ## Environment model
 
 - `dev`: developer-owned local runtime, primarily Docker Compose based, optimized for fast iteration and low coordination cost
-- `stg`: shared remote staging on the VPS k3s cluster, used as the automatic deployment target for covered services
+- `stg`: shared remote staging on the VPS k3s cluster, formerly the automatic deployment target for covered services (host decommissioned, deploys are manual-only today)
 - `prod`: controlled production target with manual promotion, stricter operational review, and higher runtime guarantees
 
 ## Deployment principles
@@ -55,7 +55,9 @@ It does not automatically cover:
 
 ## Automatic staging deployment
 
-Automatic deployment to staging is enabled for the covered runtime services.
+> **Status (2026-11):** disabled. The k3s staging host no longer exists and `deploy.yaml` is manual-only (`workflow_dispatch`). The text below describes the thesis-era design.
+
+Automatic deployment to staging was enabled for the covered runtime services.
 
 Conditions:
 
@@ -63,7 +65,7 @@ Conditions:
 2. the service validation jobs succeed
 3. the service workflow dispatches `platform-infra` build-push
 4. the centralized image build succeeds
-5. `platform-infra` deploy runs via `workflow_run`
+5. `platform-infra` deploy ran via `workflow_run` (trigger removed)
 
 Staging deployment therefore acts as a continuation of CI, not as a manually curated release lane.
 
