@@ -32,9 +32,9 @@ This capability keeps request, response, and event semantics aligned across repo
 
 | Type | Location | Notes |
 |---|---|---|
-| Source artifact | versioned OpenAPI specs under `contracts-and-schemas/schemas/openapi/` | HTTP contract source of truth |
+| Source artifact | versioned OpenAPI specs under `contracts-and-schemas/schemas/openapi/` | hand-written HTTP documentation for the internal services (not the gateway or BFFs); checked against code on 2026-11-12, nothing generates code from it |
 | Source artifact | JSON Schemas under `contracts-and-schemas/schemas/json/` | payload and query semantics |
-| Generated artifact | shared SDK modules under `shared-sdk-client/typescript/src/` | consumer integration surface |
+| Hand-written library | shared SDK modules under `shared-sdk-client/typescript/src/` | internal TypeScript consumer integration surface (not generated from the contracts) |
 
 ### Inputs
 
@@ -45,7 +45,7 @@ This capability keeps request, response, and event semantics aligned across repo
 ### Outputs
 
 - canonical specs and schemas
-- generated SDK exports such as `AiEngineClient`, `createGameRoutes()`, and reusable validators
+- SDK exports such as `AiEngineClient`, `createGameRoutes()`, and reusable validators (hand-written, not generated)
 - CI and compile feedback from consumers
 
 ### Contract sources

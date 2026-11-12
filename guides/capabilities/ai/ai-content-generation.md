@@ -167,7 +167,7 @@ This capability turns internal generation requests into validated game payloads,
 ## Open questions
 
 - the quiz tests still assert effective language as English on model-specific generation paths even when the route defaults use `X-Game-Language=es`; that contract should be clarified explicitly at the platform level
-- true-false generation and ingest routes exist in ai-engine, but the current capability inventory and main consumers focus on quiz and word-pass only
+- true-false generation and ingest routes exist in ai-engine, but no microservice, BFF route or mobile game uses them (checked on `origin/main`, 2026-11-12) and the gateway does not proxy them; the platform only plays quiz and word-pass
 - the operational boundary between ai-engine local llama-target state and gateway/BFF ai-engine target overrides is functional but still easy to misread during incident response
 
 ## References

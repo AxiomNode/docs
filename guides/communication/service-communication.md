@@ -68,7 +68,7 @@ Last updated: 2026-04-05.
 
 - Batch generation endpoints return `taskId` values.
 - Clients poll process-status endpoints for progress/completion.
-- Event contracts are versioned in `contracts-and-schemas/schemas/events/`.
+- Event contracts are proposed in `contracts-and-schemas/schemas/events/` but are **not implemented** (no broker, no producer, no consumer on `origin/main`, 2026-11-12). Asynchronous behaviour today is the in-process generation tasks above.
 
 ## Effective AI request path
 

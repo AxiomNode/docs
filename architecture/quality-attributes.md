@@ -9,11 +9,11 @@ Each scenario uses the SEI template (Source, Stimulus, Environment, Artifact, Re
 ### QA-P1 Quiz round latency under nominal load
 
 - Source: Mobile player.
-- Stimulus: `GET /v1/games/quiz/random` with cached generation available.
+- Stimulus: `GET /v1/mobile/games/quiz/random` with stored quiz models available (the route only reads stored rows; it never calls `ai-engine`).
 - Environment: staging or production, normal load (<= 50 RPS per service).
 - Artifact: `api-gateway` -> `bff-mobile` -> `microservice-quizz`.
-- Response: returns 200 with cached `GameGeneration`.
-- Measure: p95 < 400 ms end-to-end; cache hit ratio > 70 % observed via stats.
+- Response: returns 200 with stored `GameGeneration` models.
+- Measure: p95 < 400 ms end-to-end (target; no automated measurement was found in this review).
 
 ### QA-P2 AI cold generation latency
 
@@ -80,9 +80,9 @@ Each scenario uses the SEI template (Source, Stimulus, Environment, Artifact, Re
 - Source: Contracts maintainer.
 - Stimulus: breaking change merged to `contracts-and-schemas`.
 - Environment: CI of consumers.
-- Artifact: SDK regeneration step.
-- Response: dependent service builds fail until contracts are honored.
-- Measure: 100 % of consumer pipelines re-run on SDK update.
+- Artifact: SDK regeneration step. *Not implemented:* the SDK is not generated from contracts; CI only validates the contract files and builds the TypeScript library.
+- Response: dependent service builds fail until contracts are honored (target; today a contract change does not affect any service build).
+- Measure: 100 % of consumer pipelines re-run on SDK update (target).
 
 ### QA-M2 Service repo can be regenerated to a known good baseline
 
@@ -120,7 +120,7 @@ Each scenario uses the SEI template (Source, Stimulus, Environment, Artifact, Re
 - Source: Engineering team.
 - Stimulus: introduce a new game type.
 - Environment: workspace.
-- Artifact: new microservice repo + contracts entry + SDK regen.
+- Artifact: new microservice repo + hand-written contracts entry + SDK update (there is no SDK regeneration).
 - Response: new BFF route + gateway forward; no schema changes to other services.
 - Measure: 0 modifications required to existing microservice DBs.
 

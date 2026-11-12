@@ -25,8 +25,8 @@ Common terms used across AxiomNode documentation.
 | Sealed-secret | Encrypted secret object committed to git and decrypted in-cluster. |
 | Validation chain | Per-repo CI gates (lint, test, audit, contract validation) that must pass before dispatch. |
 | Dispatch | Cross-repo `repository_dispatch` from a service to `platform-infra` to trigger build/push. |
-| SDK | Generated client library distributed via `shared-sdk-client` (TS / Python / Kotlin). |
-| Contract | OpenAPI/JSON Schema/event schema in `contracts-and-schemas`. |
+| SDK | `shared-sdk-client`: an internal TypeScript library (shared Zod schemas, HTTP proxy helpers, game-service runtime). Not generated from contracts. |
+| Contract | OpenAPI/JSON Schema/event schema in `contracts-and-schemas`. Hand-written and validated by CI; the event schemas are not implemented. |
 | Bounded context | DDD term; one microservice = one context. |
 | Aggregate | DDD term; consistency boundary inside a bounded context. |
 | ADR | Architecture Decision Record (see `decision-records/`). |
