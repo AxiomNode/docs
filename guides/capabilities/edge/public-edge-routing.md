@@ -1,17 +1,17 @@
 # Public Edge Routing
 
-Last updated: 2026-05-03.
+Last updated: 2026-11-13.
 
 ## Purpose
 
-This capability provides the stable ingress boundary for mobile and backoffice clients while keeping downstream services private, replaceable, and operationally reroutable.
+This capability provides the stable ingress boundary for mobile and backoffice clients while keeping downstream services private and replaceable.
 
 ## Functional objective
 
 - accept public traffic through one edge service
 - apply edge auth, CORS, timeout, and forwarding policy before reaching BFFs
 - expose internal AI proxy routes without making ai-engine public
-- preserve a stable public surface even when runtime targets change underneath
+- preserve a stable public surface when downstream targets change
 
 ## Ownership and boundaries
 
@@ -33,8 +33,8 @@ This capability provides the stable ingress boundary for mobile and backoffice c
 
 ### Explicit boundaries
 
-- owns public ingress, route registration, forwarding, and AI proxy target resolution in `api-gateway/src/app/routes/proxy.ts`
-- owns persisted AI target overrides in `api-gateway/src/app/services/routingStateStore.ts`
+- owns public ingress and the route table in `api-gateway/src/app/routes/routeTable.ts`, with forwarding and AI proxy target resolution in `proxy.ts`
+- still owns a persisted target override for the `/internal/ai-engine/*` proxy in `api-gateway/src/app/services/routingStateStore.ts`; `bff-backoffice` no longer writes to it (see [Runtime routing and service targeting](../../../operations/runtime-routing-and-service-targeting.md))
 - delegates business orchestration to BFFs and AI execution to ai-engine
 - does not own domain validation, persistence, or operator UI semantics
 
@@ -48,7 +48,7 @@ This capability provides the stable ingress boundary for mobile and backoffice c
 | HTTP route | `/v1/mobile/*` | public ingress toward `bff-mobile` |
 | HTTP route | `/v1/backoffice/*` | public ingress toward `bff-backoffice` |
 | HTTP route | `/internal/ai-engine/*` | internal proxy for generation, ingest, catalogs, health, and stats |
-| HTTP route | `/internal/admin/ai-engine/target` | privileged runtime target read/update/delete |
+| HTTP route | `/internal/admin/ai-engine/target` | privileged read/update/delete of the gateway's own AI proxy target (`API_GATEWAY_ADMIN_TOKEN`); not used by the Backoffice flow |
 
 ### Inputs
 
@@ -61,7 +61,7 @@ This capability provides the stable ingress boundary for mobile and backoffice c
 
 - forwarded public responses for mobile and backoffice clients
 - forwarded internal responses for ai-engine generation, ingest, health, and stats
-- persisted side effects when operators mutate the AI target through admin routes
+- persisted side effects when the gateway admin target route is used
 
 ### Contract sources
 
@@ -74,7 +74,7 @@ This capability provides the stable ingress boundary for mobile and backoffice c
 
 1. A public client reaches `api-gateway` on a `/v1/mobile/*` or `/v1/backoffice/*` route.
 2. The gateway applies edge auth and request policy in `server.ts`, including health-route exemptions and route classification for rate limiting.
-3. `proxy.ts` resolves the correct upstream target, using persisted AI overrides for `/internal/ai-engine/*` and static BFF URLs for public BFF paths.
+3. `proxy.ts` resolves the upstream from the route table, using the gateway AI target (environment default or persisted override) for `/internal/ai-engine/*` and static BFF URLs for public BFF paths.
 4. The gateway forwards the request through shared HTTP helpers and route-specific circuit breakers.
 5. The response is returned to the caller while preserving edge-visible status and correlation context.
 
@@ -82,19 +82,19 @@ This capability provides the stable ingress boundary for mobile and backoffice c
 
 ### Owned persistence
 
-- gateway routing state persisted by `RoutingStateStore`
+- gateway AI proxy target persisted by `RoutingStateStore`
 
 ### Runtime state
 
 - default upstream URLs from `api-gateway/src/app/config.ts`
-- effective AI API and stats targets computed from env defaults plus persisted overrides
+- effective AI API and stats targets for `/internal/ai-engine/*` computed from env defaults plus the persisted gateway override
 - per-upstream circuit-breaker state inside the gateway process
 
 ### State risks
 
 - stale AI target after restart or redeploy because the routing state file survives
 - gateway target drift relative to BFF or ai-engine runtime state
-- public route availability diverging from operator expectations when the gateway lags behind downstream route additions
+- public route availability diverging from operator expectations when the gateway lags behind downstream route additions or removals: the route table still lists some `bff-backoffice` paths that no longer exist (`/kubernetes/overview`, `/ai-engine/presets*`, `/ai-engine/connections*`, `/service-targets*`), which end in an upstream error; cleanup is pending
 
 ## Observability evidence
 
@@ -111,6 +111,7 @@ This capability provides the stable ingress boundary for mobile and backoffice c
 ### Verification evidence
 
 - `api-gateway/src/tests/proxy.test.ts`
+- `api-gateway/src/tests/proxyRouteEquivalence.test.ts`
 - `api-gateway/src/tests/routingStateStore.test.ts`
 - focused health-route tests in `api-gateway/src/tests/health.test.ts`
 

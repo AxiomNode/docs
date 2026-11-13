@@ -1,139 +1,70 @@
 # Runtime Routing Control
 
-Last updated: 2026-05-03.
+Last updated: 2026-11-13.
 
 ## Purpose
 
-This capability lets operators change effective service and AI routing at runtime, persist those overrides, and return safely to defaults without rebuilding the platform.
-
-## Functional objective
-
-- persist and apply runtime target overrides and presets
-- expose the effective routing picture to operators
-- support controlled rollback from overrides back to default topology
+This capability lets operators point `ai-engine-api` at a different llama runtime without a redeploy, persist that override, and return to the environment default. It is the only runtime routing control that remains; the full flow is in [Runtime routing and service targeting](../../../operations/runtime-routing-and-service-targeting.md).
 
 ## Ownership and boundaries
 
-### Main owners
+| Owner | Responsibility | Code |
+|---|---|---|
+| `Backoffice` | llama target card (`AiEngineTargetControl`) in AI diagnostics | `Backoffice/src/src/ui/components/AiEngineTargetControl.tsx` |
+| `api-gateway` | plain forwarding of `/v1/backoffice/*` to the BFF | `api-gateway/src/app/routes/routeTable.ts` |
+| `bff-backoffice` | validation, host allowlist, probe, sync to ai-engine | `bff-backoffice/src/app/routes/backoffice.ts` |
+| `ai-engine-api` | owns and persists the override | `ai-engine/src/ai_engine/api/app.py` |
 
-- `bff-backoffice`
-- `api-gateway`
-- `ai-engine`
-
-### Upstream actors
-
-- backoffice operators
-
-### Explicit boundaries
-
-- owns BFF-side service target and AI preset management in `bff-backoffice/src/app/routes/backoffice.ts`
-- owns gateway-side AI target persistence in `api-gateway/src/app/services/routingStateStore.ts`
-- owns ai-engine local llama target override in `ai-engine`
-- does not replace deploy-time configuration management in `platform-infra`, but can override runtime behavior after deploy
+Out of scope: deploy-time configuration (`platform-infra`) and any BFF-side routing state (none exists).
 
 ## Entrypoints and contracts
 
-### Main entrypoints
-
-| Type | Location | Notes |
+| Type | Route | Notes |
 |---|---|---|
-| HTTP route | `GET/PUT/DELETE /v1/backoffice/ai-engine/target` | BFF AI target inspection and mutation |
-| HTTP route | `GET/POST/PUT/DELETE /v1/backoffice/ai-engine/presets*` | shared AI preset management |
-| HTTP route | `/v1/backoffice/service-targets/:service` | runtime service override control |
-| HTTP route | `GET/PUT/DELETE /internal/admin/ai-engine/target` | gateway-owned AI target control |
-| HTTP route | ai-engine internal llama target routes | ai-engine local runtime override |
+| HTTP | `GET/PUT/DELETE /v1/backoffice/ai-engine/target` | read, apply, clear |
+| HTTP | `POST /v1/backoffice/ai-engine/probe` | non-mutating reachability check of `<target>/v1/models` |
+| HTTP | `GET /v1/backoffice/ai-engine/plugin/capabilities` | effective plugin runtime capabilities |
+| HTTP (private) | `GET/PUT/DELETE /internal/admin/llama-target` on `ai-engine-api` | called by the BFF with `x-api-key` |
 
-### Inputs
-
-- operator target changes and preset payloads validated by Zod schemas
-- current runtime state from BFF routing store, gateway routing store, and ai-engine target store
-- service identifiers such as `ai-engine-api`, `ai-engine-stats`, and other BFF-managed upstreams
-
-### Outputs
-
-- persisted override files and preset state
-- effective runtime target changes
-- reset-to-default side effects when overrides are cleared
-
-### Contract sources
-
-- `bff-backoffice/src/app/routes/backoffice.ts`
-- `bff-backoffice/src/app/services/routingStateStore.ts`
-- `api-gateway/src/app/services/routingStateStore.ts`
-- `api-gateway/src/app/routes/proxy.ts`
+Payload for `PUT` and `POST probe`: `host`, `protocol` (`http` or `https`), `port`, optional `label`, validated with Zod in the BFF.
 
 ## Main functional flow
 
-1. An operator changes a target or preset in backoffice.
-2. `bff-backoffice` validates the payload and persists the change in its routing-state store.
-3. When the change affects AI execution, the BFF synchronizes runtime state toward `api-gateway` and ai-engine as needed.
-4. Subsequent requests use the new effective target without a redeploy.
-5. Operators verify health and can clear the override to fall back to defaults.
+1. The operator edits the llama target card and optionally probes it.
+2. The BFF checks the host against `ALLOWED_ROUTING_TARGET_HOSTS` and calls `ai-engine-api`.
+3. `ai-engine-api` persists the override in `AI_ENGINE_LLAMA_TARGET_STATE_FILE` and applies it.
+4. The BFF clears its upstream cache and breakers and returns the read-back target.
+5. `DELETE` restores the environment default.
 
-## Persistence and runtime state
+## Persistence and risks
 
-### Owned persistence
+- State lives only in `ai-engine-api` (file on mounted storage); it survives restarts and redeploys.
+- A stale override after a rollout leaves generation pointing at an unexpected runtime while pods look healthy.
+- Rolling back images does not roll back the override.
 
-- BFF service-target overrides and AI preset records
-- gateway AI target override file
-- ai-engine local llama target override file
+## Failure modes
 
-### Runtime state
-
-- effective topology is computed from environment defaults plus one or more persisted overrides
-- overrides survive restart and redeploy unless explicitly cleared
-- BFF, gateway, and ai-engine can each hold part of the routing truth
-
-### State risks
-
-- stale override after a healthy rollout leaves runtime using an unexpected target
-- sync-order mistakes across BFF, gateway, and ai-engine create split routing state
-- UI can display one topology while the actual traffic path uses another
-
-## Observability evidence
-
-### Health signals
-
-- health probes executed after target changes
-
-### Operational signals
-
-- target and preset readback routes in the BFF and gateway
-- operator probe route `POST /v1/backoffice/ai-engine/probe`
-- runtime-target comparison in backoffice diagnostics
-
-### Verification evidence
-
-- `bff-backoffice/src/tests/routingStateStore.test.ts`
-- `bff-backoffice/src/tests/backofficeRouteGuards.test.ts`
-- `api-gateway/src/tests/routingStateStore.test.ts`
-- `api-gateway/src/tests/proxy.test.ts`
-
-## Failure modes and risks
-
-| Failure mode | Likely cause | User/operator impact | Detection path | Recovery path |
-|---|---|---|---|---|
-| Wrong target configured | operator error or stale preset | runtime requests fail while pods stay healthy | target read routes and smoke requests | reset to default or apply a known-good preset |
-| State mismatch across owners | failed sync or concurrent edits | UI shows one topology while runtime uses another | compare BFF, gateway, and ai-engine target reads | resynchronize holders and retest |
-| Override survives too long | runtime holder not cleared after rollout | traffic keeps pointing to a temporary host | post-deploy routing inspection | explicitly clear override and verify |
+| Failure mode | Likely cause | Detection | Recovery |
+|---|---|---|---|
+| `400` on `PUT` | host not allowed or invalid payload | response message | fix the payload or `ALLOWED_ROUTING_TARGET_HOSTS` |
+| Probe not reachable | wrong host/port or runtime down | probe result | correct the target |
+| Target set but generation fails | llama runtime unreachable or warming up | smoke request, `ai-engine-api` health | `DELETE` the override or fix the runtime |
+| Admin call times out | `ai-engine-api` hung | BFF error citing the timeout (`AI_ENGINE_ADMIN_TIMEOUT_MS`) | restore `ai-engine-api` |
 
 ## Security and access model
 
-- routing mutation paths are high-impact admin operations and should remain role-gated and auditable
-- preset and target payloads can reveal sensitive internal topology and must stay on protected surfaces
-- route guards in BFF and gateway are part of the control boundary, not optional UI behavior
+- Mutating routes are high-impact admin operations behind the backoffice authentication path.
+- Targets are restricted by `ALLOWED_ROUTING_TARGET_HOSTS` (denied outside development when empty).
+- `ai-engine-api` internal admin routes are not public.
 
-## Deployment and rollback implications
+## Observability and verification
 
-### Deployment impact
+- Readback via `GET /v1/backoffice/ai-engine/target`; reachability via the probe route.
+- Tests: `bff-backoffice/src/tests/backoffice.test.ts`, `backofficeBranches.test.ts`, `routingAllowlist.test.ts`; `ai-engine/src/tests/test_api/test_llama_target_store.py`; `Backoffice/src/src/test/ai-diagnostics-panel.integration.test.tsx`.
 
-- routing overrides can outlive container rollouts and therefore change the effective behavior of an otherwise healthy deployment
-- gateway, BFF, and ai-engine changes must preserve routing-state compatibility across restarts
+## History
 
-### Rollback impact
-
-- rolling back binaries does not automatically roll back persisted routing state
-- safe rollback often requires both image rollback and explicit override reset or reapplication
+Service-target overrides, shared presets and connections, the Kubernetes overview, routing history, and the matching Backoffice tab and presets selector were removed (`bff-backoffice` PR #9, `Backoffice` PR #7). The gateway still carries a separate `/internal/admin/ai-engine/target` store and some dead forwarding entries; see the operations reference.
 
 ## Related capabilities
 
@@ -142,13 +73,7 @@ This capability lets operators change effective service and AI routing at runtim
 - [AI observability and diagnostics](../ai/ai-observability-and-diagnostics.md)
 - [Backoffice operational diagnostics](./backoffice-operational-diagnostics.md)
 
-## Open questions
-
-- whether all routing transitions are audited consistently enough across BFF, gateway, and ai-engine holders
-- whether concurrent operator edits need stronger conflict semantics and UI signaling
-
 ## References
 
 - [Platform capability matrix](../../foundations/platform-capability-matrix.md)
 - [Platform functional overview](../../foundations/platform-functional-overview.md)
-- [Backoffice operational diagnostics](./backoffice-operational-diagnostics.md)
