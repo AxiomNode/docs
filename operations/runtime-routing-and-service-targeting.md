@@ -46,9 +46,9 @@ The llama target is the host, port, and protocol that `ai-engine-api` uses to re
 - `PUT` is rejected unless the host matches `ALLOWED_ROUTING_TARGET_HOSTS` (exact host, `*.suffix`, or IPv4 CIDR). When the variable is empty, overrides are denied outside development.
 - The probe route performs a server-side request to an operator-supplied host; keep it on the authenticated backoffice surface.
 
-## Gateway state (current, cleanup pending)
+## Gateway
 
-`api-gateway` still has a second, separate target store on `main`: `GET/PUT/DELETE /internal/admin/ai-engine/target` (guarded by `API_GATEWAY_ADMIN_TOKEN`, persisted in `GATEWAY_ROUTING_STATE_FILE`) that can redirect the `/internal/ai-engine/*` proxy. `bff-backoffice` no longer calls it, so the Backoffice flow above does not touch it. The gateway route table also still forwards a few paths that `bff-backoffice` no longer serves (`/kubernetes/overview`, `/ai-engine/presets*`, `/ai-engine/connections*`, `/service-targets*`); those requests end in an upstream error. No pull request that removes them is open in `AxiomNode/api-gateway` as of this date, so treat this as current behavior and an open cleanup item.
+`api-gateway` holds no routing state: it resolves the `/internal/ai-engine/*` upstreams only from `AI_ENGINE_API_URL` and `AI_ENGINE_STATS_URL`, and its route table no longer lists the removed `bff-backoffice` paths (`/kubernetes/overview`, `/ai-engine/presets*`, `/ai-engine/connections*`, `/service-targets*`). Its former `/internal/admin/ai-engine/target` store, `API_GATEWAY_ADMIN_TOKEN` and `GATEWAY_ROUTING_STATE_FILE` were removed in `api-gateway` PR #8.
 
 ## Validation
 

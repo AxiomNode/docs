@@ -64,7 +64,7 @@ Payload for `PUT` and `POST probe`: `host`, `protocol` (`http` or `https`), `por
 
 ## History
 
-Service-target overrides, shared presets and connections, the Kubernetes overview, routing history, and the matching Backoffice tab and presets selector were removed (`bff-backoffice` PR #9, `Backoffice` PR #7). The gateway still carries a separate `/internal/admin/ai-engine/target` store and some dead forwarding entries; see the operations reference.
+Service-target overrides, shared presets and connections, the Kubernetes overview, routing history, and the matching Backoffice tab and presets selector were removed (`bff-backoffice` PR #9, `Backoffice` PR #7). The matching dead forwarding entries and the gateway's own `/internal/admin/ai-engine/target` store were removed from `api-gateway` (PR #8).
 
 ## Related capabilities
 

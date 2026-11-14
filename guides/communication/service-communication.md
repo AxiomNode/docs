@@ -65,9 +65,8 @@ Only the llama target remains as a runtime control. See [Runtime routing and ser
 | POST | `/v1/backoffice/ai-engine/probe` | `bff-backoffice` |
 | GET | `/v1/backoffice/ai-engine/plugin/capabilities` | `bff-backoffice` |
 | GET/PUT/DELETE | `/internal/admin/llama-target` | `ai-engine-api` (private, called by the BFF) |
-| GET/PUT/DELETE | `/internal/admin/ai-engine/target` | `api-gateway` (separate gateway target store, no longer used by the BFF; cleanup pending) |
 
-History: service targets, ai-engine presets and connections, and the Kubernetes overview were removed from `bff-backoffice` and the Backoffice UI.
+History: service targets, ai-engine presets and connections, and the Kubernetes overview were removed from `bff-backoffice`, the Backoffice UI and the `api-gateway` route table (the gateway's own `/internal/admin/ai-engine/target` store was removed as well).
 
 ## Asynchronous flow
 

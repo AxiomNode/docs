@@ -41,7 +41,7 @@ Related: `POST /v1/mobile/games/quiz/generate` (and `/wordpass/generate`) is als
 
 ## SF-02 Backoffice operator changes the runtime AI target (UC-09)
 
-There are two independent targets. This flow covers the llama target that `ai-engine-api` uses for generation. The gateway keeps its own ai-engine API/stats target, changed with `PUT /internal/admin/ai-engine/target` (guarded by `API_GATEWAY_ADMIN_TOKEN` when set); it is not changed by this flow.
+This flow covers the llama target that `ai-engine-api` uses for generation. The gateway keeps no routing state: its ai-engine API/stats upstreams come only from environment variables.
 
 ```mermaid
 sequenceDiagram
