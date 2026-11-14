@@ -107,7 +107,7 @@ Backoffice access is role-gated through `microservice-users`. The current role m
 ### Current runtime reality to document explicitly
 
 - The deployed Kubernetes topology and the effective runtime topology are not always identical.
-- `api-gateway`, `bff-backoffice`, and `ai-engine-api` can all hold persisted runtime targeting state.
+- Only `ai-engine-api` holds persisted runtime targeting state (the llama target); `api-gateway` and `bff-backoffice` hold none.
 - Staging may run `ai-engine-api` and `ai-engine-stats` in-cluster while the llama runtime remains external, or it may render the optional full in-cluster AI overlay for controlled diagnostics.
 - Documentation must distinguish environment defaults, persisted overrides, and live effective targets.
 

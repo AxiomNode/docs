@@ -1,10 +1,10 @@
 # Backoffice Operational Diagnostics
 
-Last updated: 2026-05-03.
+Last updated: 2026-11-14.
 
 ## Purpose
 
-This capability gives operators a single UI and BFF-backed surface to inspect service health, logs, metrics, the packaged backoffice version, Kubernetes state, and AI runtime context.
+This capability gives operators a single UI and BFF-backed surface to inspect service health, logs, metrics, the packaged backoffice version, and AI runtime context.
 
 ## Functional objective
 
@@ -26,13 +26,12 @@ This capability gives operators a single UI and BFF-backed surface to inspect se
 - `microservice-wordpass`
 - `ai-engine`
 - `api-gateway`
-- Kubernetes observability inputs
 
 ### Explicit boundaries
 
 - owns operator-facing visualization in backoffice panels such as `ServiceOverviewPanel.tsx` and `ServiceConsolePanel.tsx`
 - owns BFF aggregation logic in `bff-backoffice/src/app/routes/backoffice.ts`
-- reads Kubernetes state and exposes the packaged backoffice version, but does not own the health of the underlying services it displays
+- exposes the packaged backoffice version, but does not own the health of the underlying services it displays
 - overlaps with runtime routing control only where diagnostics must reflect current effective targets
 
 ## Entrypoints and contracts
@@ -42,21 +41,20 @@ This capability gives operators a single UI and BFF-backed surface to inspect se
 | Type | Location | Notes |
 |---|---|---|
 | UI flow | backoffice dashboards and operational panels | operator entry surface |
-| HTTP route | BFF metrics, logs, data, and Kubernetes routes | aggregated diagnostics data |
+| HTTP route | BFF metrics, logs, and data routes | aggregated diagnostics data |
 | Service call | backoffice `operationalSummary.ts` | front-end composition of diagnostics calls |
 
 ### Inputs
 
 - operator auth/session state from backoffice
 - downstream service metrics, logs, and data endpoints
-- Kubernetes overview data from `kubernetesObservability.ts`
 - effective target state and AI probe results where relevant
 
 ### Outputs
 
 - service-overview panels and drill-down console views
 - enriched diagnostics summaries through the BFF
-- operator-visible packaged version and Kubernetes overview payloads
+- operator-visible packaged version
 
 ### Contract sources
 
@@ -69,34 +67,32 @@ This capability gives operators a single UI and BFF-backed surface to inspect se
 
 1. An operator opens a diagnostics screen in backoffice.
 2. The UI calls gateway-exposed backoffice routes that land in `bff-backoffice`.
-3. The BFF queries downstream services and Kubernetes observability helpers.
-4. The UI merges those responses with the packaged version into operator panels for health, logs, metrics, deployments, and runtime topology.
-5. Operators use the same surface to correlate a visible issue with the current effective routing and deployment state.
+3. The BFF queries downstream services.
+4. The UI merges those responses with the packaged version into operator panels for health, logs, metrics, and the llama target.
+5. Operators use the same surface to correlate a visible issue with the current llama target.
 
 ## Persistence and runtime state
 
 ### Owned persistence
 
-- UI screen state and BFF-managed routing/preset state used by diagnostics panels
+- UI screen state only: the BFF keeps no routing state
 
 ### Runtime state
 
 - downstream availability directly affects what panels can render
-- Kubernetes overview can become stale relative to the actual effective routing path
 - operator screen state may lag behind new probes or target changes until refreshed
 
 ### State risks
 
 - partial downstream outage makes the diagnostics picture incomplete or inconsistent
 - missing proxy exposure at gateway level breaks whole panels despite healthy downstream code
-- stale deployment or routing context leads to wrong incident conclusions
+- stale llama target context leads to wrong incident conclusions
 
 ## Observability evidence
 
 ### Health signals
 
 - backoffice and BFF health
-- Kubernetes overview route availability
 
 ### Operational signals
 
@@ -116,7 +112,7 @@ This capability gives operators a single UI and BFF-backed surface to inspect se
 |---|---|---|---|---|
 | Missing proxy or route exposure | gateway or BFF route drift | diagnostics page fails even if the underlying service is healthy | UI error state, edge 404, route smoke checks | restore the route chain and revalidate |
 | Partial downstream visibility | one downstream data source unavailable | operator sees incomplete runtime picture | missing panels and failed BFF calls | degrade clearly and restore the missing source |
-| Stale deployment or routing context | cached or unrefreshed panel state | wrong operational action | compare diagnostics output with direct target reads | refresh and reconcile state |
+| Stale llama target context | cached or unrefreshed panel state | wrong operational action | compare diagnostics output with direct target reads | refresh and reconcile state |
 
 ## Security and access model
 

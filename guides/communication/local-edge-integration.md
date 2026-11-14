@@ -59,8 +59,7 @@ The smoke now covers:
 - authenticated mobile profile read/update/read round-trip with persisted `playerId`, `displayName`, `preferredLanguage`, timestamp presence, and zero-state stats semantics
 - deferred gameplay event sync with converged profile stats and duplicate-batch deduplication
 - direct quiz AI generation through `microservice-quizz:/games/generate` and `microservice-quizz:/games/generate/process/wait`, followed by observable history growth and inventory selection through `/games/models/random`
-- runtime service-target override for `microservice-quiz`, followed by an affected catalogs request and rollback to `env`
-- dedicated `ai-engine target` override/readback/reset through backoffice routing controls
+- `ai-engine target` override/readback/reset through backoffice routing controls
 - mobile quiz and word-pass discovery routes
 - selected mobile generate routes with invalid-payload rejection and playable response-envelope checks
 - selected backoffice leaderboard and monitoring routes

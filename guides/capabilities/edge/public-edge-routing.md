@@ -126,7 +126,7 @@ This capability provides the stable ingress boundary for mobile and backoffice c
 ### Deployment impact
 
 - gateway deployment can change public behavior independently of BFF or ai-engine deploys
-- AI behavior at the edge depends on both deployed gateway code and persisted target state
+- AI behavior at the edge depends on deployed gateway code and the environment-provided upstream URLs; the gateway keeps no persisted target state
 
 ### Rollback impact
 

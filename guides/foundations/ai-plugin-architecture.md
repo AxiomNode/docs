@@ -97,7 +97,7 @@ Best fit:
 
 ```text
 VPS platform
-  -> gateway/BFF target override
+  -> llama target override (ai-engine-api)
     -> plugin ai-engine-api
     -> plugin ai-engine-stats
     -> plugin vector store

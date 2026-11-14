@@ -6,7 +6,7 @@ Last updated: 2026-11-12.
 
 ## Purpose
 
-This document describes the current production-grade CI/CD chain across the AxiomNode workspace. It focuses on the services that publish container images and can trigger automatic rollout to the staging VPS.
+This document describes the current production-grade CI/CD chain across the AxiomNode workspace. It focuses on the services that publish container images and could trigger automatic rollout to the staging VPS (thesis-era; deploys are manual-only today).
 
 ## When to use this
 
@@ -169,7 +169,7 @@ Expected behavior:
 
 ### Use case 4: staging with externalized ai-engine
 
-The service deployment chain continues to auto-update the cluster services even when the effective AI model runtime is external to the cluster. In the current split topology, `ai-engine-api` and `ai-engine-stats` may still auto-deploy in-cluster while runtime wiring for the llama target is controlled through persisted routing state.
+Thesis-era behavior: the deployment chain auto-updated the cluster services even when the effective AI model runtime was external to the cluster. Today deploys are manual-only; in a split topology `ai-engine-api` and `ai-engine-stats` run in-cluster while the llama target is controlled through the persisted override in `ai-engine-api`.
 
 ### Use case 5: full in-cluster AI verification
 
@@ -223,14 +223,14 @@ Each failure domain stops promotion at its own level and should be diagnosed in 
 ## Governance notes
 
 - Deployment policy is centralized in `platform-infra`, not duplicated across service repositories.
-- Mutable environment tags exist for operations convenience, but automatic staging deploys use immutable short-SHA image references.
+- Mutable environment tags exist for operations convenience; the thesis-era automatic staging deploys used immutable short-SHA image references (disabled; deploys are manual-only today).
 - Documentation that still mentions automatic `dev` deployment is obsolete and should be considered superseded by this document.
 
 ## Risks and cautions
 
 - split AI runtime means a successful cluster rollout does not prove end-to-end AI reachability on its own
 - dispatch-token or cross-repo-read drift can break the chain before packaging even starts
-- mutable tags are operationally useful but should never be treated as the authoritative record of automatic staging state
+- mutable tags are operationally useful but should never be treated as the authoritative record of what a deploy applied
 
 ## Related documents
 

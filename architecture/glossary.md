@@ -15,8 +15,8 @@ Common terms used across AxiomNode documentation.
 | Full in-cluster AI | Optional overlay that runs llama inside k3s for diagnostics. |
 | Effective topology | The routing actually in use, including persisted runtime overrides. |
 | Declared topology | The topology described by Kubernetes manifests in `platform-infra`. |
-| Routing target | Persisted runtime URL for an upstream (gateway-ai, bff-override, ai-llama). |
-| Control plane (runtime) | Backoffice-driven set of routing mutations that survive pod restart. |
+| Routing target | Persisted runtime URL for the ai-engine llama upstream (the only runtime routing target). |
+| Control plane (runtime) | Backoffice-driven llama target mutation (set, reset) that survives pod restart. |
 | Cache key | Composite key `(category_id, embedding_model, corpus_signature, request_shape)` used by `ai-engine-api`. |
 | Corpus signature | Stable hash of the curated corpus used for retrieval; participates in cache keys. |
 | GHCR | GitHub Container Registry, where service images are published. |

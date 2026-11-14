@@ -1,6 +1,6 @@
 # C4 Views
 
-Last updated: 2026-04-22.
+Last updated: 2026-11-14.
 
 This document captures the AxiomNode platform using the C4 model: System Context (Level 1), Containers (Level 2), and Components (Level 3) for the most relevant containers. Level 4 (code) is intentionally omitted; it lives in each repository.
 
@@ -25,7 +25,7 @@ Rel(player, axiom, "Plays games / consults stats", "HTTPS")
 Rel(operator, axiom, "Operates and monitors", "HTTPS")
 Rel(platformEng, github, "Pushes code, dispatches builds")
 Rel(github, ghcr, "Publishes images")
-Rel(github, axiom, "Deploys to k3s")
+Rel(github, axiom, "Manual deploy (workflow_dispatch; no staging host today)")
 Rel(axiom, llama, "Generation requests", "HTTP")
 Rel(player, firebase, "Auth / push", "HTTPS")
 ```
@@ -40,7 +40,7 @@ Person(player, "Mobile Player")
 Person(operator, "Backoffice Operator")
 
 System_Boundary(edge, "Edge") {
-  Container(gateway, "api-gateway", "Node/Express", "Single public ingress, auth, CORS, routing, persists active ai-engine target")
+  Container(gateway, "api-gateway", "Node/Express", "Single public ingress, auth, CORS, routing; stateless (no routing state)")
 }
 
 System_Boundary(experience, "Experience / BFF") {
@@ -78,7 +78,7 @@ Rel(operator, spa, "HTTPS")
 Rel(spa, gateway, "HTTPS")
 Rel(gateway, bffMobile, "HTTP")
 Rel(gateway, bffBack, "HTTP")
-Rel(gateway, aiApi, "HTTP (live target)")
+Rel(gateway, aiApi, "HTTP (/internal/ai-engine, upstream from env)")
 Rel(bffMobile, quiz, "HTTP")
 Rel(bffMobile, wp, "HTTP")
 Rel(bffMobile, users, "HTTP")
@@ -86,7 +86,7 @@ Rel(bffBack, users, "HTTP")
 Rel(bffBack, quiz, "HTTP")
 Rel(bffBack, wp, "HTTP")
 Rel(bffBack, aiStats, "HTTP")
-Rel(bffBack, gateway, "HTTP (control plane mutations)")
+Rel(bffBack, aiApi, "HTTP (llama target, plugin capabilities)")
 Rel(quiz, gateway, "HTTP (generation, /internal/ai-engine)")
 Rel(wp, gateway, "HTTP (generation, /internal/ai-engine)")
 Rel(aiApi, llama, "HTTP")
@@ -108,14 +108,12 @@ Rel(sdk, bffBack, "imports")
 - `RouteRegistry` — declarative route map, version-aware.
 - `Forwarder` (`proxy` SDK module) — `forwardHttp` with structured upstream errors.
 - `ContractGuards` — Zod-based validation for shared public query contracts.
-- `RuntimeTargetStore` — persists active ai-engine API/stats target on mounted PV.
 - `EdgePolicy` — auth, CORS, rate-limit hooks.
 
 ### bff-backoffice
 
 - `OperatorAuth` — session and role resolution against `microservice-users`.
-- `ServiceTargetOverrideStore` — persists per-route upstream overrides.
-- `AIPresetStore` — reusable ai-engine destination presets.
+- `LlamaTargetControl` — proxies llama target read/set/reset/probe to `ai-engine-api` `/internal/admin/llama-target`; keeps no routing state.
 - `MetricsAggregator` — adapts upstream metrics caches with normalized TTL keys.
 - `RowsQueryEngine` — UI-side filter with precomputed lowercase row strings.
 
@@ -124,7 +122,7 @@ Rel(sdk, bffBack, "imports")
 - `RAGRetriever` — multilingual MiniLM embeddings + metadata-aware oversample/rerank.
 - `Optimizer` — query enrichment with category name, model, corpus signature.
 - `CacheManager` — keyed by category, embedding model, corpus signature.
-- `LlamaClient` — points to active llama target (persisted).
+- `LlamaClient` — points to active llama target (persisted in `AI_ENGINE_LLAMA_TARGET_STATE_FILE`).
 - `Diagnostics` — structured counters surfaced via FastAPI hooks.
 
 ### microservice-quizz / wordpass
@@ -137,7 +135,7 @@ Rel(sdk, bffBack, "imports")
 ### platform-infra
 
 - `BuildPushWorkflow` — receives dispatch, builds, publishes `:sha`/`:stg`/`:prod`.
-- `DeployWorkflow` — `kubectl apply -k overlays/{env}` with smoke checks.
+- `DeployWorkflow` — manual-only (`workflow_dispatch`): `kubectl apply -k overlays/{env}` with smoke checks; no staging host exists today.
 - `Overlays` — `dev`, `stg`, `prod` (+ optional full-AI overlay).
 - `SealedSecrets` — per-overlay sealed material.
 

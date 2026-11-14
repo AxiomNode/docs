@@ -1,6 +1,6 @@
 # Domain Model
 
-Last updated: 2026-04-22.
+Last updated: 2026-11-14.
 
 High-level domain model of the AxiomNode platform. Each bounded context is owned by exactly one microservice; cross-context references travel by ID and never by foreign-key joins across databases.
 
@@ -12,7 +12,7 @@ High-level domain model of the AxiomNode platform. Each bounded context is owned
 | Quiz Gameplay | `microservice-quizz` | PostgreSQL (quizz DB) | Indirect |
 | Wordpass Gameplay | `microservice-wordpass` | PostgreSQL (wordpass DB) | Indirect |
 | AI Generation | `ai-engine` | Redis cache + vector store + on-disk corpus | Internal only |
-| Runtime Routing State | `api-gateway`, `bff-backoffice`, `ai-engine-api` | Mounted PV (per service) | Operator only |
+| Runtime Routing State (llama target) | `ai-engine-api` | Mounted PV | Operator only |
 | Contracts | `contracts-and-schemas` | Git | n/a |
 
 ## Entities (logical view)
@@ -70,11 +70,9 @@ classDiagram
     +latencyMs: int
     +cacheHit: bool
   }
-  class RoutingTarget {
-    +scope: enum (gateway-ai, bff-override, ai-llama)
-    +targetUrl: string
-    +presetId: string?
-    +updatedBy: string
+  class LlamaTarget {
+    +url: string
+    +label: string?
     +updatedAt: datetime
   }
 
@@ -113,12 +111,13 @@ classDiagram
   - `cacheKey` uniquely identifies a generation request shape.
   - `corpusSignature` change invalidates dependent cached entries logically.
 
-### RoutingTarget (control-plane state, distributed)
+### LlamaTarget (control-plane state, owned by `ai-engine-api`)
 
-- Root: `RoutingTarget` keyed by `scope`.
+- Root: `LlamaTarget`, persisted as a single JSON file (`AI_ENGINE_LLAMA_TARGET_STATE_FILE`, fields `url`, `label`, `updatedAt`).
 - Invariants:
-  - At most one active target per scope per service instance share the mounted PV.
-  - Drift between scopes is allowed but observable (operators can see effective vs declared).
+  - At most one active override; deleting it falls back to the environment URL.
+  - The override can differ from the declared manifests; operators read the effective value through `GET /v1/backoffice/ai-engine/target`.
+  - The gateway and `bff-backoffice` keep no routing state (service-target overrides and presets were removed).
 
 ## Cross-context contracts
 

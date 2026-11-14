@@ -1,6 +1,6 @@
 # Repository Map
 
-Last updated: 2026-04-19.
+Last updated: 2026-11-14.
 
 ## Runtime repositories
 
@@ -19,8 +19,8 @@ Last updated: 2026-04-19.
 
 | Repository | Persisted runtime state | Why it matters |
 |---|---|---|
-| `api-gateway` | Active ai-engine API/stats target | Determines where live AI traffic is forwarded |
-| `bff-backoffice` | Service target overrides and shared ai-engine presets | Shapes operator-visible effective topology |
+| `api-gateway` | None (upstreams come from `AI_ENGINE_API_URL` and `AI_ENGINE_STATS_URL`) | Stateless edge; no routing store |
+| `bff-backoffice` | None (only an audit trail of admin actions) | Proxies the llama target control to `ai-engine-api` |
 | `ai-engine` | Active llama target inside `ai-engine-api` | Controls where generation calls reach the model runtime |
 
 ## Client and operator entry points
@@ -30,7 +30,7 @@ Last updated: 2026-04-19.
 | Mobile app | `api-gateway` | `api-gateway` -> `bff-mobile` -> quiz/word-pass services |
 | Backoffice SPA | `api-gateway` | `api-gateway` -> `bff-backoffice` -> users/services/ai diagnostics |
 | Internal AI producers | service-local clients | quiz/word-pass -> `ai-engine-api` |
-| Operators changing AI routing | `backoffice` through `bff-backoffice` | backoffice -> `bff-backoffice` -> `api-gateway` / `ai-engine-api` |
+| Operators changing the llama target | `backoffice` through `bff-backoffice` | backoffice -> `api-gateway` -> `bff-backoffice` -> `ai-engine-api` |
 
 ## Delivery-chain classification
 
@@ -48,9 +48,9 @@ These repositories participate in the current automatic image publication and st
 - `microservice-quizz`
 - `microservice-wordpass`
 
-### Outside the current automatic staging chain
+### Outside the image-build chain
 
-- `mobile-app`: validated in its own CI, but not published as a k3s runtime image through `platform-infra`
+- `mobile-app`: validated in its own CI, but not published as a runtime image through `platform-infra`
 - external llama runtime: still operationally external in the split staging topology unless the optional full in-cluster AI overlay is rendered deliberately
 
 ## Platform repositories
@@ -79,10 +79,9 @@ For AI-related flows, the effective runtime topology may differ from the deploye
 
 Reason:
 
-- `api-gateway` can hold the active ai-engine target at runtime
-- `bff-backoffice` can persist shared ai-engine presets and service-target overrides
-- `ai-engine-api` can hold the active llama target at runtime
-- staging can therefore operate in split-AI mode even while the rest of the services remain auto-deployed on k3s
+- `ai-engine-api` can hold the active llama target at runtime (the only runtime routing state)
+- `api-gateway` and `bff-backoffice` hold none
+- a deployment can therefore run in split-AI mode, with the llama runtime outside the cluster, even though the manifests describe in-cluster services
 
 ## Current CI/CD automation map
 
