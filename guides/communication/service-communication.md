@@ -1,6 +1,6 @@
 # Service Communication Model
 
-Last updated: 2026-04-05.
+Last updated: 2026-11-13.
 
 ## Synchronous request flow
 
@@ -16,7 +16,7 @@ Last updated: 2026-04-05.
 | Client applications | `api-gateway` | Public boundary only |
 | `api-gateway` | `bff-mobile`, `bff-backoffice`, internal ai-engine proxy routes | No direct client access to domain services |
 | `bff-mobile` | domain services | BFF-to-BFF calls are not allowed |
-| `bff-backoffice` | domain services, ai diagnostics endpoints, gateway admin sync | Backoffice runtime control path is explicit |
+| `bff-backoffice` | domain services, ai diagnostics endpoints, `ai-engine-api` llama target admin routes | Backoffice runtime control path is explicit |
 | quiz/word-pass services | `ai-engine-api`, `ai-engine-stats` | Internal AI producer traffic |
 | `ai-engine-api` | llama runtime | Model execution path, may be externalized |
 
@@ -57,12 +57,16 @@ Last updated: 2026-04-05.
 
 ### Runtime control routes
 
+Only the llama target remains as a runtime control. See [Runtime routing and service targeting](../../operations/runtime-routing-and-service-targeting.md).
+
 | Method | Route | Owner |
 |---|---|---|
-| GET/PUT/DELETE | `/internal/admin/ai-engine/target` | `api-gateway` |
-| GET/PUT/DELETE | `/v1/backoffice/ai-engine/target` | `bff-backoffice` |
-| GET/POST/PUT/DELETE | `/v1/backoffice/ai-engine/presets` | `bff-backoffice` |
-| GET/PUT/DELETE | `/v1/backoffice/service-targets/:service` | `bff-backoffice` |
+| GET/PUT/DELETE | `/v1/backoffice/ai-engine/target` | `bff-backoffice` (forwarded by the gateway) |
+| POST | `/v1/backoffice/ai-engine/probe` | `bff-backoffice` |
+| GET | `/v1/backoffice/ai-engine/plugin/capabilities` | `bff-backoffice` |
+| GET/PUT/DELETE | `/internal/admin/llama-target` | `ai-engine-api` (private, called by the BFF) |
+
+History: service targets, ai-engine presets and connections, and the Kubernetes overview were removed from `bff-backoffice`, the Backoffice UI and the `api-gateway` route table (the gateway's own `/internal/admin/ai-engine/target` store was removed as well).
 
 ## Asynchronous flow
 
@@ -81,7 +85,7 @@ For generation-related traffic, the logical dependency chain is:
 5. llama runtime returns model output
 6. `ai-engine-api` records stats and returns validated payloads upstream
 
-This means an apparently healthy deploy can still fail functionally if the persisted live AI target or llama target points to an unreachable runtime.
+This means an apparently healthy deploy can still fail functionally if the persisted llama target points to an unreachable runtime.
 
 ## Communication rules
 
@@ -89,7 +93,7 @@ This means an apparently healthy deploy can still fail functionally if the persi
 - BFF-to-BFF calls are disallowed.
 - Timeouts and retry strategy must be explicit per dependency.
 - `x-correlation-id` must be propagated end-to-end.
-- Environment defaults and runtime overrides must be observable independently.
+- Environment defaults and the llama target override must be observable independently.
 - Auth/security headers to preserve when applicable:
 	- `authorization`
 	- `x-firebase-id-token`
