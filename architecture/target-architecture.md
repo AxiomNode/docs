@@ -143,24 +143,22 @@ That distinction is important: deployment topology and effective runtime topolog
 
 The current architecture contains a narrow operational state plane outside static manifests:
 
-- `bff-backoffice` persists service-target overrides and shared ai-engine presets
-- `api-gateway` persists the live ai-engine API and stats target used by forwarded runtime traffic
-- `ai-engine-api` persists the active llama target used by generation requests
+- `ai-engine-api` persists the active llama target used by generation requests (`AI_ENGINE_LLAMA_TARGET_STATE_FILE`)
 
-These states survive pod recreation through mounted storage and must be documented as part of the effective topology.
+`api-gateway` and `bff-backoffice` hold no routing state: the gateway resolves ai-engine upstreams from `AI_ENGINE_API_URL` and `AI_ENGINE_STATS_URL`. Service-target overrides, shared presets and connections, and the gateway live target were removed.
+
+The llama target survives pod recreation through mounted storage and must be documented as part of the effective topology.
 
 ### Runtime routing control plane
 
-Backoffice operational tooling now acts as a lightweight runtime control plane for non-static upstream selection.
+Backoffice operational tooling acts as a lightweight runtime control plane for exactly one setting, the `ai-engine-api` llama target.
 
 Current capabilities:
 
-- `bff-backoffice` can persist shared upstream routing overrides
-- `api-gateway` can persist the live `ai-engine` target used by the platform
-- backoffice operators can select and manage reusable ai-engine destination presets
-- routing state survives pod recreation because it is stored on mounted persistent volumes
+- backoffice operators can read, probe, set and reset the llama target through `bff-backoffice` (`GET/PUT/DELETE /v1/backoffice/ai-engine/target`, `POST /v1/backoffice/ai-engine/probe`)
+- `ai-engine-api` persists the override on a mounted volume, so it survives pod recreation
 
-This control-plane behavior is intentionally narrow in scope: it does not replace GitOps or declarative infrastructure, but it provides pragmatic runtime flexibility for operational AI connectivity.
+This control-plane behavior is intentionally narrow in scope: it does not replace GitOps or declarative infrastructure. See [Runtime routing and service targeting](../operations/runtime-routing-and-service-targeting.md).
 
 ### Delivery architecture
 
@@ -196,13 +194,13 @@ This preserves local service autonomy without fragmenting the deployment contrac
 
 ### Traceability
 
-- automatic staging deploys are tied to immutable image SHAs
+- images are tagged with immutable short SHAs; deploys are manual-only, so the tag a deploy uses is chosen by the operator
 - service CI, central packaging, and deployment workflows form a clear audit chain
 
 ### Operability
 
 - smoke tests and rollout checks are embedded in deployment workflows
-- runtime overrides for AI connectivity can be changed without rebuilding or redeploying the entire stack
+- the llama target can be changed without rebuilding or redeploying the stack
 
 ### Evolvability
 
@@ -211,9 +209,9 @@ This preserves local service autonomy without fragmenting the deployment contrac
 
 ### Current architectural constraints
 
-- staging automatic deploys are pinned to immutable short-SHA artifacts, but manual recovery paths can still use mutable environment tags
-- runtime overrides introduce a second operational state plane that must be documented and observed
-- not every repository in the workspace is part of the GHCR-to-k3s delivery chain
+- deploys are manual-only (`deploy.yaml` `workflow_dispatch`), so image tags are chosen by the operator; the thesis-era automatic path pinned immutable short-SHA artifacts
+- the llama target override introduces a second operational state plane that must be documented and observed
+- not every repository in the workspace is part of the GHCR image-build chain
 - AI runtime behavior in staging must always be described in terms of both in-cluster services and external llama reachability
 
 ### Documentation implications

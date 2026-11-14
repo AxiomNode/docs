@@ -1,6 +1,6 @@
 # Platform Functional Overview
 
-Last updated: 2026-05-03.
+Last updated: 2026-11-14.
 
 ## Purpose
 
@@ -42,7 +42,7 @@ The workspace contains four broad kinds of assets:
 
 - operational dashboards for service health and traffic
 - runtime inspection of services, metrics, logs, and data inventories
-- control of effective AI routing and service-target overrides
+- control of the ai-engine llama target (read, probe, set, reset)
 - management of generation workflows and curated content inventories
 
 ### Platform-facing capabilities
@@ -64,7 +64,7 @@ The workspace contains four broad kinds of assets:
 - applies edge concerns such as auth, CORS, tracing, and forwarding policy
 - routes traffic to `bff-mobile` and `bff-backoffice`
 - proxies internal AI generation, ingest, catalogs, health, and stats traffic
-- persists the live `ai-engine` upstream target used at runtime
+- resolves the `ai-engine` upstreams from environment variables only; it holds no runtime override or persisted routing state
 
 **Main dependencies:** `bff-mobile`, `bff-backoffice`, active `ai-engine-api`, active `ai-engine-stats`
 
@@ -118,10 +118,8 @@ The workspace contains four broad kinds of assets:
 
 - aggregates and normalizes data from internal services for backoffice screens
 - exposes admin APIs for auth, monitoring, service inspection, and generation flows
-- persists service-target overrides and shared AI presets
-- synchronizes effective AI target changes toward `api-gateway`
-- exposes effective runtime topology, not only environment defaults
-- provides Kubernetes and AI observability surfaces for operators
+- proxies the ai-engine llama target control (read, probe, set, reset) to `ai-engine-api`; it keeps no routing state
+- provides AI observability surfaces for operators
 
 **Main dependencies:** `microservice-users`, `microservice-quizz`, `microservice-wordpass`, `ai-engine`, `api-gateway`
 
@@ -218,12 +216,12 @@ The workspace contains four broad kinds of assets:
 
 - owns Kubernetes manifests and overlays per environment
 - builds and publishes runtime images to GHCR
-- drives automatic staging rollout for covered services
+- builds and publishes images for covered services on dispatch; deploys are manual-only (`deploy.yaml` `workflow_dispatch`)
 - validates deployment inputs and rollout steps
 - supports local full-stack or partial-stack development tooling
 - provides optional environment overlays for alternative runtime topologies
 
-**Main consumers:** all auto-deployed runtime repositories
+**Main consumers:** all runtime repositories that publish images
 
 ### `observability-platform`
 
@@ -311,8 +309,8 @@ The individual capability dossiers are indexed in [../capabilities/README.md](..
 
 1. `backoffice` calls `api-gateway`.
 2. `api-gateway` routes to `bff-backoffice`.
-3. `bff-backoffice` aggregates health, logs, metrics, inventory, routing, and AI diagnostics.
-4. Runtime control changes may propagate to `api-gateway` and affect effective AI routing.
+3. `bff-backoffice` aggregates health, logs, metrics, inventory, and AI diagnostics.
+4. Llama target changes are forwarded to `ai-engine-api` and affect effective AI generation routing.
 
 ### Delivery flow
 
@@ -320,15 +318,13 @@ The individual capability dossiers are indexed in [../capabilities/README.md](..
 2. Shared integration code is generated or updated in `shared-sdk-client`.
 3. Runtime repositories consume those artifacts.
 4. Pushes to covered runtime repos dispatch builds to `platform-infra`.
-5. `platform-infra` publishes images and rolls out staging.
+5. `platform-infra` publishes images to GHCR; deployment is a manual `deploy.yaml` dispatch (no staging host exists today).
 
 ## Repositories with persisted runtime influence
 
 Some repositories do more than serve requests; they also hold runtime state that changes effective behavior:
 
-- `api-gateway`: active AI upstream target
-- `bff-backoffice`: service-target overrides and shared AI presets
-- `ai-engine`: active llama/model target
+- `ai-engine`: active llama/model target (the only one; `api-gateway` and `bff-backoffice` hold no routing state)
 
 This matters because the effective runtime topology can differ from the static Kubernetes manifests.
 

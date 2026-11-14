@@ -83,7 +83,7 @@ Critical boundaries:
 | Locally loaded LLM models | Confidential | Risk of exfiltration via internal endpoints |
 | Prompts, RAG and eval datasets | Internal | May contain product IP |
 | Logs and Prometheus metrics | Internal | May leak PII if not sanitized |
-| Persisted runtime configuration (routes, presets) | Internal | Changes behavior without restart |
+| Persisted runtime configuration (ai-engine llama target override) | Internal | Changes behavior without restart |
 
 ## STRIDE summary per component
 

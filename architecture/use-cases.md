@@ -69,10 +69,10 @@ This document enumerates the primary use cases supported by the AxiomNode platfo
 
 ### UC-09 Change runtime AI target (Backoffice Operator)
 
-- Trigger: Operator selects a new ai-engine-api/stats target or llama upstream from the backoffice control plane.
-- Path: `backoffice -> bff-backoffice -> api-gateway` (persists active target on PV) and/or `bff-backoffice -> ai-engine-api` (persists active llama target).
+- Trigger: Operator selects a new llama upstream from the backoffice control plane.
+- Path: `backoffice -> api-gateway -> bff-backoffice -> ai-engine-api` (persists active llama target on a mounted volume).
 - Post-conditions: Effective routing diverges from declarative manifests; persisted on mounted volume; survives pod recreation.
-- Risk: state drift versus manifests; must be observable via stats endpoints and runbook.
+- Risk: state drift versus manifests; must be observable via `GET /v1/backoffice/ai-engine/target` and the runbook.
 
 ### UC-10 Generate quiz/wordpass via internal service (Internal Service)
 

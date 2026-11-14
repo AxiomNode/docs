@@ -1,6 +1,6 @@
 # AI Observability And Diagnostics
 
-Last updated: 2026-05-03.
+Last updated: 2026-11-14.
 
 ## Purpose
 
@@ -24,7 +24,7 @@ This capability exposes the operational picture of AI behavior to operators by c
 
 - owns operator-facing AI diagnostics and aggregated AI visibility
 - consumes generation/runtime signals from the AI content-generation capability
-- reads routing and preset state but does not own all runtime-target mutation paths itself
+- reads the llama target state but does not own the runtime-target mutation path itself (`ai-engine-api` persists it)
 
 ## Entrypoints and contracts
 
@@ -33,14 +33,14 @@ This capability exposes the operational picture of AI behavior to operators by c
 | Type | Location | Notes |
 |---|---|---|
 | HTTP route | ai-engine stats endpoints | aggregate AI runtime and event signals |
-| HTTP route | BFF AI target, preset, and diagnostics routes | operator aggregation and enrichment path |
+| HTTP route | BFF AI target, probe, and diagnostics routes | operator aggregation and enrichment path |
 | UI flow | `AIDiagnosticsPanel.tsx` and related backoffice screens | interactive operator surface |
 
 ### Inputs
 
 - AI event streams and stats queries emitted by ai-engine
 - cache runtime data from ai-engine internal endpoints
-- routing and preset state from BFF routing stores
+- the effective llama target read back from `ai-engine-api` through the BFF
 - operator requests initiated from the backoffice UI
 
 ### Outputs
@@ -60,7 +60,7 @@ This capability exposes the operational picture of AI behavior to operators by c
 
 1. ai-engine records local events and forwards them to ai-stats on a best-effort basis.
 2. ai-engine stats exposes aggregate runtime information for internal consumers.
-3. `bff-backoffice` reads AI target, preset, probe, and diagnostics data and enriches it with routing context.
+3. `bff-backoffice` reads AI target, probe, and diagnostics data and enriches it with routing context.
 4. `backoffice` fetches those summaries and renders diagnostic panels for operators.
 5. Operators compare health, routing, and runtime evidence before taking action.
 
@@ -69,7 +69,7 @@ This capability exposes the operational picture of AI behavior to operators by c
 ### Owned persistence
 
 - collector state in ai-stats
-- routing and preset state surfaced by `bff-backoffice`
+- none for routing: the BFF keeps no routing state (the llama target is persisted by `ai-engine-api`)
 
 ### Runtime state
 
@@ -95,7 +95,7 @@ This capability exposes the operational picture of AI behavior to operators by c
 
 - `AIDiagnosticsPanel.tsx`
 - `fetchServiceOperationalSummary()` and related backoffice operational summary calls
-- BFF AI target, preset, and probe endpoints
+- BFF AI target and probe endpoints
 
 ### Verification evidence
 

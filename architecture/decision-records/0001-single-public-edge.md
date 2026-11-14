@@ -23,6 +23,8 @@ Run a single public ingress, `api-gateway`, as the only externally reachable HTT
 - `api-gateway` becomes a routing-state holder (live AI target).
 - Operational dependency: gateway downtime equals platform downtime; mitigated by k3s replicas and probes.
 
+> **Superseded in part (2026-11-14).** The gateway no longer holds a live AI target: its persisted routing state was removed (`api-gateway` PR #8) and it resolves ai-engine upstreams from `AI_ENGINE_API_URL` and `AI_ENGINE_STATS_URL`. See [Runtime routing and service targeting](../../operations/runtime-routing-and-service-targeting.md).
+
 ## Related
 
 - [Repository map](../repository-map.md)

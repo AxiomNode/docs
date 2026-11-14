@@ -76,7 +76,7 @@ This capability packages runtime services, publishes images, and rolls environme
 
 - deployed cluster state after rollout
 - rollout behavior depends on current image, secret, and cluster conditions
-- runtime-state holders such as gateway/BFF overrides can change effective behavior after deploy
+- the persisted llama target override in `ai-engine-api` can change effective behavior after deploy
 
 ### State risks
 

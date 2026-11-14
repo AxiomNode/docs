@@ -210,7 +210,7 @@ Validate operator control of runtime targets and safe return to defaults.
 ### Evidence
 
 - Diagnostic panel screenshots for override and rollback states.
-- Gateway/BFF logs for applied target and smoke request outcome.
+- BFF and `ai-engine-api` logs for the applied target and smoke request outcome.
 
 ## Exit criteria
 

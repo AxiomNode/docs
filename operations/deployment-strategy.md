@@ -22,7 +22,7 @@ This document defines how AxiomNode promotes runtime changes across environments
 
 - service repositories validate service correctness
 - `platform-infra` owns packaging and deployment policy
-- automatic deployment is allowed only where rollback cost and operational blast radius are acceptable
+- automatic deployment is allowed only where rollback cost and operational blast radius are acceptable (none is enabled today)
 - production promotion must be explicit, inspectable, and reversible
 - mutable image tags may exist for operator convenience, but automated staging rollout must be pinned to immutable artifacts
 
@@ -131,7 +131,7 @@ Expected outcome:
 
 Expected outcome:
 
-- covered services still auto-deploy to staging
+- covered services have their images built on dispatch; deploys are manual-only (`deploy.yaml` `workflow_dispatch`) and no staging host exists today
 - `ai-engine-api` and `ai-engine-stats` may still be deployed in-cluster
 - llama reachability remains a routing concern controlled through persisted runtime state
 
@@ -179,7 +179,7 @@ Preferred approach:
 ## Operational constraints
 
 - split or externalized AI runtime means not every end-to-end behavior in staging is driven only by Kubernetes manifests
-- routing overrides in `bff-backoffice`, `api-gateway`, and `ai-engine-api` can influence effective runtime topology
+- the llama target override in `ai-engine-api` can influence effective runtime topology
 - deployment documentation must therefore distinguish between cluster deployment state and effective runtime routing state
 
 ## Recommended release criteria

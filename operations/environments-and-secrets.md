@@ -52,9 +52,7 @@ Some operational behaviors depend on persisted runtime state rather than only on
 
 Important examples:
 
-- gateway ai-engine target override state
-- backoffice service-target and preset state
-- ai-engine llama target override state
+- ai-engine llama target override state (the only persisted runtime state; the gateway and the BFF keep none)
 
 These are not secret values, but they change effective runtime behavior and must be considered alongside environment configuration during incident analysis.
 

@@ -1,6 +1,8 @@
 # Branch Protection Policy
 
-Last updated: 2026-05-03.
+Last updated: 2026-11-14.
+
+> **Status (2026-11-14):** the k3s staging host no longer exists and `platform-infra` `deploy.yaml` is manual-only (`workflow_dispatch`), so no automatic staging deployment runs today. Where this document describes an automatic staging chain, it records the thesis-era policy; the image build on dispatch is the only automatic step.
 
 ## Purpose
 
