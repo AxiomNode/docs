@@ -36,7 +36,7 @@ From the workspace root:
 
 ```bash
 docker compose -f ai-engine/src/docker-compose.yml --profile cpu up -d --build ai-cache llama-server-cpu ai-stats ai-api
-docker compose -f microservice-quizz/docker-compose.yml up -d --build
+docker compose -f microservice-games/docker-compose.yml up -d --build
 ```
 
 ## Run the smoke
@@ -60,7 +60,7 @@ bash platform-infra/environments/dev/scripts/smoke-wf05-quiz.sh
 ## Shutdown
 
 ```bash
-docker compose -f microservice-quizz/docker-compose.yml down --remove-orphans
+docker compose -f microservice-games/docker-compose.yml down --remove-orphans
 docker compose -f ai-engine/src/docker-compose.yml --profile cpu down --remove-orphans
 ```
 

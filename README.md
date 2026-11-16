@@ -98,7 +98,7 @@ Each runtime or platform repository should document its own concrete implementat
 |---|---|---|
 | Public edge | `api-gateway` | Single public ingress, stable client-facing boundary |
 | Experience | `bff-mobile`, `bff-backoffice`, `backoffice`, `mobile-app` | Channel-specific contracts and operator experience |
-| Domain runtime | `microservice-users`, `microservice-quizz`, `microservice-wordpass` | Private business services with owned persistence |
+| Domain runtime | `microservice-users`, `microservice-quizz`, `microservice-wordpass` | Private business services with owned persistence; the two game services are one code base (`microservice-games`) run once per game and share one database |
 | AI capability | `ai-engine` | Generation API, stats API, cache, llama runtime |
 | Platform governance | `platform-infra`, `contracts-and-schemas`, `shared-sdk-client`, `secrets`, `observability-platform` | Delivery, contracts, SDKs, secrets, and operations tooling |
 

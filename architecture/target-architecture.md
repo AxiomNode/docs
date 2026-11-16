@@ -101,6 +101,7 @@ flowchart TB
 - `microservice-users` is the system of record for player identity, profile reads, gameplay events, and leaderboard-oriented metrics.
 - `microservice-quizz` owns quiz validation, persistence, retrieval semantics, and its generation request contract toward AI.
 - `microservice-wordpass` owns the equivalent behavior for the word-pass domain.
+- Both game services run the same code base (`microservice-games`, formerly `microservice-quizz`) with `GAME_TYPE` selecting the game, and share one database separated by `gameType`.
 - `ai-engine` owns retrieval-augmented generation, ingest semantics, cache-aware generation behavior, observability of AI requests, and llama runtime integration.
 
 #### Platform ownership

@@ -18,8 +18,8 @@ This capability turns internal generation requests into validated game payloads,
 ### Main owners
 
 - ai-engine generation API in `ai-engine/src/ai_engine/api/app.py`
-- game-domain orchestration in `microservice-quizz/src/app/services/generationService.ts`
-- equivalent word-pass orchestration in `microservice-wordpass/src/app/services/generationService.ts`
+- game-domain orchestration in `microservice-games/src/app/services/generationService.ts`, shared by both games
+- per-game rules (prompt variants, canonicalization, content signature) in `microservice-games/src/app/games/quiz.ts` and `microservice-games/src/app/games/wordpass.ts`
 
 ### Downstream dependencies
 

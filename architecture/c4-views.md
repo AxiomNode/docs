@@ -52,10 +52,9 @@ System_Boundary(experience, "Experience / BFF") {
 System_Boundary(domain, "Domain") {
   ContainerDb(usersDb, "users DB", "PostgreSQL")
   Container(users, "microservice-users", "Node + Prisma", "Identity, profile, leaderboard, analytics")
-  ContainerDb(quizDb, "quizz DB", "PostgreSQL")
-  Container(quiz, "microservice-quizz", "Node + Prisma", "Quiz domain + AI request orchestration")
-  ContainerDb(wpDb, "wordpass DB", "PostgreSQL")
-  Container(wp, "microservice-wordpass", "Node + Prisma", "Wordpass domain + AI request orchestration")
+  ContainerDb(gamesDb, "games DB", "PostgreSQL", "Shared by both game services; rows carry gameType")
+  Container(quiz, "microservice-quizz", "Node + Prisma", "Quiz domain + AI request orchestration (microservice-games, GAME_TYPE=quiz)")
+  Container(wp, "microservice-wordpass", "Node + Prisma", "Wordpass domain + AI request orchestration (microservice-games, GAME_TYPE=word-pass)")
 }
 
 System_Boundary(ai, "AI") {
@@ -93,8 +92,8 @@ Rel(aiApi, llama, "HTTP")
 Rel(aiApi, redis, "TCP")
 Rel(aiStats, redis, "TCP")
 Rel(users, usersDb, "TCP")
-Rel(quiz, quizDb, "TCP")
-Rel(wp, wpDb, "TCP")
+Rel(quiz, gamesDb, "TCP")
+Rel(wp, gamesDb, "TCP")
 Rel(platformInfra, gateway, "deploys")
 Rel(sdk, gateway, "imports (also both BFFs, users, quizz, wordpass)")
 Rel(sdk, bffMobile, "imports")
@@ -125,7 +124,7 @@ Rel(sdk, bffBack, "imports")
 - `LlamaClient` — points to active llama target (persisted in `AI_ENGINE_LLAMA_TARGET_STATE_FILE`).
 - `Diagnostics` — structured counters surfaced via FastAPI hooks.
 
-### microservice-quizz / wordpass
+### microservice-quizz / wordpass (one code base, `microservice-games`)
 
 - `Domain` — Prisma models incl. `GameGeneration` with `difficultyPercentage`.
 - `AIClient` — calls `ai-engine-api` with category-aware payload.

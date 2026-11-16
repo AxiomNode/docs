@@ -57,8 +57,9 @@ This capability owns word-pass generation orchestration, quality validation, per
 
 ### Contract sources
 
-- `microservice-wordpass/src/app/routes/games.ts`
-- `microservice-wordpass/src/app/services/generationService.ts`
+- `microservice-games/src/app/routes/games.ts`
+- `microservice-games/src/app/services/generationService.ts`
+- `microservice-games/src/app/games/wordpass.ts` (word-pass strategy)
 - shared ai-engine client contract in `shared-sdk-client`
 - shared validators and canonicalization helpers for word-pass models
 
@@ -75,7 +76,7 @@ This capability owns word-pass generation orchestration, quality validation, per
 
 ### Owned persistence
 
-- word-pass inventory and history rows in PostgreSQL
+- word-pass inventory and history rows (`gameType = word-pass`) in the Prisma-managed `gameGeneration` table, shared with quiz rows
 
 ### Runtime state
 
@@ -103,8 +104,8 @@ This capability owns word-pass generation orchestration, quality validation, per
 
 ### Verification evidence
 
-- `microservice-wordpass/src/tests/generationService.test.ts`
-- `microservice-wordpass/src/tests/gamesRoutes.test.ts`
+- `microservice-games/src/tests/generationService.test.ts`
+- `microservice-games/src/tests/gamesRoutes.test.ts`
 - private-doc and service-metrics tests covering AI access and instrumentation behavior
 
 ## Failure modes and risks
