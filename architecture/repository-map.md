@@ -11,9 +11,11 @@ Last updated: 2026-11-14.
 | `bff-backoffice` | 7011 | Admin-oriented orchestration (auth, monitoring, generation) | `microservice-users`, `microservice-quizz`, `microservice-wordpass`, `ai-engine` |
 | `backoffice` | 7080 | React SPA for operations and admin workflows | `api-gateway` |
 | `microservice-users` | 7102 (DB: 7434) | Identity, profile, leaderboard, gameplay analytics | PostgreSQL |
-| `microservice-quizz` | 7100 (DB: 7432) | Quiz generation, persistence, and retrieval | PostgreSQL, `ai-engine` |
-| `microservice-wordpass` | 7101 (DB: 7433) | Word-pass generation, persistence, and retrieval | PostgreSQL, `ai-engine` |
+| `microservice-quizz` | 7100 (DB: 7432) | Quiz generation, persistence, and retrieval (code base `microservice-games`, `GAME_TYPE=quiz`) | PostgreSQL, `ai-engine` |
+| `microservice-wordpass` | 7101 on the host, 7100 inside the compose network and Kubernetes (DB: shared with quiz, 7432) | Word-pass generation, persistence, and retrieval (same `microservice-games` code base, `GAME_TYPE=word-pass`) | PostgreSQL, `ai-engine` |
 | `ai-engine` | 7000 (stats), 7001 (api), 7002 (llama) | AI generation, RAG, cache-aware generation, model serving, AI observability | Redis, llama server |
+
+The code of both game services lives in one repository, `microservice-games` (renamed from `microservice-quizz`; `microservice-word-pass` is archived). It builds one image, `microservice-games-api`, deployed as two Deployments that keep the names `microservice-quizz-api` and `microservice-wordpass-api`; `GAME_TYPE` selects the game per process. Both Deployments use the quiz database; every row carries a `gameType` and every query filters by it.
 
 ## Runtime state ownership
 

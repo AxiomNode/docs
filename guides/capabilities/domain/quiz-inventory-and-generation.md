@@ -26,7 +26,7 @@ This capability owns quiz generation orchestration, duplicate control, persisten
 
 ### Explicit boundaries
 
-- owns quiz route registration in `microservice-quizz/src/app/routes/games.ts`
+- owns quiz route registration in `microservice-games/src/app/routes/games.ts`
 - owns orchestration, duplicate detection, storage, and batch-generation logic in `generationService.ts`
 - consumes ai-engine through the shared `AiEngineClient`
 - does not own mobile/backoffice presentation concerns or model execution internals
@@ -58,8 +58,9 @@ This capability owns quiz generation orchestration, duplicate control, persisten
 
 ### Contract sources
 
-- `microservice-quizz/src/app/routes/games.ts`
-- `microservice-quizz/src/app/services/generationService.ts`
+- `microservice-games/src/app/routes/games.ts`
+- `microservice-games/src/app/services/generationService.ts`
+- `microservice-games/src/app/games/quiz.ts` (quiz strategy)
 - `shared-sdk-client/typescript/src/ai-engine-client.ts`
 - shared canonicalization helpers such as `canonicalizeQuizModel()`
 
@@ -76,7 +77,7 @@ This capability owns quiz generation orchestration, duplicate control, persisten
 
 ### Owned persistence
 
-- quiz inventory and history rows in the Prisma-managed `gameGeneration` table
+- quiz inventory and history rows (`gameType = quiz`) in the Prisma-managed `gameGeneration` table, shared with word-pass rows
 
 ### Runtime state
 
@@ -105,9 +106,9 @@ This capability owns quiz generation orchestration, duplicate control, persisten
 
 ### Verification evidence
 
-- `microservice-quizz/src/tests/generationService.test.ts`
-- `microservice-quizz/src/tests/gamesRoutes.test.ts`
-- `microservice-quizz/src/tests/aiEngineClient.test.ts`
+- `microservice-games/src/tests/generationService.test.ts`
+- `microservice-games/src/tests/gamesRoutes.test.ts`
+- `microservice-games/src/tests/aiEngineClient.test.ts`
 
 ## Failure modes and risks
 

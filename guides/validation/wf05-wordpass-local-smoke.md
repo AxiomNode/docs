@@ -36,8 +36,8 @@ From the workspace root:
 
 ```bash
 API_PORT=7001 docker compose -f ai-engine/src/docker-compose.yml --profile cpu up -d --build ai-cache llama-server-cpu ai-stats ai-api
-docker compose -f microservice-wordpass/docker-compose.yml stop microservice-wordpass
-docker compose -f microservice-wordpass/docker-compose.yml run -d --service-ports -e BATCH_GENERATION_ENABLED=false microservice-wordpass
+docker compose -f microservice-games/docker-compose.yml stop microservice-wordpass
+docker compose -f microservice-games/docker-compose.yml run -d --service-ports -e BATCH_GENERATION_ENABLED=false microservice-wordpass
 ```
 
 The one-off `run` command is intentional: disabling the periodic batch scheduler removes local background generation that can keep `ai-engine` busy and make the smoke flaky.
@@ -63,7 +63,7 @@ bash platform-infra/environments/dev/scripts/smoke-wf05-wordpass.sh
 ## Shutdown
 
 ```bash
-docker compose -f microservice-wordpass/docker-compose.yml down --remove-orphans
+docker compose -f microservice-games/docker-compose.yml down --remove-orphans
 docker compose -f ai-engine/src/docker-compose.yml --profile cpu down --remove-orphans
 ```
 

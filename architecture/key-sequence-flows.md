@@ -17,7 +17,7 @@ sequenceDiagram
   participant GW as api-gateway
   participant BFF as bff-mobile
   participant Q as microservice-quizz
-  participant DB as quizz DB
+  participant DB as games DB
 
   App->>GW: GET /v1/mobile/games/quiz/random?categoryId=...&count=...&language=...
   GW->>GW: validate query (MobileRandomQuerySchema), drop language
@@ -108,7 +108,7 @@ sequenceDiagram
   participant GW as api-gateway
   participant BFF as bff-backoffice
   participant Q as microservice-quizz
-  participant DB as quizz DB
+  participant DB as games DB
 
   SPA->>GW: GET /v1/backoffice/services/microservice-quiz/data?dataset=history&difficultyPercentage=...&page=...
   GW->>GW: check edge token (EDGE_API_TOKEN, when configured)
@@ -200,7 +200,7 @@ sequenceDiagram
   participant AIGW as api-gateway /internal/ai-engine
   participant AI as ai-engine-api
   participant L as llama runtime
-  participant DB as quizz DB
+  participant DB as games DB
 
   SPA->>GW: POST /v1/backoffice/services/microservice-quiz/generation/worker/start {countPerIteration, categoryIds?, difficultyLevels?}
   GW->>BFF: forward

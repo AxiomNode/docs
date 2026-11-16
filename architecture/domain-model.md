@@ -9,11 +9,13 @@ High-level domain model of the AxiomNode platform. Each bounded context is owned
 | Context | Owner | Persistence | Public-facing? |
 |---|---|---|---|
 | Identity & Player Profile | `microservice-users` | PostgreSQL (users DB) | Indirect (via BFFs) |
-| Quiz Gameplay | `microservice-quizz` | PostgreSQL (quizz DB) | Indirect |
-| Wordpass Gameplay | `microservice-wordpass` | PostgreSQL (wordpass DB) | Indirect |
+| Quiz Gameplay | `microservice-quizz` (code base `microservice-games`, `GAME_TYPE=quiz`) | PostgreSQL (games DB, shared) | Indirect |
+| Wordpass Gameplay | `microservice-wordpass` (same code base, `GAME_TYPE=word-pass`) | PostgreSQL (games DB, shared) | Indirect |
 | AI Generation | `ai-engine` | Redis cache + vector store + on-disk corpus | Internal only |
 | Runtime Routing State (llama target) | `ai-engine-api` | Mounted PV | Operator only |
 | Contracts | `contracts-and-schemas` | Git | n/a |
+
+The two gameplay contexts are served by one code base and share one database and one `GameGeneration` table; rows are separated by `gameType` (every query filters by it and the content-uniqueness key includes it).
 
 ## Entities (logical view)
 
@@ -95,7 +97,7 @@ classDiagram
   - `PlayerStats.updatedAt` monotonic.
   - Leaderboard projections eventually consistent; never primary source.
 
-### GameGeneration aggregate (`microservice-quizz` / `microservice-wordpass`)
+### GameGeneration aggregate (`microservice-quizz` / `microservice-wordpass`, one table tagged by `gameType`)
 
 - Root: `GameGeneration`.
 - Children: `QuizRound` or `WordpassRound`.

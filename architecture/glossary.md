@@ -8,7 +8,7 @@ Common terms used across AxiomNode documentation.
 |---|---|
 | Edge | The single public ingress, implemented by `api-gateway`. |
 | BFF | Backend-for-Frontend; channel-shaped API tier (`bff-mobile`, `bff-backoffice`). |
-| Domain service | Microservice owning a single bounded context with its own database (`microservice-users/quizz/wordpass`). |
+| Domain service | Microservice owning a single bounded context and its data: `microservice-users`, and the game services `microservice-quizz` / `microservice-wordpass`, which are one code base (`microservice-games`) run per game on a shared database. |
 | AI subsystem | `ai-engine-api`, `ai-engine-stats`, embedding store, cache, and llama runtime. |
 | Llama runtime | LLM model server; may run in-cluster or on an external workstation. |
 | Split-AI mode | Runtime configuration where `ai-engine-*` services run in-cluster but llama runs externally. |
